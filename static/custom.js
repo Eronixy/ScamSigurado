@@ -65,6 +65,40 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    const clearImageBtn = document.getElementById('clearImageBtn'); // Get the clear button
+
+    // New: Clear Image Button functionality
+    clearImageBtn.addEventListener('click', () => {
+        fileInput.value = ''; // Clear the selected file
+        imagePreview.src = ''; // Clear the image preview
+        fileName.textContent = ''; // Clear the file name
+        previewContainer.classList.add('hidden'); // Hide the preview container
+        analyzeBtn.disabled = true; // Disable the analyze button
+        analyzeText.textContent = 'Select an image to analyze'; // Reset button text
+        resultsSection.classList.add('hidden'); // Hide results section if visible
+        feedbackSuccess.classList.add('hidden'); // Hide feedback success message
+        reportSuccess.classList.add('hidden'); // Hide report success message
+        incorrectFeedback.classList.add('hidden'); // Hide incorrect feedback section
+    });
+
+        }
+
+        const clearImageBtn = document.getElementById('clearImageBtn'); // Get the clear button
+
+        // New: Clear Image Button functionality
+        clearImageBtn.addEventListener('click', () => {
+            fileInput.value = ''; // Clear the selected file
+            imagePreview.src = ''; // Clear the image preview
+            fileName.textContent = ''; // Clear the file name
+            previewContainer.classList.add('hidden'); // Hide the preview container
+            analyzeBtn.disabled = true; // Disable the analyze button
+            analyzeText.textContent = 'Select an image to analyze'; // Reset button text
+            resultsSection.classList.add('hidden'); // Hide results section if visible
+            feedbackSuccess.classList.add('hidden'); // Hide feedback success message
+            reportSuccess.classList.add('hidden'); // Hide report success message
+            incorrectFeedback.classList.add('hidden'); // Hide incorrect feedback section
+        });
+
     const advancedToggle = document.getElementById('advancedToggle');
     const advancedSettings = document.getElementById('advancedSettings');
     const advancedArrow = document.getElementById('advancedArrow');
