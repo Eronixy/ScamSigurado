@@ -40,6 +40,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function handleFile(file) {
         if (file && file.type.startsWith('image/')) {
+            resultsSection.classList.add('hidden');
+
+            const featureContainer = document.getElementById('featureImportanceContainer');
+            if (featureContainer) {
+                featureContainer.remove();
+            }
+
+            const textContainer = document.getElementById('extractedTextContainer');
+            if (textContainer) {
+                textContainer.remove();
+            }
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 imagePreview.src = e.target.result;
@@ -105,11 +117,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 300);
     }
 
-    // Main analysis function - now makes actual API call
     analyzeBtn.addEventListener('click', async () => {
         if (analyzeBtn.disabled || !currentFile) return;
 
-        // Reset and show loading state
         const steps = ['step1', 'step2', 'step3', 'step4'];
         steps.forEach(stepId => {
             const step = document.getElementById(stepId);
@@ -135,7 +145,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 700);
 
         try {
-            // Prepare form data
             const formData = new FormData();
             formData.append('screenshot', currentFile);
             formData.append('text_model', document.getElementById('textModel').value);
@@ -143,7 +152,6 @@ document.addEventListener("DOMContentLoaded", function () {
             formData.append('text_weight', textWeight.value);
             formData.append('cnn_weight', cnnWeight.value);
 
-            // Make API call to Flask backend
             const response = await fetch('/analyze', {
                 method: 'POST',
                 body: formData
@@ -151,15 +159,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const result = await response.json();
 
-            // Clear the step animation
             clearInterval(stepInterval);
 
-            // PROPER ERROR HANDLING - Check both response status AND result.success
             if (!response.ok || !result.success) {
                 throw new Error(result.error || `Server error: ${response.status}`);
             }
 
-            // Only proceed if truly successful
             setTimeout(() => {
                 hideModal('analysisModal', 'analysisModalContent');
 
@@ -173,24 +178,19 @@ document.addEventListener("DOMContentLoaded", function () {
                     }, 200);
                 }, 300);
 
-                // Show results with actual data from backend
                 showResults(result);
             }, 3000);
 
         } catch (error) {
             console.error('Analysis error:', error);
 
-            // Clear the step animation on error
             clearInterval(stepInterval);
 
-            // Hide the analysis modal
             hideModal('analysisModal', 'analysisModalContent');
 
-            // Show error message
             setTimeout(() => {
                 alert(`Analysis failed: ${error.message}`);
 
-                // Reset analyze button
                 analyzeBtn.disabled = false;
                 analyzeText.textContent = 'Analyze Screenshot';
             }, 300);
@@ -205,13 +205,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-
-
     function showResults(result) {
         const isScam = result.is_scam;
         const confidence = result.confidence;
         const textConf = result.text_confidence;
         const imageConf = result.image_confidence;
+        const featureImportance = result.feature_importance || [];
+            const extractedText = result.extracted_text || '';
 
         const mainResult = document.getElementById('mainResult');
         const resultIcon = document.getElementById('resultIcon');
@@ -249,7 +249,82 @@ document.addEventListener("DOMContentLoaded", function () {
         textConfidence.textContent = textConf.toFixed(1) + '%';
         imageConfidence.textContent = imageConf.toFixed(1) + '%';
 
+        displayFeatureImportance(featureImportance, isScam);
+        
+        displayExtractedText(extractedText);
+
         resultsSection.classList.remove('hidden');
+    }
+
+    function displayFeatureImportance(featureImportance, isScam) {
+        let featureContainer = document.getElementById('featureImportanceContainer');
+        if (!featureContainer) {
+            featureContainer = document.createElement('div');
+            featureContainer.id = 'featureImportanceContainer';
+            featureContainer.className = 'mt-6 p-4 rounded-lg border-2';
+            
+            const mainResult = document.getElementById('mainResult');
+            mainResult.parentNode.insertBefore(featureContainer, mainResult.nextSibling);
+        }
+
+        if (featureImportance && featureImportance.length > 0 && isScam) {
+            featureContainer.className = 'mt-6 p-4 rounded-lg border-2 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20';
+            
+            featureContainer.innerHTML = `
+                <h3 class="text-lg font-semibold mb-3 text-red-600 dark:text-red-400 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Detected Scam Indicators
+                </h3>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    ${featureImportance.map(feature => `
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border border-red-200 dark:border-red-700">
+                            ${escapeHtml(feature.word)}
+                            <span class="text-xs bg-red-200 dark:bg-red-800 px-1 rounded">
+                                ${feature.importance.toFixed(3)}
+                            </span>
+                        </span>
+                    `).join('')}
+                </div>
+                <p class="text-sm text-red-600 dark:text-red-400 italic">
+                    These words/phrases contributed most to the scam detection based on your trained model. Higher scores indicate stronger scam indicators.
+                </p>
+            `;
+        } else {
+            featureContainer.style.display = 'none';
+        }
+    }
+
+    function displayExtractedText(extractedText) {
+        let textContainer = document.getElementById('extractedTextContainer');
+        if (!textContainer) {
+            textContainer = document.createElement('div');
+            textContainer.id = 'extractedTextContainer';
+            textContainer.className = 'mt-6 p-4 rounded-lg border-2 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20';
+            
+            const featureContainer = document.getElementById('featureImportanceContainer');
+            const insertAfter = featureContainer || document.getElementById('mainResult');
+            insertAfter.parentNode.insertBefore(textContainer, insertAfter.nextSibling);
+        }
+
+        textContainer.innerHTML = `
+            <h3 class="text-lg font-semibold mb-3 text-blue-600 dark:text-blue-400 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Extracted Text
+            </h3>
+            <div class="bg-white dark:bg-gray-800 p-3 rounded border border-blue-200 dark:border-blue-700 max-h-48 overflow-y-auto">
+                <pre class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono">${escapeHtml(extractedText) || 'No text detected in the image.'}</pre>
+            </div>
+        `;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     const correctBtn = document.getElementById('correctBtn');
