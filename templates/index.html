@@ -175,7 +175,51 @@
                 </button>
 
                 <div id="advancedSettings" class="hidden space-y-6 bg-gray-50 dark:bg-scam-darker-blue p-6 rounded-lg">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-scam-dark dark:text-gray-200">Text Analysis Model</label>
+                            <select id="textModel"
+                                class="w-full p-3 border border-gray-300 dark:border-scam-light-blue rounded-lg bg-white dark:bg-scam-dark focus:ring-2 focus:ring-scam-success focus:border-transparent text-scam-dark dark:text-white">
+                                <option value="svm" selected>SVM (Support Vector Machine)</option>
+                                <option value="rf">Random Forest</option>
+                                <option value="nb">Naive Bayes</option>
+                                <option value="bert" disabled>BERT</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-scam-dark dark:text-gray-200">CNN Model</label>
+                            <select id="cnnModel"
+                                class="w-full p-3 border border-gray-300 dark:border-scam-light-blue rounded-lg bg-white dark:bg-scam-dark focus:ring-2 focus:ring-scam-success focus:border-transparent text-scam-dark dark:text-white">
+                                <option value="alexnet">AlexNet</option>
+                                <option value="vggnet">VGGNet</option>
+                                <option value="resnet">ResNet</option>
+                                <option value="mobilenet">MobileNet</option>
+                                <option value="efficientnet" selected>EfficientNet</option>
+                            </select>
+                        </div>
                     </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-scam-dark dark:text-gray-200">Text Model Weight</label>
+                            <div class="flex items-center space-x-3">
+                                <input type="range" id="textWeight" min="0" max="1" step="0.1" value="0.6"
+                                    class="flex-1 h-2 rounded-lg appearance-none cursor-pointer bg-gray-300 dark:bg-scam-light-blue accent-scam-success">
+                                <span id="textWeightValue" class="text-sm font-medium w-8 text-scam-dark dark:text-white">0.6</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-scam-dark dark:text-gray-200">CNN Model Weight</label>
+                            <div class="flex items-center space-x-3">
+                                <input type="range" id="cnnWeight" min="0" max="1" step="0.1" value="0.4"
+                                    class="flex-1 h-2 rounded-lg appearance-none cursor-pointer bg-gray-300 dark:bg-scam-light-blue accent-scam-success">
+                                <span id="cnnWeightValue" class="text-sm font-medium w-8 text-scam-dark dark:text-white">0.4</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <button id="analyzeBtn"
