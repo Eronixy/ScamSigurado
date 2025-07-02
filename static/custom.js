@@ -14,13 +14,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const analyzeText = document.getElementById('analyzeText');
     const clearImageBtn = document.getElementById('clearImageBtn');
 
-    // NEW: Get the new content containers within the dropZone
     const dropZoneContent = document.getElementById('dropZoneContent');
     const imagePreviewContent = document.getElementById('imagePreviewContent');
+    let currentFile = null;
 
-    // Event listeners for the dropZone
     dropZone.addEventListener('click', () => {
-        // Only trigger file input click if no image is currently displayed
         if (imagePreviewContent.classList.contains('hidden')) {
             fileInput.click();
         }
@@ -32,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     dropZone.addEventListener('dragleave', () => {
-        // Only remove border-custom-primary if no image is currently displayed
         if (imagePreviewContent.classList.contains('hidden')) {
             dropZone.classList.remove('border-custom-primary');
         }
@@ -40,43 +37,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
-        // The border-custom-primary class will be removed in handleFile
         const files = e.dataTransfer.files;
         if (files.length > 0) {
             handleFile(files[0]);
         }
     });
 
-    // Event listener for file input change
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
             handleFile(e.target.files[0]);
         }
     });
 
-    // Function to handle file processing and UI update
     function handleFile(file) {
         if (file && file.type.startsWith('image/')) {
+            const resultsSection = document.getElementById('resultsSection');
+            if (resultsSection) resultsSection.classList.add('hidden');
+
+            const featureContainer = document.getElementById('featureImportanceContainer');
+            if (featureContainer) {
+                featureContainer.remove();
+            }
+
+            const textContainer = document.getElementById('extractedTextContainer');
+            if (textContainer) {
+                textContainer.remove();
+            }
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 imagePreview.src = e.target.result;
                 fileName.textContent = file.name;
-                
-                // Toggle visibility: hide initial drop zone content, show image preview
+
                 dropZoneContent.classList.add('hidden');
                 imagePreviewContent.classList.remove('hidden');
-                dropZone.classList.remove('border-custom-primary'); // Remove dragover border on successful drop
+                dropZone.classList.remove('border-custom-primary');
 
                 analyzeBtn.disabled = false;
                 analyzeText.textContent = 'Analyze Screenshot';
-                
-                // Hide results and feedback sections when a new image is selected
-                const resultsSection = document.getElementById('resultsSection');
+                currentFile = file;
+
                 const feedbackSuccess = document.getElementById('feedbackSuccess');
                 const reportSuccess = document.getElementById('reportSuccess');
                 const incorrectFeedback = document.getElementById('incorrectFeedback');
 
-                if (resultsSection) resultsSection.classList.add('hidden');
                 if (feedbackSuccess) feedbackSuccess.classList.add('hidden');
                 if (reportSuccess) reportSuccess.classList.add('hidden');
                 if (incorrectFeedback) incorrectFeedback.classList.add('hidden');
@@ -85,20 +89,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Clear Image Button functionality
     clearImageBtn.addEventListener('click', () => {
-        fileInput.value = ''; // Clear the selected file
-        imagePreview.src = ''; // Clear the image preview
-        fileName.textContent = ''; // Clear the file name
-        
-        // Toggle visibility back: hide image preview, show initial drop zone content
+        fileInput.value = '';
+        imagePreview.src = '';
+        fileName.textContent = '';
+
         imagePreviewContent.classList.add('hidden');
         dropZoneContent.classList.remove('hidden');
 
-        analyzeBtn.disabled = true; // Disable the analyze button
-        analyzeText.textContent = 'Select an image to analyze'; // Reset button text
-        
-        // Hide results and feedback sections
+        analyzeBtn.disabled = true;
+        analyzeText.textContent = 'Select an image to analyze';
+
         const resultsSection = document.getElementById('resultsSection');
         const feedbackSuccess = document.getElementById('feedbackSuccess');
         const reportSuccess = document.getElementById('reportSuccess');
@@ -109,10 +110,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (reportSuccess) reportSuccess.classList.add('hidden');
         if (incorrectFeedback) incorrectFeedback.classList.add('hidden');
 
-        dropZone.classList.remove('border-custom-primary'); // Ensure default border state
+        dropZone.classList.remove('border-custom-primary');
     });
 
-    // Advanced Settings Toggle
     const advancedToggle = document.getElementById('advancedToggle');
     const advancedSettings = document.getElementById('advancedSettings');
     const advancedArrow = document.getElementById('advancedArrow');
@@ -124,7 +124,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Weight Sliders
     const textWeight = document.getElementById('textWeight');
     const cnnWeight = document.getElementById('cnnWeight');
     const textWeightValue = document.getElementById('textWeightValue');
@@ -146,11 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Modals
-    const analysisModal = document.getElementById('analysisModal');
-    const analysisModalContent = document.getElementById('analysisModalContent');
-    const successModal = document.getElementById('successModal');
-    const successModalContent = document.getElementById('successModalContent');
+    const resultsSection = document.getElementById('resultsSection'); // Redeclared, ensure it's accessible
 
     function showModal(modal, content) {
         if (modal && content) {
@@ -173,9 +168,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    const analysisModal = document.getElementById('analysisModal');
+    const analysisModalContent = document.getElementById('analysisModalContent');
+    const successModal = document.getElementById('successModal');
+    const successModalContent = document.getElementById('successModalContent');
+
     if (analyzeBtn) {
-        analyzeBtn.addEventListener('click', () => {
-            if (analyzeBtn.disabled) return;
+        analyzeBtn.addEventListener('click', async () => {
+            if (analyzeBtn.disabled || !currentFile) return;
 
             const steps = ['step1', 'step2', 'step3', 'step4'];
             steps.forEach(stepId => {
@@ -195,7 +195,6 @@ document.addEventListener("DOMContentLoaded", function () {
             showModal(analysisModal, analysisModalContent);
 
             let currentStep = 0;
-
             const stepInterval = setInterval(() => {
                 if (currentStep < steps.length) {
                     const stepElement = document.getElementById(steps[currentStep]);
@@ -209,28 +208,63 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }, 700);
 
-            setTimeout(() => {
+            try {
+                const formData = new FormData();
+                formData.append('screenshot', currentFile);
+                formData.append('text_model', document.getElementById('textModel').value);
+                formData.append('cnn_model', document.getElementById('cnnModel').value);
+                formData.append('text_weight', textWeight.value);
+                formData.append('cnn_weight', cnnWeight.value);
+
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                clearInterval(stepInterval);
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.error || `Server error: ${response.status}`);
+                }
+
+                setTimeout(() => {
+                    hideModal(analysisModal, analysisModalContent);
+
+                    setTimeout(() => {
+                        showModal(successModal, successModalContent);
+
+                        setTimeout(() => {
+                            const successIconElement = document.querySelector('#successModalContent .w-16');
+                            if (successIconElement) {
+                                successIconElement.classList.remove('scale-0');
+                                successIconElement.classList.add('scale-100');
+                            }
+                        }, 200);
+                    }, 300);
+
+                    showResults(result);
+                }, 3000);
+
+            } catch (error) {
+                console.error('Analysis error:', error);
+
+                clearInterval(stepInterval);
+
                 hideModal(analysisModal, analysisModalContent);
 
                 setTimeout(() => {
-                    showModal(successModal, successModalContent);
+                    alert(`Analysis failed: ${error.message}`);
 
-                    setTimeout(() => {
-                        const successIconElement = document.querySelector('#successModalContent .w-16');
-                        if (successIconElement) {
-                            successIconElement.classList.remove('scale-0');
-                            successIconElement.classList.add('scale-100');
-                        }
-                    }, 200);
+                    analyzeBtn.disabled = false;
+                    analyzeText.textContent = 'Analyze Screenshot';
                 }, 300);
-
-                showResults();
-            }, 3000);
+            }
         });
     }
 
     const viewResultsBtn = document.getElementById('viewResultsBtn');
-    const resultsSection = document.getElementById('resultsSection');
 
     if (viewResultsBtn && resultsSection) {
         viewResultsBtn.addEventListener('click', () => {
@@ -241,11 +275,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function showResults() {
-        const isScam = Math.random() > 0.4;
-        const confidence = Math.random() * 40 + 60;
-        const textConf = Math.random() * 100;
-        const imageConf = Math.random() * 100;
+    function showResults(result) {
+        const isScam = result.is_scam;
+        const confidence = result.confidence;
+        const textConf = result.text_confidence;
+        const imageConf = result.image_confidence;
+        const featureImportance = result.feature_importance || [];
+        const extractedText = result.extracted_text || '';
 
         const mainResult = document.getElementById('mainResult');
         const resultIcon = document.getElementById('resultIcon');
@@ -288,7 +324,86 @@ document.addEventListener("DOMContentLoaded", function () {
         textConfidence.textContent = textConf.toFixed(1) + '%';
         imageConfidence.textContent = imageConf.toFixed(1) + '%';
 
+        displayFeatureImportance(featureImportance, isScam);
+
+        displayExtractedText(extractedText);
+
         resultsSection.classList.remove('hidden');
+    }
+
+    function displayFeatureImportance(featureImportance, isScam) {
+        let featureContainer = document.getElementById('featureImportanceContainer');
+        if (!featureContainer) {
+            featureContainer = document.createElement('div');
+            featureContainer.id = 'featureImportanceContainer';
+            featureContainer.className = 'mt-6 p-4 rounded-lg border-2';
+
+            const mainResult = document.getElementById('mainResult');
+            if (mainResult) {
+                mainResult.parentNode.insertBefore(featureContainer, mainResult.nextSibling);
+            }
+        }
+
+        if (featureImportance && featureImportance.length > 0 && isScam) {
+            featureContainer.className = 'mt-6 p-4 rounded-lg border-2 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20';
+
+            featureContainer.innerHTML = `
+                <h3 class="text-lg font-semibold mb-3 text-red-600 dark:text-red-400 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Detected Scam Indicators
+                </h3>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    ${featureImportance.map(feature => `
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border border-red-200 dark:border-red-700">
+                            ${escapeHtml(feature.word)}
+                            <span class="text-xs bg-red-200 dark:bg-red-800 px-1 rounded">
+                                ${feature.importance.toFixed(3)}
+                            </span>
+                        </span>
+                    `).join('')}
+                </div>
+                <p class="text-sm text-red-600 dark:text-red-400 italic">
+                    These words/phrases contributed most to the scam detection based on your trained model. Higher scores indicate stronger scam indicators.
+                </p>
+            `;
+        } else {
+            featureContainer.style.display = 'none';
+        }
+    }
+
+    function displayExtractedText(extractedText) {
+        let textContainer = document.getElementById('extractedTextContainer');
+        if (!textContainer) {
+            textContainer = document.createElement('div');
+            textContainer.id = 'extractedTextContainer';
+            textContainer.className = 'mt-6 p-4 rounded-lg border-2 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20';
+
+            const featureContainer = document.getElementById('featureImportanceContainer');
+            const insertAfter = featureContainer || document.getElementById('mainResult');
+            if (insertAfter) {
+                insertAfter.parentNode.insertBefore(textContainer, insertAfter.nextSibling);
+            }
+        }
+
+        textContainer.innerHTML = `
+            <h3 class="text-lg font-semibold mb-3 text-blue-600 dark:text-blue-400 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Extracted Text
+            </h3>
+            <div class="bg-white dark:bg-gray-800 p-3 rounded border border-blue-200 dark:border-blue-700 max-h-48 overflow-y-auto">
+                <pre class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono">${escapeHtml(extractedText) || 'No text detected in the image.'}</pre>
+            </div>
+        `;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     const correctBtn = document.getElementById('correctBtn');
@@ -299,10 +414,27 @@ document.addEventListener("DOMContentLoaded", function () {
     const submitFeedback = document.getElementById('submitFeedback');
 
     if (correctBtn && feedbackButtons && feedbackSuccess) {
-        correctBtn.addEventListener('click', () => {
-            feedbackButtons.classList.add('hidden');
-            feedbackSuccess.classList.remove('hidden');
-            feedbackSuccess.textContent = 'Thank you for confirming! This helps improve our model accuracy.';
+        correctBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        feedback_type: 'correct',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    feedbackButtons.classList.add('hidden');
+                    feedbackSuccess.classList.remove('hidden');
+                    feedbackSuccess.textContent = 'Thank you for confirming! This helps improve our model accuracy.';
+                }
+            } catch (error) {
+                console.error('Feedback error:', error);
+            }
         });
     }
 
@@ -314,14 +446,33 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (submitFeedback && incorrectFeedback && feedbackSuccess) {
-        submitFeedback.addEventListener('click', () => {
-            const classification = document.getElementById('correctClassification');
-            const comments = document.getElementById('feedbackComments');
+        submitFeedback.addEventListener('click', async () => {
+            const classification = document.getElementById('correctClassification').value;
+            const comments = document.getElementById('feedbackComments').value;
 
-            if (classification && classification.value) {
-                incorrectFeedback.classList.add('hidden');
-                feedbackSuccess.classList.remove('hidden');
-                feedbackSuccess.textContent = 'Thank you for the correction! This helps improve our model accuracy.';
+            if (classification) {
+                try {
+                    const response = await fetch('/feedback', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            feedback_type: 'incorrect',
+                            correct_classification: classification,
+                            comments: comments,
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+
+                    if (response.ok) {
+                        incorrectFeedback.classList.add('hidden');
+                        feedbackSuccess.classList.remove('hidden');
+                        feedbackSuccess.textContent = 'Thank you for the correction! This helps improve our model accuracy.';
+                    }
+                } catch (error) {
+                    console.error('Feedback error:', error);
+                }
             } else {
                 alert('Please select the correct classification.');
             }
@@ -332,34 +483,50 @@ document.addEventListener("DOMContentLoaded", function () {
     const reportSuccess = document.getElementById('reportSuccess');
 
     if (reportScam && reportSuccess) {
-        reportScam.addEventListener('click', () => {
-            const scamType = document.getElementById('scamType');
-            const description = document.getElementById('scamDescription');
+        reportScam.addEventListener('click', async () => {
+            const scamType = document.getElementById('scamType').value;
+            const description = document.getElementById('scamDescription').value;
 
-            if (scamType && scamType.value && description && description.value) {
-                reportSuccess.classList.remove('hidden');
-                reportScam.disabled = true;
-                reportScam.textContent = 'Report Submitted ✓';
-                reportScam.className = 'bg-gray-400 text-white py-2 px-4 rounded-lg font-medium cursor-not-allowed';
+            if (scamType && description) {
+                try {
+                    const response = await fetch('/report', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            scam_type: scamType,
+                            description: description,
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+
+                    if (response.ok) {
+                        reportSuccess.classList.remove('hidden');
+                        reportScam.disabled = true;
+                        reportScam.textContent = 'Report Submitted ✓';
+                        reportScam.className = 'bg-gray-400 text-white py-2 px-4 rounded-lg font-medium cursor-not-allowed';
+                    }
+                } catch (error) {
+                    console.error('Report error:', error);
+                }
             } else {
                 alert('Please fill in all required fields.');
             }
         });
     }
 
-    // Carousel functionality
-    const carousel = document.getElementById('carousel');
-    const carouselTrack = document.getElementById('carouselTrack'); // Added this ID to the inner div
+    const carouselTrack = document.getElementById('carouselTrack');
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    const carouselDotsContainer = document.getElementById('carouselDots'); // Container for dots
-    
+    const carouselDotsContainer = document.getElementById('carouselDots');
+    const carouselItems = document.querySelectorAll('.carousel-item');
     let currentSlide = 0;
-    const totalSlides = 5; // Ensure this matches the number of slides in your HTML
+    const totalSlides = carouselItems.length;
 
     const createCarouselDots = () => {
         if (!carouselDotsContainer) return;
-        carouselDotsContainer.innerHTML = ''; // Clear existing dots
+        carouselDotsContainer.innerHTML = '';
         for (let i = 0; i < totalSlides; i++) {
             const dot = document.createElement('span');
             dot.classList.add('carousel-dot', 'w-3', 'h-3', 'rounded-full', 'bg-gray-300', 'dark:bg-gray-600', 'cursor-pointer', 'transition-colors', 'duration-300');
@@ -374,23 +541,22 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateCarousel() {
         if (!carouselTrack || !carouselDotsContainer) return;
         const translateX = -currentSlide * 100;
-        carouselTrack.style.transform = `translateX(${translateX}%)`; // Apply transform to carouselTrack
+        carouselTrack.style.transform = `translateX(${translateX}%)`;
 
-        const dots = carouselDotsContainer.querySelectorAll('.carousel-dot'); // Select dots within the container
+        const dots = carouselDotsContainer.querySelectorAll('.carousel-dot');
         dots.forEach((dot, index) => {
             if (index === currentSlide) {
-                dot.classList.remove('bg-gray-300', 'dark:bg-gray-600'); // Remove inactive state
-                dot.classList.add('bg-scam-primary'); // Add active state
+                dot.classList.remove('bg-gray-300', 'dark:bg-gray-600');
+                dot.classList.add('bg-scam-primary');
             } else {
-                dot.classList.remove('bg-scam-primary'); // Remove active state
-                dot.classList.add('bg-gray-300', 'dark:bg-gray-600'); // Add inactive state
+                dot.classList.remove('bg-scam-primary');
+                dot.classList.add('bg-gray-300', 'dark:bg-gray-600');
             }
         });
     }
 
-    // Initialize dots and first slide on load
     createCarouselDots();
-    updateCarousel(); // Show the first slide and update dots initially
+    updateCarousel();
 
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
@@ -406,7 +572,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Auto-advance carousel
     setInterval(() => {
         currentSlide = (currentSlide === totalSlides - 1) ? 0 : currentSlide + 1;
         updateCarousel();
