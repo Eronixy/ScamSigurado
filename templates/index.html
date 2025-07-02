@@ -359,107 +359,89 @@
                 Philippines.</p>
 
             <div class="relative">
-                <div id="carousel" class="flex overflow-hidden rounded-lg">
-                    <div
-                        class="carousel-item min-w-full bg-scam-darker-blue dark:bg-scam-darker-blue h-80 flex items-center justify-center relative">
-                        <div class="text-center p-8 text-white">
-                            <div
-                                class="bg-scam-primary w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1">
-                                    </path>
-                                </svg>
-                            </div>
-                            <h4 class="font-bold text-lg mb-2">Online Shopping Scam</h4>
-                            <p class="text-sm text-gray-300">Fake e-commerce sites offering products
-                                at unrealistic prices.</p>
-                            <div
-                                class="mt-4 text-xs bg-scam-light-red/30 text-scam-light-red px-3 py-1 rounded-full inline-block">
-                                Warning Signs: Too-good-to-be-true prices, poor grammar, no contact info
+                <div id="carousel" class="overflow-hidden rounded-lg w-full">
+                    <div id="carouselTrack" class="flex transition-transform duration-500 ease-in-out">
+                        <div class="carousel-item min-w-full w-full flex-shrink-0 bg-scam-darker-blue h-80 flex items-center justify-center">
+                            <div class="text-center p-8 text-white">
+                                <div class="bg-scam-primary w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h4 class="font-bold text-lg mb-2">Online Shopping Scam</h4>
+                                <p class="text-sm text-gray-300 mb-4">Fake e-commerce sites offering products at unrealistic prices.</p>
+                                <div class="text-xs bg-scam-light-red/30 text-scam-light-red px-3 py-1 rounded-full inline-block">
+                                    Warning Signs: Too-good-to-be-true prices, poor grammar, no contact info
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div
-                        class="carousel-item min-w-full bg-scam-darker-blue dark:bg-scam-darker-blue h-80 flex items-center justify-center relative">
-                        <div class="text-center p-8 text-white">
-                            <div
-                                class="bg-yellow-500 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <h4 class="font-bold text-lg mb-2">Investment Scam</h4>
-                            <p class="text-sm text-gray-300">Ponzi schemes promising high returns
-                                with minimal risk.</p>
-                            <div
-                                class="mt-4 text-xs bg-red-100/30 text-red-400 px-3 py-1 rounded-full inline-block">
-                                Warning Signs: Guaranteed high returns, pressure to invest quickly, recruit others
+                        <div class="carousel-item min-w-full w-full flex-shrink-0 bg-scam-darker-blue h-80 flex items-center justify-center">
+                            <div class="text-center p-8 text-white">
+                                <div class="bg-yellow-500 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <h4 class="font-bold text-lg mb-2">Investment Scam</h4>
+                                <p class="text-sm text-gray-300 mb-4">Ponzi schemes promising high returns with minimal risk.</p>
+                                <div class="text-xs bg-red-100/30 text-red-400 px-3 py-1 rounded-full inline-block">
+                                    Warning Signs: Guaranteed high returns, pressure to invest quickly, recruit others
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div
-                        class="carousel-item min-w-full bg-scam-darker-blue dark:bg-scam-darker-blue h-80 flex items-center justify-center relative">
-                        <div class="text-center p-8 text-white">
-                            <div
-                                class="bg-pink-500 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <h4 class="font-bold text-lg mb-2">Romance Scam</h4>
-                            <p class="text-sm text-gray-300">Fake romantic relationships to extract
-                                money from victims.</p>
-                            <div
-                                class="mt-4 text-xs bg-red-100/30 text-red-400 px-3 py-1 rounded-full inline-block">
-                                Warning Signs: Professes love quickly, avoids meeting, asks for money
+                        <div class="carousel-item min-w-full w-full flex-shrink-0 bg-scam-darker-blue h-80 flex items-center justify-center">
+                            <div class="text-center p-8 text-white">
+                                <div class="bg-pink-500 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h4 class="font-bold text-lg mb-2">Romance Scam</h4>
+                                <p class="text-sm text-gray-300 mb-4">Fake romantic relationships to extract money from victims.</p>
+                                <div class="text-xs bg-red-100/30 text-red-400 px-3 py-1 rounded-full inline-block">
+                                    Warning Signs: Professes love quickly, avoids meeting, asks for money
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div
-                        class="carousel-item min-w-full bg-scam-darker-blue dark:bg-scam-darker-blue h-80 flex items-center justify-center relative">
-                        <div class="text-center p-8 text-white">
-                            <div
-                                class="bg-blue-500 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <h4 class="font-bold text-lg mb-2">Phishing Scam</h4>
-                            <p class="text-sm text-gray-300">Fake messages impersonating banks or
-                                government agencies.</p>
-                            <div
-                                class="mt-4 text-xs bg-red-100/30 text-red-400 px-3 py-1 rounded-full inline-block">
-                                Warning Signs: Urgent action required, suspicious links, requests for passwords
+                        <div class="carousel-item min-w-full w-full flex-shrink-0 bg-scam-darker-blue h-80 flex items-center justify-center">
+                            <div class="text-center p-8 text-white">
+                                <div class="bg-blue-500 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h4 class="font-bold text-lg mb-2">Phishing Scam</h4>
+                                <p class="text-sm text-gray-300 mb-4">Fake messages impersonating banks or government agencies.</p>
+                                <div class="text-xs bg-red-100/30 text-red-400 px-3 py-1 rounded-full inline-block">
+                                    Warning Signs: Urgent action required, suspicious links, requests for passwords
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div
-                        class="carousel-item min-w-full bg-scam-darker-blue dark:bg-scam-darker-blue h-80 flex items-center justify-center relative">
-                        <div class="text-center p-8 text-white">
-                            <div
-                                class="bg-purple-500 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6">
-                                    </path>
-                                </svg>
-                            </div>
-                            <h4 class="font-bold text-lg mb-2">Job Scam</h4>
-                            <p class="text-sm text-gray-300">Fake job postings requiring upfront
-                                payments or personal info.</p>
-                            <div
-                                class="mt-4 text-xs bg-red-100/30 text-red-400 px-3 py-1 rounded-full inline-block">
-                                Warning Signs: Upfront fees, work from home with high pay, vague job description
+                        <div class="carousel-item min-w-full w-full flex-shrink-0 bg-scam-darker-blue h-80 flex items-center justify-center">
+                            <div class="text-center p-8 text-white">
+                                <div class="bg-purple-500 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h4 class="font-bold text-lg mb-2">Job Scam</h4>
+                                <p class="text-sm text-gray-300 mb-4">Fake job postings requiring upfront payments or personal info.</p>
+                                <div class="text-xs bg-red-100/30 text-red-400 px-3 py-1 rounded-full inline-block">
+                                    Warning Signs: Upfront fees, work from home with high pay, vague job description
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -468,8 +450,7 @@
                 <button id="prevBtn"
                     class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white dark:bg-scam-darker-blue p-2 rounded-full shadow-lg hover:bg-gray-100 dark:hover:bg-scam-light-blue transition-colors text-scam-dark dark:text-white">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                     </svg>
                 </button>
 
@@ -480,8 +461,7 @@
                     </svg>
                 </button>
 
-                <div id="carouselDots" class="flex justify-center mt-4 space-x-2">
-                    </div>
+                <div id="carouselDots" class="flex justify-center mt-4 space-x-2"></div>
             </div>
         </section>
 

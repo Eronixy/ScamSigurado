@@ -369,45 +369,62 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    const carousel = document.getElementById('carousel');
+    // --- Carousel Specific JavaScript ---
+    const carouselTrack = document.getElementById('carouselTrack'); // Corrected: target carouselTrack
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    const carouselDots = document.querySelectorAll('.carousel-dot');
+    const carouselDotsContainer = document.getElementById('carouselDots'); // Target the container for dots
+    const carouselItems = document.querySelectorAll('.carousel-item'); // Get all carousel items
     let currentSlide = 0;
-    const totalSlides = 5;
+    const totalSlides = carouselItems.length; // Dynamically get total slides
+
+    // Create the dots dynamically
+    function createCarouselDots() {
+        carouselDotsContainer.innerHTML = ''; // Clear existing dots
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('button');
+            dot.classList.add('carousel-dot', 'w-3', 'h-3', 'rounded-full', 'mx-1', 'transition-colors', 'duration-300'); // Add common classes
+            dot.addEventListener('click', () => {
+                currentSlide = i;
+                updateCarousel();
+            });
+            carouselDotsContainer.appendChild(dot);
+        }
+    }
 
     function updateCarousel() {
         const translateX = -currentSlide * 100;
-        carousel.style.transform = `translateX(${translateX}%)`;
+        carouselTrack.style.transform = `translateX(${translateX}%)`; // Apply transform to carouselTrack
 
-        carouselDots.forEach((dot, index) => {
+        const dots = carouselDotsContainer.querySelectorAll('.carousel-dot'); // Select dots within the container
+        dots.forEach((dot, index) => {
             if (index === currentSlide) {
-                dot.className = 'carousel-dot w-3 h-3 rounded-full bg-custom-primary';
+                dot.classList.remove('bg-gray-300', 'dark:bg-gray-600'); // Remove inactive state
+                dot.classList.add('bg-scam-primary'); // Add active state
             } else {
-                dot.className = 'carousel-dot w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600';
+                dot.classList.remove('bg-scam-primary'); // Remove active state
+                dot.classList.add('bg-gray-300', 'dark:bg-gray-600'); // Add inactive state
             }
         });
     }
 
+    // Initialize dots and first slide on load
+    createCarouselDots();
+    updateCarousel(); // Show the first slide and update dots initially
+
     prevBtn.addEventListener('click', () => {
-        currentSlide = currentSlide === 0 ? totalSlides - 1 : currentSlide - 1;
+        currentSlide = (currentSlide === 0) ? totalSlides - 1 : currentSlide - 1;
         updateCarousel();
     });
 
     nextBtn.addEventListener('click', () => {
-        currentSlide = currentSlide === totalSlides - 1 ? 0 : currentSlide + 1;
+        currentSlide = (currentSlide === totalSlides - 1) ? 0 : currentSlide + 1;
         updateCarousel();
     });
 
-    carouselDots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-            currentSlide = index;
-            updateCarousel();
-        });
-    });
-
+    // Auto-advance carousel
     setInterval(() => {
-        currentSlide = currentSlide === totalSlides - 1 ? 0 : currentSlide + 1;
+        currentSlide = (currentSlide === totalSlides - 1) ? 0 : currentSlide + 1;
         updateCarousel();
     }, 5000);
 });
