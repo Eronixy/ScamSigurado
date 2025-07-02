@@ -29,7 +29,6 @@ class ScamDetector:
         self.load_models()
     
     def load_models(self):
-        """Load all the pickle files"""
         try:
             text_model_paths = {
                 'svm': 'models/svm_model.pkl',
@@ -142,7 +141,6 @@ class ScamDetector:
             return 0.5
     
     def predict_image_scam(self, image_path, model_name='efficientnet'):
-        """Predict scam probability from image"""
         try:
             if model_name not in self.cnn_models:
                 return 0.5  
@@ -165,9 +163,83 @@ class ScamDetector:
         except Exception as e:
             print(f"Error in image prediction: {e}")
             return 0.5
+
+    def get_feature_importance(self, text, model_name='svm', top_n=10):
+        try:
+            if model_name not in self.text_models or not self.vectorizer:
+                return []
+            
+            processed_text = self.preprocess_text(text)
+            if not processed_text:
+                return []
+
+            text_vector = self.vectorizer.transform([processed_text])
+            model = self.text_models[model_name]
+
+            feature_names = self.vectorizer.get_feature_names_out()
+
+            if model_name == 'svm':
+                if hasattr(model, 'coef_'):
+                    coefficients = model.coef_[0]
+                    text_features = text_vector.toarray()[0]
+                    feature_scores = []
+                    
+                    for idx, (feature_val, coef) in enumerate(zip(text_features, coefficients)):
+                        if feature_val > 0: 
+                            importance = abs(coef * feature_val)
+                            feature_scores.append({
+                                'word': feature_names[idx],
+                                'importance': float(importance),
+                                'coefficient': float(coef)
+                            })
+                    
+                    feature_scores.sort(key=lambda x: x['importance'], reverse=True)
+                    return feature_scores[:top_n]
+            
+            elif model_name == 'rf':
+                if hasattr(model, 'feature_importances_'):
+                    importances = model.feature_importances_
+                    text_features = text_vector.toarray()[0]
+                    feature_scores = []
+                    
+                    for idx, (feature_val, importance) in enumerate(zip(text_features, importances)):
+                        if feature_val > 0: 
+                            score = importance * feature_val
+                            feature_scores.append({
+                                'word': feature_names[idx],
+                                'importance': float(score),
+                                'feature_importance': float(importance)
+                            })
+                    
+                    feature_scores.sort(key=lambda x: x['importance'], reverse=True)
+                    return feature_scores[:top_n]
+            
+            elif model_name == 'nb':
+                if hasattr(model, 'feature_log_prob_'):
+                    scam_log_probs = model.feature_log_prob_[1]
+                    text_features = text_vector.toarray()[0]
+                    feature_scores = []
+                    
+                    for idx, (feature_val, log_prob) in enumerate(zip(text_features, scam_log_probs)):
+                        if feature_val > 0: 
+                            score = feature_val * log_prob
+                            feature_scores.append({
+                                'word': feature_names[idx],
+                                'importance': float(abs(score)),
+                                'log_prob': float(log_prob)
+                            })
+                    
+                    feature_scores.sort(key=lambda x: x['importance'], reverse=True)
+                    return feature_scores[:top_n]
+            
+            return []
+            
+        except Exception as e:
+            print(f"Error getting feature importance: {e}")
+            return []
     
     def analyze_screenshot(self, image_path, text_model='svm', cnn_model='efficientnet', 
-                          text_weight=0.6, cnn_weight=0.4):
+                        text_weight=0.6, cnn_weight=0.4):
         try:
             extracted_text = self.extract_text_from_image(image_path)
             
@@ -176,10 +248,12 @@ class ScamDetector:
             image_probability = self.predict_image_scam(image_path, cnn_model)
             
             combined_probability = (text_weight * text_probability + 
-                                  cnn_weight * image_probability)
+                                cnn_weight * image_probability)
             
             is_scam = bool(combined_probability > 0.5) 
             confidence = float(combined_probability if is_scam else (1 - combined_probability))
+            
+            feature_importance = self.get_feature_importance(extracted_text, text_model, top_n=15)
             
             return {
                 'success': True,
@@ -188,7 +262,8 @@ class ScamDetector:
                 'text_confidence': float(text_probability) * 100,
                 'image_confidence': float(image_probability) * 100,
                 'extracted_text': extracted_text[:500],
-                'combined_probability': float(combined_probability)
+                'combined_probability': float(combined_probability),
+                'feature_importance': feature_importance
             }
 
         except Exception as e:
@@ -201,7 +276,8 @@ class ScamDetector:
                 'text_confidence': 0.0,
                 'image_confidence': 0.0,
                 'extracted_text': "",
-                'combined_probability': 0.0
+                'combined_probability': 0.0,
+                'feature_importance': []
             }
 
 detector = ScamDetector()
@@ -245,7 +321,8 @@ def analyze():
                     'confidence': round(float(result['confidence']), 1),
                     'text_confidence': round(float(result['text_confidence']), 1),
                     'image_confidence': round(float(result['image_confidence']), 1),
-                    'extracted_text': result['extracted_text']
+                    'extracted_text': result['extracted_text'],
+                    'feature_importance': result['feature_importance']
                 }
                 print(f"DEBUG: Sending successful response: {response_data}")
                 return jsonify(response_data)
