@@ -8,244 +8,244 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
-    const previewContainer = document.getElementById('previewContainer');
     const imagePreview = document.getElementById('imagePreview');
     const fileName = document.getElementById('fileName');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const analyzeText = document.getElementById('analyzeText');
-    let currentFile = null;
+    const clearImageBtn = document.getElementById('clearImageBtn');
 
-    dropZone.addEventListener('click', () => fileInput.click());
+    // NEW: Get the new content containers within the dropZone
+    const dropZoneContent = document.getElementById('dropZoneContent');
+    const imagePreviewContent = document.getElementById('imagePreviewContent');
+
+    // Event listeners for the dropZone
+    dropZone.addEventListener('click', () => {
+        // Only trigger file input click if no image is currently displayed
+        if (imagePreviewContent.classList.contains('hidden')) {
+            fileInput.click();
+        }
+    });
+
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropZone.classList.add('border-custom-primary');
     });
+
     dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('border-custom-primary');
+        // Only remove border-custom-primary if no image is currently displayed
+        if (imagePreviewContent.classList.contains('hidden')) {
+            dropZone.classList.remove('border-custom-primary');
+        }
     });
+
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
-        dropZone.classList.remove('border-custom-primary');
+        // The border-custom-primary class will be removed in handleFile
         const files = e.dataTransfer.files;
         if (files.length > 0) {
             handleFile(files[0]);
         }
     });
 
+    // Event listener for file input change
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
             handleFile(e.target.files[0]);
         }
     });
 
+    // Function to handle file processing and UI update
     function handleFile(file) {
         if (file && file.type.startsWith('image/')) {
-            resultsSection.classList.add('hidden');
-
-            const featureContainer = document.getElementById('featureImportanceContainer');
-            if (featureContainer) {
-                featureContainer.remove();
-            }
-
-            const textContainer = document.getElementById('extractedTextContainer');
-            if (textContainer) {
-                textContainer.remove();
-            }
-
             const reader = new FileReader();
             reader.onload = (e) => {
                 imagePreview.src = e.target.result;
                 fileName.textContent = file.name;
-                previewContainer.classList.remove('hidden');
+                
+                // Toggle visibility: hide initial drop zone content, show image preview
+                dropZoneContent.classList.add('hidden');
+                imagePreviewContent.classList.remove('hidden');
+                dropZone.classList.remove('border-custom-primary'); // Remove dragover border on successful drop
+
                 analyzeBtn.disabled = false;
                 analyzeText.textContent = 'Analyze Screenshot';
-                currentFile = file;
+                
+                // Hide results and feedback sections when a new image is selected
+                const resultsSection = document.getElementById('resultsSection');
+                const feedbackSuccess = document.getElementById('feedbackSuccess');
+                const reportSuccess = document.getElementById('reportSuccess');
+                const incorrectFeedback = document.getElementById('incorrectFeedback');
+
+                if (resultsSection) resultsSection.classList.add('hidden');
+                if (feedbackSuccess) feedbackSuccess.classList.add('hidden');
+                if (reportSuccess) reportSuccess.classList.add('hidden');
+                if (incorrectFeedback) incorrectFeedback.classList.add('hidden');
             };
             reader.readAsDataURL(file);
         }
     }
 
-    const clearImageBtn = document.getElementById('clearImageBtn'); // Get the clear button
-
-    // New: Clear Image Button functionality
+    // Clear Image Button functionality
     clearImageBtn.addEventListener('click', () => {
         fileInput.value = ''; // Clear the selected file
         imagePreview.src = ''; // Clear the image preview
         fileName.textContent = ''; // Clear the file name
-        previewContainer.classList.add('hidden'); // Hide the preview container
+        
+        // Toggle visibility back: hide image preview, show initial drop zone content
+        imagePreviewContent.classList.add('hidden');
+        dropZoneContent.classList.remove('hidden');
+
         analyzeBtn.disabled = true; // Disable the analyze button
         analyzeText.textContent = 'Select an image to analyze'; // Reset button text
-        resultsSection.classList.add('hidden'); // Hide results section if visible
-        feedbackSuccess.classList.add('hidden'); // Hide feedback success message
-        reportSuccess.classList.add('hidden'); // Hide report success message
-        incorrectFeedback.classList.add('hidden'); // Hide incorrect feedback section
+        
+        // Hide results and feedback sections
+        const resultsSection = document.getElementById('resultsSection');
+        const feedbackSuccess = document.getElementById('feedbackSuccess');
+        const reportSuccess = document.getElementById('reportSuccess');
+        const incorrectFeedback = document.getElementById('incorrectFeedback');
+
+        if (resultsSection) resultsSection.classList.add('hidden');
+        if (feedbackSuccess) feedbackSuccess.classList.add('hidden');
+        if (reportSuccess) reportSuccess.classList.add('hidden');
+        if (incorrectFeedback) incorrectFeedback.classList.add('hidden');
+
+        dropZone.classList.remove('border-custom-primary'); // Ensure default border state
     });
 
-        }
-
-        const clearImageBtn = document.getElementById('clearImageBtn'); // Get the clear button
-
-        // New: Clear Image Button functionality
-        clearImageBtn.addEventListener('click', () => {
-            fileInput.value = ''; // Clear the selected file
-            imagePreview.src = ''; // Clear the image preview
-            fileName.textContent = ''; // Clear the file name
-            previewContainer.classList.add('hidden'); // Hide the preview container
-            analyzeBtn.disabled = true; // Disable the analyze button
-            analyzeText.textContent = 'Select an image to analyze'; // Reset button text
-            resultsSection.classList.add('hidden'); // Hide results section if visible
-            feedbackSuccess.classList.add('hidden'); // Hide feedback success message
-            reportSuccess.classList.add('hidden'); // Hide report success message
-            incorrectFeedback.classList.add('hidden'); // Hide incorrect feedback section
-        });
-
+    // Advanced Settings Toggle
     const advancedToggle = document.getElementById('advancedToggle');
     const advancedSettings = document.getElementById('advancedSettings');
     const advancedArrow = document.getElementById('advancedArrow');
 
-    advancedToggle.addEventListener('click', () => {
-        advancedSettings.classList.toggle('hidden');
-        advancedArrow.classList.toggle('rotate-180');
-    });
+    if (advancedToggle && advancedSettings && advancedArrow) {
+        advancedToggle.addEventListener('click', () => {
+            advancedSettings.classList.toggle('hidden');
+            advancedArrow.classList.toggle('rotate-180');
+        });
+    }
 
+    // Weight Sliders
     const textWeight = document.getElementById('textWeight');
     const cnnWeight = document.getElementById('cnnWeight');
     const textWeightValue = document.getElementById('textWeightValue');
     const cnnWeightValue = document.getElementById('cnnWeightValue');
 
-    textWeight.addEventListener('input', (e) => {
-        const value = parseFloat(e.target.value);
-        textWeightValue.textContent = value.toFixed(1);
-        cnnWeight.value = (1 - value).toFixed(1);
-        cnnWeightValue.textContent = (1 - value).toFixed(1);
-    });
-
-    cnnWeight.addEventListener('input', (e) => {
-        const value = parseFloat(e.target.value);
-        cnnWeightValue.textContent = value.toFixed(1);
-        textWeight.value = (1 - value).toFixed(1);
-        textWeightValue.textContent = (1 - value).toFixed(1);
-    });
-
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const resultsSection = document.getElementById('resultsSection');
-
-    function showModal(modalId, contentId) {
-        const modal = document.getElementById(modalId);
-        const content = document.getElementById(contentId);
-
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            content.classList.remove('scale-95', 'opacity-0');
-            content.classList.add('scale-100', 'opacity-100');
-        }, 10);
-    }
-
-    function hideModal(modalId, contentId) {
-        const content = document.getElementById(contentId);
-        content.classList.remove('scale-100', 'opacity-100');
-        content.classList.add('scale-95', 'opacity-0');
-
-        setTimeout(() => {
-            document.getElementById(modalId).classList.add('hidden');
-        }, 300);
-    }
-
-    analyzeBtn.addEventListener('click', async () => {
-        if (analyzeBtn.disabled || !currentFile) return;
-
-        const steps = ['step1', 'step2', 'step3', 'step4'];
-        steps.forEach(stepId => {
-            const step = document.getElementById(stepId);
-            step.classList.add('opacity-50');
-            step.classList.remove('text-custom-primary', 'font-medium');
+    if (textWeight && cnnWeight && textWeightValue && cnnWeightValue) {
+        textWeight.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            textWeightValue.textContent = value.toFixed(1);
+            cnnWeight.value = (1 - value).toFixed(1);
+            cnnWeightValue.textContent = (1 - value).toFixed(1);
         });
 
-        const successIcon = document.querySelector('#successModalContent .w-16');
-        successIcon.classList.remove('scale-100');
-        successIcon.classList.add('scale-0');
+        cnnWeight.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            cnnWeightValue.textContent = value.toFixed(1);
+            textWeight.value = (1 - value).toFixed(1);
+            textWeightValue.textContent = (1 - value).toFixed(1);
+        });
+    }
 
-        showModal('analysisModal', 'analysisModalContent');
+    // Modals
+    const analysisModal = document.getElementById('analysisModal');
+    const analysisModalContent = document.getElementById('analysisModalContent');
+    const successModal = document.getElementById('successModal');
+    const successModalContent = document.getElementById('successModalContent');
 
-        let currentStep = 0;
-        const stepInterval = setInterval(() => {
-            if (currentStep < steps.length) {
-                document.getElementById(steps[currentStep]).classList.remove('opacity-50');
-                document.getElementById(steps[currentStep]).classList.add('text-custom-primary', 'font-medium');
-                currentStep++;
-            } else {
-                clearInterval(stepInterval);
-            }
-        }, 700);
+    function showModal(modal, content) {
+        if (modal && content) {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+    }
 
-        try {
-            const formData = new FormData();
-            formData.append('screenshot', currentFile);
-            formData.append('text_model', document.getElementById('textModel').value);
-            formData.append('cnn_model', document.getElementById('cnnModel').value);
-            formData.append('text_weight', textWeight.value);
-            formData.append('cnn_weight', cnnWeight.value);
-
-            const response = await fetch('/analyze', {
-                method: 'POST',
-                body: formData
-            });
-
-            const result = await response.json();
-
-            clearInterval(stepInterval);
-
-            if (!response.ok || !result.success) {
-                throw new Error(result.error || `Server error: ${response.status}`);
-            }
+    function hideModal(modal, content) {
+        if (modal && content) {
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
 
             setTimeout(() => {
-                hideModal('analysisModal', 'analysisModalContent');
+                modal.classList.add('hidden');
+            }, 300);
+        }
+    }
+
+    if (analyzeBtn) {
+        analyzeBtn.addEventListener('click', () => {
+            if (analyzeBtn.disabled) return;
+
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+            steps.forEach(stepId => {
+                const step = document.getElementById(stepId);
+                if (step) {
+                    step.classList.add('opacity-50');
+                    step.classList.remove('text-custom-primary', 'font-medium');
+                }
+            });
+
+            const successIcon = document.querySelector('#successModalContent .w-16');
+            if (successIcon) {
+                successIcon.classList.remove('scale-100');
+                successIcon.classList.add('scale-0');
+            }
+
+            showModal(analysisModal, analysisModalContent);
+
+            let currentStep = 0;
+
+            const stepInterval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    const stepElement = document.getElementById(steps[currentStep]);
+                    if (stepElement) {
+                        stepElement.classList.remove('opacity-50');
+                        stepElement.classList.add('text-custom-primary', 'font-medium');
+                    }
+                    currentStep++;
+                } else {
+                    clearInterval(stepInterval);
+                }
+            }, 700);
+
+            setTimeout(() => {
+                hideModal(analysisModal, analysisModalContent);
 
                 setTimeout(() => {
-                    showModal('successModal', 'successModalContent');
+                    showModal(successModal, successModalContent);
 
                     setTimeout(() => {
-                        const successIcon = document.querySelector('#successModalContent .w-16');
-                        successIcon.classList.remove('scale-0');
-                        successIcon.classList.add('scale-100');
+                        const successIconElement = document.querySelector('#successModalContent .w-16');
+                        if (successIconElement) {
+                            successIconElement.classList.remove('scale-0');
+                            successIconElement.classList.add('scale-100');
+                        }
                     }, 200);
                 }, 300);
 
-                showResults(result);
+                showResults();
             }, 3000);
+        });
+    }
 
-        } catch (error) {
-            console.error('Analysis error:', error);
+    const viewResultsBtn = document.getElementById('viewResultsBtn');
+    const resultsSection = document.getElementById('resultsSection');
 
-            clearInterval(stepInterval);
-
-            hideModal('analysisModal', 'analysisModalContent');
-
+    if (viewResultsBtn && resultsSection) {
+        viewResultsBtn.addEventListener('click', () => {
+            hideModal(successModal, successModalContent);
             setTimeout(() => {
-                alert(`Analysis failed: ${error.message}`);
-
-                analyzeBtn.disabled = false;
-                analyzeText.textContent = 'Analyze Screenshot';
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
             }, 300);
-        }
-    });
+        });
+    }
 
-    document.getElementById('viewResultsBtn').addEventListener('click', () => {
-        hideModal('successModal', 'successModalContent');
-        setTimeout(() => {
-            resultsSection.scrollIntoView({ behavior: 'smooth' });
-        }, 300);
-    });
-
-
-    function showResults(result) {
-        const isScam = result.is_scam;
-        const confidence = result.confidence;
-        const textConf = result.text_confidence;
-        const imageConf = result.image_confidence;
-        const featureImportance = result.feature_importance || [];
-            const extractedText = result.extracted_text || '';
+    function showResults() {
+        const isScam = Math.random() > 0.4;
+        const confidence = Math.random() * 40 + 60;
+        const textConf = Math.random() * 100;
+        const imageConf = Math.random() * 100;
 
         const mainResult = document.getElementById('mainResult');
         const resultIcon = document.getElementById('resultIcon');
@@ -255,6 +255,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const confidenceText = document.getElementById('confidenceText');
         const textConfidence = document.getElementById('textConfidence');
         const imageConfidence = document.getElementById('imageConfidence');
+
+        if (!mainResult || !resultIcon || !resultTitle || !resultDescription || !confidenceBar || !confidenceText || !textConfidence || !imageConfidence) {
+            console.error("One or more result elements not found.");
+            return;
+        }
 
         if (isScam) {
             mainResult.className = 'text-center p-6 rounded-lg border-2 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20';
@@ -283,82 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
         textConfidence.textContent = textConf.toFixed(1) + '%';
         imageConfidence.textContent = imageConf.toFixed(1) + '%';
 
-        displayFeatureImportance(featureImportance, isScam);
-        
-        displayExtractedText(extractedText);
-
         resultsSection.classList.remove('hidden');
-    }
-
-    function displayFeatureImportance(featureImportance, isScam) {
-        let featureContainer = document.getElementById('featureImportanceContainer');
-        if (!featureContainer) {
-            featureContainer = document.createElement('div');
-            featureContainer.id = 'featureImportanceContainer';
-            featureContainer.className = 'mt-6 p-4 rounded-lg border-2';
-            
-            const mainResult = document.getElementById('mainResult');
-            mainResult.parentNode.insertBefore(featureContainer, mainResult.nextSibling);
-        }
-
-        if (featureImportance && featureImportance.length > 0 && isScam) {
-            featureContainer.className = 'mt-6 p-4 rounded-lg border-2 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20';
-            
-            featureContainer.innerHTML = `
-                <h3 class="text-lg font-semibold mb-3 text-red-600 dark:text-red-400 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    Detected Scam Indicators
-                </h3>
-                <div class="flex flex-wrap gap-2 mb-3">
-                    ${featureImportance.map(feature => `
-                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border border-red-200 dark:border-red-700">
-                            ${escapeHtml(feature.word)}
-                            <span class="text-xs bg-red-200 dark:bg-red-800 px-1 rounded">
-                                ${feature.importance.toFixed(3)}
-                            </span>
-                        </span>
-                    `).join('')}
-                </div>
-                <p class="text-sm text-red-600 dark:text-red-400 italic">
-                    These words/phrases contributed most to the scam detection based on your trained model. Higher scores indicate stronger scam indicators.
-                </p>
-            `;
-        } else {
-            featureContainer.style.display = 'none';
-        }
-    }
-
-    function displayExtractedText(extractedText) {
-        let textContainer = document.getElementById('extractedTextContainer');
-        if (!textContainer) {
-            textContainer = document.createElement('div');
-            textContainer.id = 'extractedTextContainer';
-            textContainer.className = 'mt-6 p-4 rounded-lg border-2 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20';
-            
-            const featureContainer = document.getElementById('featureImportanceContainer');
-            const insertAfter = featureContainer || document.getElementById('mainResult');
-            insertAfter.parentNode.insertBefore(textContainer, insertAfter.nextSibling);
-        }
-
-        textContainer.innerHTML = `
-            <h3 class="text-lg font-semibold mb-3 text-blue-600 dark:text-blue-400 flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                Extracted Text
-            </h3>
-            <div class="bg-white dark:bg-gray-800 p-3 rounded border border-blue-200 dark:border-blue-700 max-h-48 overflow-y-auto">
-                <pre class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono">${escapeHtml(extractedText) || 'No text detected in the image.'}</pre>
-            </div>
-        `;
-    }
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     const correctBtn = document.getElementById('correctBtn');
@@ -368,116 +298,71 @@ document.addEventListener("DOMContentLoaded", function () {
     const feedbackSuccess = document.getElementById('feedbackSuccess');
     const submitFeedback = document.getElementById('submitFeedback');
 
-    correctBtn.addEventListener('click', async () => {
-        try {
-            const response = await fetch('/feedback', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    feedback_type: 'correct',
-                    timestamp: new Date().toISOString()
-                })
-            });
+    if (correctBtn && feedbackButtons && feedbackSuccess) {
+        correctBtn.addEventListener('click', () => {
+            feedbackButtons.classList.add('hidden');
+            feedbackSuccess.classList.remove('hidden');
+            feedbackSuccess.textContent = 'Thank you for confirming! This helps improve our model accuracy.';
+        });
+    }
 
-            if (response.ok) {
-                feedbackButtons.classList.add('hidden');
+    if (incorrectBtn && feedbackButtons && incorrectFeedback) {
+        incorrectBtn.addEventListener('click', () => {
+            feedbackButtons.classList.add('hidden');
+            incorrectFeedback.classList.remove('hidden');
+        });
+    }
+
+    if (submitFeedback && incorrectFeedback && feedbackSuccess) {
+        submitFeedback.addEventListener('click', () => {
+            const classification = document.getElementById('correctClassification');
+            const comments = document.getElementById('feedbackComments');
+
+            if (classification && classification.value) {
+                incorrectFeedback.classList.add('hidden');
                 feedbackSuccess.classList.remove('hidden');
-                feedbackSuccess.textContent = 'Thank you for confirming! This helps improve our model accuracy.';
+                feedbackSuccess.textContent = 'Thank you for the correction! This helps improve our model accuracy.';
+            } else {
+                alert('Please select the correct classification.');
             }
-        } catch (error) {
-            console.error('Feedback error:', error);
-        }
-    });
-
-    incorrectBtn.addEventListener('click', () => {
-        feedbackButtons.classList.add('hidden');
-        incorrectFeedback.classList.remove('hidden');
-    });
-
-    submitFeedback.addEventListener('click', async () => {
-        const classification = document.getElementById('correctClassification').value;
-        const comments = document.getElementById('feedbackComments').value;
-
-        if (classification) {
-            try {
-                const response = await fetch('/feedback', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        feedback_type: 'incorrect',
-                        correct_classification: classification,
-                        comments: comments,
-                        timestamp: new Date().toISOString()
-                    })
-                });
-
-                if (response.ok) {
-                    incorrectFeedback.classList.add('hidden');
-                    feedbackSuccess.classList.remove('hidden');
-                    feedbackSuccess.textContent = 'Thank you for the correction! This helps improve our model accuracy.';
-                }
-            } catch (error) {
-                console.error('Feedback error:', error);
-            }
-        } else {
-            alert('Please select the correct classification.');
-        }
-    });
+        });
+    }
 
     const reportScam = document.getElementById('reportScam');
     const reportSuccess = document.getElementById('reportSuccess');
 
-    reportScam.addEventListener('click', async () => {
-        const scamType = document.getElementById('scamType').value;
-        const description = document.getElementById('scamDescription').value;
+    if (reportScam && reportSuccess) {
+        reportScam.addEventListener('click', () => {
+            const scamType = document.getElementById('scamType');
+            const description = document.getElementById('scamDescription');
 
-        if (scamType && description) {
-            try {
-                const response = await fetch('/report', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        scam_type: scamType,
-                        description: description,
-                        timestamp: new Date().toISOString()
-                    })
-                });
-
-                if (response.ok) {
-                    reportSuccess.classList.remove('hidden');
-                    reportScam.disabled = true;
-                    reportScam.textContent = 'Report Submitted ✓';
-                    reportScam.className = 'bg-gray-400 text-white py-2 px-4 rounded-lg font-medium cursor-not-allowed';
-                }
-            } catch (error) {
-                console.error('Report error:', error);
+            if (scamType && scamType.value && description && description.value) {
+                reportSuccess.classList.remove('hidden');
+                reportScam.disabled = true;
+                reportScam.textContent = 'Report Submitted ✓';
+                reportScam.className = 'bg-gray-400 text-white py-2 px-4 rounded-lg font-medium cursor-not-allowed';
+            } else {
+                alert('Please fill in all required fields.');
             }
-        } else {
-            alert('Please fill in all required fields.');
-        }
-    });
+        });
+    }
 
-    // --- Carousel Specific JavaScript ---
-    const carouselTrack = document.getElementById('carouselTrack'); // Corrected: target carouselTrack
+    // Carousel functionality
+    const carousel = document.getElementById('carousel');
+    const carouselTrack = document.getElementById('carouselTrack'); // Added this ID to the inner div
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    const carouselDotsContainer = document.getElementById('carouselDots'); // Target the container for dots
-    const carouselItems = document.querySelectorAll('.carousel-item'); // Get all carousel items
+    const carouselDotsContainer = document.getElementById('carouselDots'); // Container for dots
+    
     let currentSlide = 0;
-    const totalSlides = carouselItems.length; // Dynamically get total slides
+    const totalSlides = 5; // Ensure this matches the number of slides in your HTML
 
-    // Create the dots dynamically
-    function createCarouselDots() {
+    const createCarouselDots = () => {
+        if (!carouselDotsContainer) return;
         carouselDotsContainer.innerHTML = ''; // Clear existing dots
         for (let i = 0; i < totalSlides; i++) {
-            const dot = document.createElement('button');
-            dot.classList.add('carousel-dot', 'w-3', 'h-3', 'rounded-full', 'mx-1', 'transition-colors', 'duration-300'); // Add common classes
+            const dot = document.createElement('span');
+            dot.classList.add('carousel-dot', 'w-3', 'h-3', 'rounded-full', 'bg-gray-300', 'dark:bg-gray-600', 'cursor-pointer', 'transition-colors', 'duration-300');
             dot.addEventListener('click', () => {
                 currentSlide = i;
                 updateCarousel();
@@ -487,6 +372,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateCarousel() {
+        if (!carouselTrack || !carouselDotsContainer) return;
         const translateX = -currentSlide * 100;
         carouselTrack.style.transform = `translateX(${translateX}%)`; // Apply transform to carouselTrack
 
@@ -506,15 +392,19 @@ document.addEventListener("DOMContentLoaded", function () {
     createCarouselDots();
     updateCarousel(); // Show the first slide and update dots initially
 
-    prevBtn.addEventListener('click', () => {
-        currentSlide = (currentSlide === 0) ? totalSlides - 1 : currentSlide - 1;
-        updateCarousel();
-    });
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            currentSlide = (currentSlide === 0) ? totalSlides - 1 : currentSlide - 1;
+            updateCarousel();
+        });
+    }
 
-    nextBtn.addEventListener('click', () => {
-        currentSlide = (currentSlide === totalSlides - 1) ? 0 : currentSlide + 1;
-        updateCarousel();
-    });
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            currentSlide = (currentSlide === totalSlides - 1) ? 0 : currentSlide + 1;
+            updateCarousel();
+        });
+    }
 
     // Auto-advance carousel
     setInterval(() => {

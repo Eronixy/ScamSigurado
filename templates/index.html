@@ -139,30 +139,31 @@
             </p>
             <div class="mb-8">
                 <div id="dropZone"
-                    class="border-2 border-dashed border-gray-300 dark:border-scam-light-blue rounded-xl p-8 text-center hover:border-scam-success dark:hover:border-scam-light-red transition-colors cursor-pointer">
-                    <svg class="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-300" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                        </path>
-                    </svg>
-                    <p class="text-lg mb-2 text-scam-dark dark:text-white">Drop your screenshot here or click to browse</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">PNG, JPG, or JPEG (Max 10MB)</p>
+                    class="border-2 border-dashed border-gray-300 dark:border-scam-light-blue rounded-xl p-8 text-center hover:border-scam-success dark:hover:border-scam-light-red transition-colors cursor-pointer relative">
+                    
+                    <div id="dropZoneContent">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                            </path>
+                        </svg>
+                        <p class="text-lg mb-2 text-scam-dark dark:text-white">Drop your screenshot here or click to browse</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">PNG, JPG, or JPEG (Max 10MB)</p>
+                    </div>
+
+                    <div id="imagePreviewContent" class="hidden mt-4">
+                        <button id="clearImageBtn" class="absolute top-2 right-2 p-1 rounded-full bg-gray-200 dark:bg-scam-light-blue text-gray-600 dark:text-white hover:bg-gray-300 dark:hover:bg-scam-darker-blue transition-colors z-10">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                        <img id="imagePreview" class="max-w-full h-64 object-contain mx-auto rounded-lg shadow-md">
+                        <p id="fileName" class="text-center mt-2 text-sm text-gray-600 dark:text-gray-400"></p>
+                    </div>
+
                     <input type="file" id="fileInput" class="hidden" accept="image/*">
                 </div>
-                <div id="previewContainer" class="mt-4 hidden relative">
-                    <img id="imagePreview" class="max-w-full h-64 object-contain mx-auto rounded-lg shadow-md">
-                    <button id="clearImageBtn"
-                        class="clear-image-btn text-scam-dark dark:text-white p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                    <p id="fileName" class="text-center mt-2 text-sm text-gray-600 dark:text-gray-400"></p>
-                </div>
             </div>
-
             <div class="mb-8">
                 <button id="advancedToggle"
                     class="text-scam-success hover:text-scam-light-red font-medium mb-4 flex items-center">
@@ -174,51 +175,7 @@
                 </button>
 
                 <div id="advancedSettings" class="hidden space-y-6 bg-gray-50 dark:bg-scam-darker-blue p-6 rounded-lg">
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium mb-2 text-scam-dark dark:text-gray-200">Text Analysis Model</label>
-                            <select id="textModel"
-                                class="w-full p-3 border border-gray-300 dark:border-scam-light-blue rounded-lg bg-white dark:bg-scam-dark focus:ring-2 focus:ring-scam-success focus:border-transparent text-scam-dark dark:text-white">
-                                <option value="svm" selected>SVM (Support Vector Machine)</option>
-                                <option value="rf">Random Forest</option>
-                                <option value="nb">Naive Bayes</option>
-                                <option value="bert" disabled>BERT</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium mb-2 text-scam-dark dark:text-gray-200">CNN Model</label>
-                            <select id="cnnModel"
-                                class="w-full p-3 border border-gray-300 dark:border-scam-light-blue rounded-lg bg-white dark:bg-scam-dark focus:ring-2 focus:ring-scam-success focus:border-transparent text-scam-dark dark:text-white">
-                                <option value="alexnet">AlexNet</option>
-                                <option value="vggnet">VGGNet</option>
-                                <option value="resnet">ResNet</option>
-                                <option value="mobilenet">MobileNet</option>
-                                <option value="efficientnet" selected>EfficientNet</option>
-                            </select>
-                        </div>
                     </div>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium mb-2 text-scam-dark dark:text-gray-200">Text Model Weight</label>
-                            <div class="flex items-center space-x-3">
-                                <input type="range" id="textWeight" min="0" max="1" step="0.1" value="0.6"
-                                    class="flex-1 h-2 rounded-lg appearance-none cursor-pointer bg-gray-300 dark:bg-scam-light-blue accent-scam-success">
-                                <span id="textWeightValue" class="text-sm font-medium w-8 text-scam-dark dark:text-white">0.6</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium mb-2 text-scam-dark dark:text-gray-200">CNN Model Weight</label>
-                            <div class="flex items-center space-x-3">
-                                <input type="range" id="cnnWeight" min="0" max="1" step="0.1" value="0.4"
-                                    class="flex-1 h-2 rounded-lg appearance-none cursor-pointer bg-gray-300 dark:bg-scam-light-blue accent-scam-success">
-                                <span id="cnnWeightValue" class="text-sm font-medium w-8 text-scam-dark dark:text-white">0.4</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <button id="analyzeBtn"
