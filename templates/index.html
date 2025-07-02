@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScamSigurado - Filipino Online Scam Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'custom-text': '#060706',
+                        'custom-bg': '#f0f4f1',
+                        'custom-primary': '#4ac16a',
+                        'custom-secondary': '#8deaa6',
+                        'custom-accent': '#4ef67b',
+                        'dark-text': '#f9faf9',
+                        'dark-bg': '#0a0b0a',
+                        'dark-primary': '#4ac16a',
+                        'dark-secondary': '#2d5a3d',
+                        'dark-accent': '#4ef67b'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-custom-bg dark:bg-dark-bg text-custom-text dark:text-dark-text transition-colors duration-300">
+    <header class="py-6 px-4 max-w-6xl mx-auto">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-custom-primary rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">ScamSigurado</h1>
+                </div>
+            </div>
+            <button id="darkModeToggle"
+                class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+                <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                    </path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 space-y-12">
+
+        <section id="uploadSection" class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg">
+            <h2 class="text-4xl md:text-5xl text-center font-bold mb-4">AI-Powered Filipino Scam Detection</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto text-center">
+                Upload a screenshot and let our advanced multimodal machine learning system analyze both textual and
+                visual elements to detect potential Filipino online scams with high accuracy.
+            </p>
+            <div class="mb-8">
+                <div id="dropZone"
+                    class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-custom-primary dark:hover:border-custom-primary transition-colors cursor-pointer">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                        </path>
+                    </svg>
+                    <p class="text-lg mb-2">Drop your screenshot here or click to browse</p>
+                    <p class="text-sm text-gray-500">PNG, JPG, or JPEG (Max 10MB)</p>
+                    <input type="file" id="fileInput" class="hidden" accept="image/*">
+                </div>
+                <div id="previewContainer" class="mt-4 hidden">
+                    <img id="imagePreview" class="max-w-full h-64 object-contain mx-auto rounded-lg shadow-md">
+                    <p id="fileName" class="text-center mt-2 text-sm text-gray-600 dark:text-gray-400"></p>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <button id="advancedToggle"
+                    class="text-custom-primary hover:text-custom-accent font-medium mb-4 flex items-center">
+                    <span>Advanced Settings</span>
+                    <svg id="advancedArrow" class="w-4 h-4 ml-2 transform transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+
+                <div id="advancedSettings" class="hidden space-y-6 bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Text Analysis Model</label>
+                            <select id="textModel"
+                                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-custom-primary focus:border-transparent">
+                                <option value="svm" selected>SVM (Support Vector Machine)</option>
+                                <option value="rf">Random Forest</option>
+                                <option value="nb">Naive Bayes</option>
+                                <option value="bert">BERT</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-2">CNN Model</label>
+                            <select id="cnnModel"
+                                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-custom-primary focus:border-transparent">
+                                <option value="alexnet">AlexNet</option>
+                                <option value="vggnet">VGGNet</option>
+                                <option value="resnet">ResNet</option>
+                                <option value="mobilenet">MobileNet</option>
+                                <option value="efficientnet" selected>EfficientNet</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Text Model Weight</label>
+                            <div class="flex items-center space-x-3">
+                                <input type="range" id="textWeight" min="0" max="1" step="0.1" value="0.6"
+                                    class="flex-1">
+                                <span id="textWeightValue" class="text-sm font-medium w-8">0.6</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-2">CNN Model Weight</label>
+                            <div class="flex items-center space-x-3">
+                                <input type="range" id="cnnWeight" min="0" max="1" step="0.1" value="0.4"
+                                    class="flex-1">
+                                <span id="cnnWeightValue" class="text-sm font-medium w-8">0.4</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="analyzeBtn"
+                class="w-full bg-custom-primary hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+                <span id="analyzeText">Select an image to analyze</span>
+                <svg id="loadingSpinner" class="hidden animate-spin w-5 h-5 ml-2 inline" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+            </button>
+        </section>
+
+        <section id="resultsSection" class="hidden bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg">
+            <h3 class="text-2xl font-semibold mb-6">Analysis Results</h3>
+
+            <div class="space-y-6">
+                <div id="mainResult" class="text-center p-6 rounded-lg border-2">
+                    <div id="resultIcon" class="w-16 h-16 mx-auto mb-4"></div>
+                    <h4 id="resultTitle" class="text-2xl font-bold mb-2"></h4>
+                    <p id="resultDescription" class="text-gray-600 dark:text-gray-400"></p>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
+                    <h5 class="font-semibold mb-3">Confidence Score</h5>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3">
+                            <div id="confidenceBar" class="h-3 rounded-full transition-all duration-500"></div>
+                        </div>
+                        <span id="confidenceText" class="font-bold text-lg"></span>
+                    </div>
+                    <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="text-gray-600 dark:text-gray-400">Text Analysis:</span>
+                            <span id="textConfidence" class="font-medium ml-2"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600 dark:text-gray-400">Image Analysis:</span>
+                            <span id="imageConfidence" class="font-medium ml-2"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <h5 class="font-semibold mb-3 text-blue-800 dark:text-blue-300">Help Improve Our Model</h5>
+                    <p class="text-sm text-blue-700 dark:text-blue-400 mb-4">Was this analysis correct? Your feedback
+                        helps us improve our detection accuracy.</p>
+
+                    <div id="feedbackButtons" class="flex space-x-3 mb-4">
+                        <button id="correctBtn"
+                            class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            ✓ Correct Analysis
+                        </button>
+                        <button id="incorrectBtn"
+                            class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            ✗ Incorrect Analysis
+                        </button>
+                    </div>
+
+                    <div id="incorrectFeedback" class="hidden space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-blue-800 dark:text-blue-300">What should
+                                the correct classification be?</label>
+                            <select id="correctClassification"
+                                class="w-full p-2 border border-blue-300 dark:border-blue-600 rounded-lg bg-white dark:bg-gray-800">
+                                <option value="">Select correct classification...</option>
+                                <option value="scam">This is a scam</option>
+                                <option value="legitimate">This is legitimate</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-blue-800 dark:text-blue-300">Additional
+                                comments (optional)</label>
+                            <textarea id="feedbackComments"
+                                class="w-full p-2 border border-blue-300 dark:border-blue-600 rounded-lg bg-white dark:bg-gray-800"
+                                rows="3" placeholder="Please provide any additional details..."></textarea>
+                        </div>
+                        <button id="submitFeedback"
+                            class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            Submit Feedback
+                        </button>
+                    </div>
+
+                    <div id="feedbackSuccess" class="hidden text-green-600 dark:text-green-400 font-medium">
+                        Thank you for your feedback! This helps improve our model accuracy.
+                    </div>
+                </div>
+
+                <div
+                    class="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-lg border border-orange-200 dark:border-orange-800">
+                    <h5 class="font-semibold mb-3 text-orange-800 dark:text-orange-300">Report Scam</h5>
+                    <p class="text-sm text-orange-700 dark:text-orange-400 mb-4">If this is a confirmed scam, you can
+                        report it to help warn others.</p>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-orange-800 dark:text-orange-300">Scam
+                                type</label>
+                            <select id="scamType"
+                                class="w-full p-2 border border-orange-300 dark:border-orange-600 rounded-lg bg-white dark:bg-gray-800">
+                                <option value="">Select scam type...</option>
+                                <option value="online_shopping">Online Shopping Scam</option>
+                                <option value="investment">Investment/Get-Rich-Quick Scam</option>
+                                <option value="romance">Romance Scam</option>
+                                <option value="phishing">Phishing/Account Takeover</option>
+                                <option value="job">Job/Employment Scam</option>
+                                <option value="loan">Loan Scam</option>
+                                <option value="prize">Prize/Lottery Scam</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium mb-2 text-orange-800 dark:text-orange-300">Description</label>
+                            <textarea id="scamDescription"
+                                class="w-full p-2 border border-orange-300 dark:border-orange-600 rounded-lg bg-white dark:bg-gray-800"
+                                rows="3" placeholder="Describe the scam details, how it operates, etc."></textarea>
+                        </div>
+                        <button id="reportScam"
+                            class="bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            Submit Report
+                        </button>
+                    </div>
+
+                    <div id="reportSuccess" class="hidden text-green-600 dark:text-green-400 font-medium mt-3">
+                        Report submitted successfully. Thank you for helping protect others!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg">
+            <h3 class="text-2xl font-semibold mb-6">Common Filipino Scam Examples</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Learn to identify common scam patterns found in the
+                Philippines</p>
+
+            <div class="relative">
+                <div id="carousel" class="flex overflow-hidden rounded-lg">
+                    <div
+                        class="carousel-item min-w-full bg-gray-100 dark:bg-gray-700 h-80 flex items-center justify-center relative">
+                        <div class="text-center p-8">
+                            <div
+                                class="bg-gradient-to-br from-red-400 to-red-600 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Online Shopping Scam</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Fake e-commerce sites offering products
+                                at unrealistic prices</p>
+                            <div
+                                class="mt-4 text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 px-3 py-1 rounded-full inline-block">
+                                Warning Signs: Too-good-to-be-true prices, poor grammar, no contact info
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="carousel-item min-w-full bg-gray-100 dark:bg-gray-700 h-80 flex items-center justify-center relative">
+                        <div class="text-center p-8">
+                            <div
+                                class="bg-gradient-to-br from-yellow-400 to-yellow-600 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Investment Scam</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Ponzi schemes promising high returns
+                                with minimal risk</p>
+                            <div
+                                class="mt-4 text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 px-3 py-1 rounded-full inline-block">
+                                Warning Signs: Guaranteed high returns, pressure to invest quickly, recruit others
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="carousel-item min-w-full bg-gray-100 dark:bg-gray-700 h-80 flex items-center justify-center relative">
+                        <div class="text-center p-8">
+                            <div
+                                class="bg-gradient-to-br from-pink-400 to-pink-600 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Romance Scam</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Fake romantic relationships to extract
+                                money from victims</p>
+                            <div
+                                class="mt-4 text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 px-3 py-1 rounded-full inline-block">
+                                Warning Signs: Professes love quickly, avoids meeting, asks for money
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="carousel-item min-w-full bg-gray-100 dark:bg-gray-700 h-80 flex items-center justify-center relative">
+                        <div class="text-center p-8">
+                            <div
+                                class="bg-gradient-to-br from-blue-400 to-blue-600 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Phishing Scam</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Fake messages impersonating banks or
+                                government agencies</p>
+                            <div
+                                class="mt-4 text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 px-3 py-1 rounded-full inline-block">
+                                Warning Signs: Urgent action required, suspicious links, requests for passwords
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="carousel-item min-w-full bg-gray-100 dark:bg-gray-700 h-80 flex items-center justify-center relative">
+                        <div class="text-center p-8">
+                            <div
+                                class="bg-gradient-to-br from-purple-400 to-purple-600 w-20 h-20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Job Scam</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Fake job postings requiring upfront
+                                payments or personal info</p>
+                            <div
+                                class="mt-4 text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 px-3 py-1 rounded-full inline-block">
+                                Warning Signs: Upfront fees, work from home with high pay, vague job description
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="prevBtn"
+                    class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
+                    </svg>
+                </button>
+
+                <button id="nextBtn"
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+
+                <div class="flex justify-center mt-4 space-x-2">
+                    <button class="carousel-dot w-3 h-3 rounded-full bg-custom-primary" data-index="0"></button>
+                    <button class="carousel-dot w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600"
+                        data-index="4"></button>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg">
+            <h3 class="text-2xl font-semibold mb-6">Database Analytics</h3>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="text-3xl font-bold text-custom-primary">15,342</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Screenshots</div>
+                </div>
+
+                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="text-3xl font-bold text-red-500">8,967</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Scam Detected</div>
+                </div>
+
+                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="text-3xl font-bold text-green-500">6,375</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Legitimate</div>
+                </div>
+
+                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="text-3xl font-bold text-custom-accent">94.2%</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Accuracy</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg">
+            <h3 class="text-2xl font-semibold mb-6">About Us</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Our Research</h4>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">
+                        ScamSigurado is a thesis project focused on developing a multimodal machine learning system for
+                        detecting Filipino online scams through combined textual and visual analysis of screenshots.
+                    </p>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">
+                        Our system leverages advanced natural language processing and computer vision techniques to
+                        identify scam patterns specific to the Filipino online ecosystem, helping protect users from
+                        fraudulent activities.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Research Team</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div
+                                class="w-10 h-10 bg-custom-primary rounded-full flex items-center justify-center text-white font-bold">
+                                IB
+                            </div>
+                            <div>
+                                <p class="font-medium">Irron Jovic Jun V. Brosoto</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Computer Science Student</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div
+                                class="w-10 h-10 bg-custom-secondary rounded-full flex items-center justify-center text-white font-bold">
+                                JP
+                            </div>
+                            <div>
+                                <p class="font-medium">Jezrielle Anne G. Padlan</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Computer Science Student</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div
+                                class="w-10 h-10 bg-custom-accent rounded-full flex items-center justify-center text-white font-bold">
+                                JR
+                            </div>
+                            <div>
+                                <p class="font-medium">Julia Kyla C. Rustia</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Computer Science Student</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div
+                                class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                                CT
+                            </div>
+                            <div>
+                                <p class="font-medium">Catherine C. Tabigne</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Computer Science Student</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row gap-4 mt-6">
+                <div
+                    class="flex-1 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <p class="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">Thesis Title:</p>
+                    <p class="text-sm text-blue-700 dark:text-blue-400 break-words">
+                        "Multimodal Machine Learning for Filipino Online Scam Detection Through Combined Textual and
+                        Visual Analysis of Screenshots"
+                    </p>
+                </div>
+                <div
+                    class="flex-1 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <p class="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">Institution:</p>
+                    <p class="text-sm text-blue-700 dark:text-blue-400">
+                        College of Computer and Information Sciences<br>
+                        Polytechnic University of the Philippines – Manila Campus<br>
+                        Sta. Mesa, Manila, Philippines
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <p class="text-gray-600 dark:text-gray-400 text-sm">
+                    This research aims to contribute to cybersecurity efforts in the Philippines by providing an
+                    accessible tool for scam detection and prevention.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <div id="analysisModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden transition-all duration-300">
+        <div id="analysisModalContent"
+            class="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md mx-4 text-center transform scale-95 opacity-0 transition-all duration-300">
+            <div class="mb-6">
+                <div
+                    class="animate-spin w-16 h-16 border-4 border-custom-primary border-t-transparent rounded-full mx-auto mb-4">
+                </div>
+                <h3 class="text-xl font-bold mb-2">Analyzing Screenshot</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Our AI is processing your image...</p>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                    <div id="analysisSteps" class="space-y-2">
+                        <div id="step1" class="flex items-center justify-center opacity-50 transition-all duration-300">
+                            <span class="w-2 h-2 bg-custom-primary rounded-full mr-2"></span>
+                            Extracting text content
+                        </div>
+                        <div id="step2" class="flex items-center justify-center opacity-50 transition-all duration-300">
+                            <span class="w-2 h-2 bg-custom-primary rounded-full mr-2"></span>
+                            Analyzing visual elements
+                        </div>
+                        <div id="step3" class="flex items-center justify-center opacity-50 transition-all duration-300">
+                            <span class="w-2 h-2 bg-custom-primary rounded-full mr-2"></span>
+                            Running scam detection models
+                        </div>
+                        <div id="step4" class="flex items-center justify-center opacity-50 transition-all duration-300">
+                            <span class="w-2 h-2 bg-custom-primary rounded-full mr-2"></span>
+                            Generating results
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="successModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden transition-all duration-300">
+        <div id="successModalContent"
+            class="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md mx-4 text-center transform scale-95 opacity-0 transition-all duration-300">
+            <div class="mb-6">
+                <div
+                    class="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4 transform scale-0 transition-transform duration-500">
+                    <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2 text-green-600">Analysis Complete!</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">Your screenshot has been successfully analyzed.</p>
+                <button id="viewResultsBtn"
+                    class="bg-custom-primary hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors transform hover:scale-105">
+                    View Results
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-8 px-4 text-center text-gray-600 dark:text-gray-400 max-w-6xl mx-auto mt-16">
+        <p>&copy; 2024 ScamSigurado. A thesis project by PUP Computer Science students for Filipino online scam
+            detection.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='custom.js') }}"></script>
+</body>
+
+</html>1"></button>
