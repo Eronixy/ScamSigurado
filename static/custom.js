@@ -64,6 +64,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 textContainer.remove();
             }
 
+            resetAnalysisModal();
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 imagePreview.src = e.target.result;
@@ -168,6 +170,23 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function resetAnalysisModal() {
+        const steps = ['step1', 'step2', 'step3', 'step4'];
+        steps.forEach(stepId => {
+            const step = document.getElementById(stepId);
+            if (step) {
+                step.classList.remove('text-custom-primary', 'font-medium');
+                step.classList.add('opacity-50');
+            }
+        });
+
+        const successIcon = document.querySelector('#successModalContent .w-16');
+        if (successIcon) {
+            successIcon.classList.remove('scale-100');
+            successIcon.classList.add('scale-0');
+        }
+    }
+
     const analysisModal = document.getElementById('analysisModal');
     const analysisModalContent = document.getElementById('analysisModalContent');
     const successModal = document.getElementById('successModal');
@@ -177,20 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
         analyzeBtn.addEventListener('click', async () => {
             if (analyzeBtn.disabled || !currentFile) return;
 
-            const steps = ['step1', 'step2', 'step3', 'step4'];
-            steps.forEach(stepId => {
-                const step = document.getElementById(stepId);
-                if (step) {
-                    step.classList.add('opacity-50');
-                    step.classList.remove('text-custom-primary', 'font-medium');
-                }
-            });
-
-            const successIcon = document.querySelector('#successModalContent .w-16');
-            if (successIcon) {
-                successIcon.classList.remove('scale-100');
-                successIcon.classList.add('scale-0');
-            }
+            resetAnalysisModal();
 
             showModal(analysisModal, analysisModalContent);
 
@@ -251,12 +257,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error('Analysis error:', error);
 
                 clearInterval(stepInterval);
-
                 hideModal(analysisModal, analysisModalContent);
 
                 setTimeout(() => {
                     alert(`Analysis failed: ${error.message}`);
-
                     analyzeBtn.disabled = false;
                     analyzeText.textContent = 'Analyze Screenshot';
                 }, 300);
