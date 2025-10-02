@@ -1,0 +1,1036 @@
+{% extends "base.html" %} {% block title %}Upload Screenshot - ScamShield{%
+endblock %} {% block content %}
+<div class="fade-in pb-6">
+  <!-- Header Section -->
+  <div
+    class="bg-brand text-center text-white px-6 py-8 rounded-b-3xl shadow-md"
+  >
+    <h1 class="text-4xl font-semibold mb-2">ScamSigurado</h1>
+    <p class="text-blue-100 text-sm">
+      Upload a screenshot to detect potential scams
+    </p>
+  </div>
+
+  <!-- Upload Card -->
+  <div class="px-4 mt-6">
+    <div class="bg-white rounded-2xl shadow-sm p-6 mb-4">
+      <!-- Drop Zone -->
+      <div
+        id="dropZone"
+        class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-brand hover:bg-blue-50 transition-all"
+      >
+        <div id="dropZoneContent">
+          <div
+            class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fas fa-cloud-upload-alt text-4xl text-brand"></i>
+          </div>
+          <p class="text-gray-800 font-medium mb-1">Tap to upload screenshot</p>
+          <p class="text-gray-500 text-sm">PNG, JPG, or JPEG (Max 10MB)</p>
+        </div>
+
+        <!-- Image Preview (Hidden Initially) -->
+        <div id="imagePreviewContent" class="hidden">
+          <div class="relative">
+            <img
+              id="imagePreview"
+              class="max-w-full h-64 object-contain mx-auto rounded-lg mb-3"
+            />
+            <button
+              id="clearImageBtn"
+              class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-100"
+            >
+              <i class="fas fa-times text-gray-600"></i>
+            </button>
+          </div>
+          <p id="fileName" class="text-sm text-gray-600"></p>
+        </div>
+
+        <input type="file" id="fileInput" class="hidden" accept="image/*" />
+      </div>
+
+      <!-- Analyze Button -->
+      <button
+        id="analyzeBtn"
+        disabled
+        class="w-full mt-6 bg-brand text-white font-semibold py-4 rounded-xl hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+      >
+        <span id="analyzeText">Select an image to analyze</span>
+        <i id="loadingSpinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+      </button>
+    </div>
+
+    <!-- Advanced Settings Card -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
+      <button
+        id="advancedToggle"
+        class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+      >
+        <div class="flex items-center">
+          <i class="fas fa-sliders-h text-brand mr-3"></i>
+          <span class="font-medium text-gray-800">Advanced Settings</span>
+        </div>
+        <i
+          id="advancedArrow"
+          class="fas fa-chevron-down text-gray-400 transition-transform"
+        ></i>
+      </button>
+
+      <div
+        id="advancedSettings"
+        class="hidden px-6 pb-6 border-t border-gray-100"
+      >
+        <div class="pt-4 space-y-4">
+          <!-- Text Analysis Model -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-font text-brand mr-2"></i>Text Analysis Model
+            </label>
+            <select
+              id="textModel"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-brand focus:border-transparent"
+            >
+              <option value="svm" selected>SVM (Support Vector Machine)</option>
+              <option value="rf">Random Forest</option>
+              <option value="nb">Naive Bayes</option>
+              <option value="bert" disabled>BERT</option>
+            </select>
+          </div>
+
+          <!-- CNN Model -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-image text-brand mr-2"></i>Image Analysis Model
+            </label>
+            <select
+              id="cnnModel"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-brand focus:border-transparent"
+            >
+              <option value="alexnet">AlexNet</option>
+              <option value="vggnet">VGGNet</option>
+              <option value="resnet">ResNet</option>
+              <option value="mobilenet">MobileNet</option>
+              <option value="efficientnet" selected>EfficientNet</option>
+            </select>
+          </div>
+
+          <!-- Model Weights -->
+          <div class="pt-2">
+            <label class="block text-sm font-medium text-gray-700 mb-3"
+              >Model Weights</label
+            >
+
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                  <span>Text Analysis</span>
+                  <span id="textWeightValue" class="font-semibold text-brand"
+                    >60%</span
+                  >
+                </div>
+                <input
+                  type="range"
+                  id="textWeight"
+                  min="0"
+                  max="100"
+                  value="60"
+                  class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 accent-brand"
+                />
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                  <span>Image Analysis</span>
+                  <span id="cnnWeightValue" class="font-semibold text-brand"
+                    >40%</span
+                  >
+                </div>
+                <input
+                  type="range"
+                  id="cnnWeight"
+                  min="0"
+                  max="100"
+                  value="40"
+                  class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 accent-brand"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="bg-blue-50 rounded-2xl p-4 flex items-start">
+      <div
+        class="w-10 h-10 bg-brand rounded-full flex items-center justify-center flex-shrink-0 mr-3"
+      >
+        <i class="fas fa-info text-white"></i>
+      </div>
+      <div>
+        <p class="text-sm text-gray-700 font-medium mb-1">How it works</p>
+        <p class="text-xs text-gray-600">
+          Our AI analyzes both text and visual elements in your screenshot to
+          detect potential scams with high accuracy.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Section (Hidden Initially) -->
+  <div id="resultsSection" class="hidden px-4 mt-6">
+    <!-- Main Result Card -->
+    <div class="bg-white rounded-2xl shadow-sm p-6 mb-4">
+      <div class="text-center">
+        <div
+          id="resultIcon"
+          class="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"
+        ></div>
+        <h3 id="resultTitle" class="text-xl font-bold mb-2"></h3>
+        <p id="resultDescription" class="text-gray-600 text-sm"></p>
+      </div>
+    </div>
+
+    <!-- Confidence Score Card -->
+    <div class="bg-white rounded-2xl shadow-sm p-6 mb-4">
+      <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-chart-bar text-brand mr-2"></i>Confidence Score
+      </h4>
+
+      <div class="flex items-center mb-4">
+        <div class="flex-1 bg-gray-200 rounded-full h-3 mr-3">
+          <div
+            id="confidenceBar"
+            class="h-3 rounded-full transition-all duration-500"
+          ></div>
+        </div>
+        <span id="confidenceText" class="font-bold text-lg text-brand"></span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-gray-100">
+        <div class="bg-gray-50 rounded-lg p-3">
+          <p class="text-xs text-gray-500 mb-1">Text Analysis</p>
+          <p id="textConfidence" class="font-semibold text-gray-800"></p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-3">
+          <p class="text-xs text-gray-500 mb-1">Image Analysis</p>
+          <p id="imageConfidence" class="font-semibold text-gray-800"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Share Card -->
+    <div class="bg-white rounded-2xl shadow-sm p-6 mb-4">
+      <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+        <i class="fas fa-share-alt text-brand mr-2"></i>Share Results
+      </h4>
+      <p class="text-sm text-gray-600 mb-4">
+        Download or share your analysis results
+      </p>
+
+      <div class="grid grid-cols-2 gap-3">
+        <button
+          id="downloadBtn"
+          class="bg-brand hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center"
+        >
+          <i class="fas fa-download mr-2"></i>Download
+        </button>
+        <button
+          id="shareBtn"
+          class="bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center"
+        >
+          <i class="fas fa-share-nodes mr-2"></i>Share
+        </button>
+      </div>
+
+      <!-- Share Success Message -->
+      <div id="shareSuccess" class="hidden mt-4 p-3 bg-green-50 rounded-lg">
+        <p class="text-sm text-green-700 flex items-center">
+          <i class="fas fa-check-circle mr-2"></i>
+          <span>Image saved successfully!</span>
+        </p>
+      </div>
+
+      <!-- Share Loading -->
+      <div id="shareLoading" class="hidden mt-4 p-3 bg-blue-50 rounded-lg">
+        <p class="text-sm text-brand flex items-center">
+          <i class="fas fa-spinner fa-spin mr-2"></i>
+          <span>Creating shareable image...</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Feedback Card -->
+    <div class="bg-white rounded-2xl shadow-sm p-6">
+      <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
+        <i class="fas fa-comment-dots text-brand mr-2"></i>Help Us Improve
+      </h4>
+      <p class="text-sm text-gray-600 mb-4">Was this analysis correct?</p>
+
+      <div id="feedbackButtons" class="grid grid-cols-2 gap-3 mb-4">
+        <button
+          id="correctBtn"
+          class="bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center"
+        >
+          <i class="fas fa-check mr-2"></i>Correct
+        </button>
+        <button
+          id="incorrectBtn"
+          class="bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center"
+        >
+          <i class="fas fa-times mr-2"></i>Incorrect
+        </button>
+      </div>
+
+      <!-- Incorrect Feedback Form -->
+      <div
+        id="incorrectFeedback"
+        class="hidden space-y-3 pt-3 border-t border-gray-100"
+      >
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Correct classification</label
+          >
+          <select
+            id="correctClassification"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-brand focus:border-transparent"
+          >
+            <option value="">Select correct classification...</option>
+            <option value="scam">This is a scam</option>
+            <option value="legitimate">This is legitimate</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Additional comments</label
+          >
+          <textarea
+            id="feedbackComments"
+            rows="3"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-brand focus:border-transparent text-sm"
+            placeholder="Tell us more (optional)"
+          ></textarea>
+        </div>
+        <button
+          id="submitFeedback"
+          class="w-full bg-brand hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-medium transition-colors"
+        >
+          Submit Feedback
+        </button>
+      </div>
+
+      <div id="feedbackSuccess" class="hidden text-center py-4">
+        <i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>
+        <p class="text-green-600 font-medium">Thank you for your feedback!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analysis Progress Modal -->
+  <div
+    id="analysisModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+  >
+    <div
+      class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in"
+    >
+      <!-- Header -->
+      <div class="text-center mb-6">
+        <div
+          class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <i class="fas fa-shield-alt text-4xl text-brand"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">
+          Analyzing Screenshot
+        </h3>
+        <p class="text-sm text-gray-600">
+          Please wait while we scan for potential scams
+        </p>
+      </div>
+
+      <!-- Progress Steps -->
+      <div class="space-y-4 mb-6">
+        <!-- Step 1: Upload -->
+        <div
+          id="step1"
+          class="flex items-center p-4 rounded-xl bg-gray-50 transition-all"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4 flex-shrink-0"
+          >
+            <i class="fas fa-upload text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold text-gray-800">Processing Image</p>
+            <p class="text-xs text-gray-500">
+              Preparing screenshot for analysis
+            </p>
+          </div>
+          <div id="step1-spinner" class="hidden">
+            <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
+          </div>
+          <div id="step1-check" class="hidden">
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+          </div>
+        </div>
+
+        <!-- Step 2: Text Extraction -->
+        <div
+          id="step2"
+          class="flex items-center p-4 rounded-xl bg-gray-50 transition-all"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4 flex-shrink-0"
+          >
+            <i class="fas fa-font text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold text-gray-800">Extracting Text</p>
+            <p class="text-xs text-gray-500">Reading content from image</p>
+          </div>
+          <div id="step2-spinner" class="hidden">
+            <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
+          </div>
+          <div id="step2-check" class="hidden">
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+          </div>
+        </div>
+
+        <!-- Step 3: Text Analysis -->
+        <div
+          id="step3"
+          class="flex items-center p-4 rounded-xl bg-gray-50 transition-all"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4 flex-shrink-0"
+          >
+            <i class="fas fa-brain text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold text-gray-800">Text Analysis</p>
+            <p class="text-xs text-gray-500">
+              Scanning for suspicious language
+            </p>
+          </div>
+          <div id="step3-spinner" class="hidden">
+            <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
+          </div>
+          <div id="step3-check" class="hidden">
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+          </div>
+        </div>
+
+        <!-- Step 4: Image Analysis -->
+        <div
+          id="step4"
+          class="flex items-center p-4 rounded-xl bg-gray-50 transition-all"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4 flex-shrink-0"
+          >
+            <i class="fas fa-image text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold text-gray-800">Visual Analysis</p>
+            <p class="text-xs text-gray-500">Examining image patterns</p>
+          </div>
+          <div id="step4-spinner" class="hidden">
+            <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
+          </div>
+          <div id="step4-check" class="hidden">
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+          </div>
+        </div>
+
+        <!-- Step 5: Final Result -->
+        <div
+          id="step5"
+          class="flex items-center p-4 rounded-xl bg-gray-50 transition-all"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4 flex-shrink-0"
+          >
+            <i class="fas fa-chart-line text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold text-gray-800">Generating Results</p>
+            <p class="text-xs text-gray-500">Calculating confidence scores</p>
+          </div>
+          <div id="step5-spinner" class="hidden">
+            <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
+          </div>
+          <div id="step5-check" class="hidden">
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overall Progress Bar -->
+      <div class="mb-4">
+        <div class="flex justify-between text-xs text-gray-600 mb-2">
+          <span>Overall Progress</span>
+          <span id="overallProgress">0%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div
+            id="progressBar"
+            class="bg-brand h-2 rounded-full transition-all duration-500"
+            style="width: 0%"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+
+<style>
+  @keyframes scale-in {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out;
+  }
+
+  #analysisModal .bg-gray-50 {
+    transition: all 0.3s ease;
+  }
+
+  #analysisModal .bg-gray-50.active {
+    background-color: #eff6ff;
+    border: 2px solid #2563eb;
+  }
+
+  #analysisModal .bg-gray-50.active .bg-gray-300 {
+    background-color: #2563eb;
+  }
+
+  #analysisModal .bg-gray-50.completed {
+    background-color: #f0fdf4;
+  }
+
+  #analysisModal .bg-gray-50.completed .bg-gray-300 {
+    background-color: #22c55e;
+  }
+</style>
+
+<script>
+  // File input and drop zone handling
+  const dropZone = document.getElementById("dropZone");
+  const fileInput = document.getElementById("fileInput");
+  const dropZoneContent = document.getElementById("dropZoneContent");
+  const imagePreviewContent = document.getElementById("imagePreviewContent");
+  const imagePreview = document.getElementById("imagePreview");
+  const fileName = document.getElementById("fileName");
+  const clearImageBtn = document.getElementById("clearImageBtn");
+  const analyzeBtn = document.getElementById("analyzeBtn");
+  const analyzeText = document.getElementById("analyzeText");
+  const loadingSpinner = document.getElementById("loadingSpinner");
+
+  // Advanced settings toggle
+  const advancedToggle = document.getElementById("advancedToggle");
+  const advancedSettings = document.getElementById("advancedSettings");
+  const advancedArrow = document.getElementById("advancedArrow");
+
+  // Model weights
+  const textWeight = document.getElementById("textWeight");
+  const cnnWeight = document.getElementById("cnnWeight");
+  const textWeightValue = document.getElementById("textWeightValue");
+  const cnnWeightValue = document.getElementById("cnnWeightValue");
+
+  // Results
+  const resultsSection = document.getElementById("resultsSection");
+  const resultIcon = document.getElementById("resultIcon");
+  const resultTitle = document.getElementById("resultTitle");
+  const resultDescription = document.getElementById("resultDescription");
+  const confidenceBar = document.getElementById("confidenceBar");
+  const confidenceText = document.getElementById("confidenceText");
+  const textConfidence = document.getElementById("textConfidence");
+  const imageConfidence = document.getElementById("imageConfidence");
+
+  // Share buttons
+  const downloadBtn = document.getElementById("downloadBtn");
+  const shareBtn = document.getElementById("shareBtn");
+  const shareSuccess = document.getElementById("shareSuccess");
+  const shareLoading = document.getElementById("shareLoading");
+
+  // Feedback
+  const feedbackButtons = document.getElementById("feedbackButtons");
+  const correctBtn = document.getElementById("correctBtn");
+  const incorrectBtn = document.getElementById("incorrectBtn");
+  const incorrectFeedback = document.getElementById("incorrectFeedback");
+  const submitFeedback = document.getElementById("submitFeedback");
+  const feedbackSuccess = document.getElementById("feedbackSuccess");
+
+  let selectedFile = null;
+  let currentResult = null;
+
+  // Click to upload
+  dropZone.addEventListener("click", (e) => {
+    if (e.target !== clearImageBtn && !clearImageBtn.contains(e.target)) {
+      fileInput.click();
+    }
+  });
+
+  // Drag and drop handlers
+  dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("border-brand", "bg-blue-50");
+  });
+
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("border-brand", "bg-blue-50");
+  });
+
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove("border-brand", "bg-blue-50");
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFile(files[0]);
+    }
+  });
+
+  // File input change
+  fileInput.addEventListener("change", (e) => {
+    if (e.target.files.length > 0) {
+      handleFile(e.target.files[0]);
+    }
+  });
+
+  // Handle file selection
+  function handleFile(file) {
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File size must be less than 10MB");
+      return;
+    }
+
+    selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imagePreview.src = e.target.result;
+      fileName.textContent = file.name;
+      dropZoneContent.classList.add("hidden");
+      imagePreviewContent.classList.remove("hidden");
+      analyzeBtn.disabled = false;
+      analyzeText.textContent = "Analyze Screenshot";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Clear image
+  clearImageBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    selectedFile = null;
+    fileInput.value = "";
+    dropZoneContent.classList.remove("hidden");
+    imagePreviewContent.classList.add("hidden");
+    analyzeBtn.disabled = true;
+    analyzeText.textContent = "Select an image to analyze";
+    resultsSection.classList.add("hidden");
+    currentResult = null;
+  });
+
+  // Advanced settings toggle
+  advancedToggle.addEventListener("click", () => {
+    advancedSettings.classList.toggle("hidden");
+    advancedArrow.classList.toggle("rotate-180");
+  });
+
+  // Weight sliders
+  textWeight.addEventListener("input", (e) => {
+    textWeightValue.textContent = e.target.value + "%";
+    cnnWeight.value = 100 - e.target.value;
+    cnnWeightValue.textContent = 100 - e.target.value + "%";
+  });
+
+  cnnWeight.addEventListener("input", (e) => {
+    cnnWeightValue.textContent = e.target.value + "%";
+    textWeight.value = 100 - e.target.value;
+    textWeightValue.textContent = 100 - e.target.value + "%";
+  });
+
+  // Analyze button
+  analyzeBtn.addEventListener("click", async () => {
+    if (!selectedFile) return;
+
+    // Show modal
+    showAnalysisModal();
+
+    // Disable analyze button
+    analyzeBtn.disabled = true;
+    analyzeText.textContent = "Analyzing...";
+    loadingSpinner.classList.remove("hidden");
+    resultsSection.classList.add("hidden");
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("text_model", document.getElementById("textModel").value);
+    formData.append("cnn_model", document.getElementById("cnnModel").value);
+    formData.append("text_weight", (textWeight.value / 100).toFixed(1));
+    formData.append("cnn_weight", (cnnWeight.value / 100).toFixed(1));
+
+    // Function that performs actual analysis
+    const performActualAnalysis = async () => {
+      try {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Analysis failed");
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          return result;
+        } else {
+          throw new Error(result.error || "Analysis failed");
+        }
+      } catch (error) {
+        throw error;
+      }
+    };
+
+    try {
+      // Run analysis with step simulation
+      const result = await simulateAnalysisSteps(performActualAnalysis);
+
+      // Hide modal
+      hideAnalysisModal();
+
+      // Display results
+      currentResult = result;
+      displayResults(result);
+    } catch (error) {
+      hideAnalysisModal();
+      alert("Error analyzing image. Please try again.");
+      console.error(error);
+    } finally {
+      analyzeBtn.disabled = false;
+      analyzeText.textContent = "Analyze Screenshot";
+      loadingSpinner.classList.add("hidden");
+    }
+  });
+
+  // Display results
+  function displayResults(result) {
+    const isScam = result.prediction === "scam";
+    const confidence = Math.round(result.confidence * 100);
+
+    // Update result icon and text
+    resultIcon.innerHTML = isScam
+      ? '<i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>'
+      : '<i class="fas fa-check-circle text-4xl text-green-500"></i>';
+    resultIcon.className = isScam
+      ? "w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center bg-red-50"
+      : "w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center bg-green-50";
+
+    resultTitle.textContent = isScam
+      ? "⚠️ Potential Scam Detected"
+      : "✓ Appears Legitimate";
+    resultTitle.className = isScam
+      ? "text-xl font-bold mb-2 text-red-600"
+      : "text-xl font-bold mb-2 text-green-600";
+
+    resultDescription.textContent = isScam
+      ? "This screenshot shows signs of a potential scam. Please be cautious."
+      : "This screenshot appears to be legitimate. Stay vigilant nonetheless.";
+
+    // Update confidence bar
+    confidenceBar.style.width = confidence + "%";
+    confidenceBar.className = isScam
+      ? "h-3 rounded-full transition-all duration-500 bg-red-500"
+      : "h-3 rounded-full transition-all duration-500 bg-green-500";
+    confidenceText.textContent = confidence + "%";
+
+    // Update individual scores
+    textConfidence.textContent = Math.round(result.text_confidence * 100) + "%";
+    imageConfidence.textContent =
+      Math.round(result.image_confidence * 100) + "%";
+
+    // Show results section
+    resultsSection.classList.remove("hidden");
+    resultsSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+    // Reset feedback
+    feedbackButtons.classList.remove("hidden");
+    incorrectFeedback.classList.add("hidden");
+    feedbackSuccess.classList.add("hidden");
+    shareSuccess.classList.add("hidden");
+    shareLoading.classList.add("hidden");
+  }
+
+  // Download button
+  downloadBtn.addEventListener("click", async () => {
+    if (!currentResult) return;
+
+    try {
+      shareLoading.classList.remove("hidden");
+      shareSuccess.classList.add("hidden");
+
+      const response = await fetch("/api/share", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ result: currentResult }),
+      });
+
+      console.log("Fetch response status:", response.status);
+      console.log("Fetch response headers:", [...response.headers]);
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Server error response:", text);
+        throw new Error("Failed to create share image");
+      }
+
+      // Download the image
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `scamshield_analysis_${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      shareLoading.classList.add("hidden");
+      shareSuccess.classList.remove("hidden");
+
+      setTimeout(() => {
+        shareSuccess.classList.add("hidden");
+      }, 3000);
+    } catch (error) {
+      console.error("Error downloading image:", error);
+      alert("Failed to download image. Please try again.");
+      shareLoading.classList.add("hidden");
+    }
+  });
+
+  // Share button - uses Web Share API if available
+  shareBtn.addEventListener("click", async () => {
+    if (!currentResult) return;
+
+    try {
+      shareLoading.classList.remove("hidden");
+      shareSuccess.classList.add("hidden");
+
+      const response = await fetch("/api/share", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ result: currentResult }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text);
+      }
+
+      const blob = await response.blob();
+      const file = new File([blob], `scamshield_analysis_${Date.now()}.png`, {
+        type: "image/png",
+      });
+
+      shareLoading.classList.add("hidden");
+
+      // Check if Web Share API is available
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({ files: [file] })
+      ) {
+        await navigator.share({
+          files: [file],
+          title: "ScamShield Analysis",
+          text: `Check out my ScamShield analysis result: ${
+            currentResult.prediction === "scam"
+              ? "Potential Scam Detected"
+              : "Appears Legitimate"
+          }`,
+        });
+
+        shareSuccess.classList.remove("hidden");
+        setTimeout(() => {
+          shareSuccess.classList.add("hidden");
+        }, 3000);
+      } else {
+        // Fallback to download if Web Share API is not available
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `scamshield_analysis_${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        shareSuccess.classList.remove("hidden");
+        setTimeout(() => {
+          shareSuccess.classList.add("hidden");
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error sharing image:", error);
+      if (error.name !== "AbortError") {
+        alert("Failed to share image. Please try again.");
+      }
+      shareLoading.classList.add("hidden");
+    }
+  });
+
+  // Feedback buttons
+  correctBtn.addEventListener("click", () => {
+    feedbackButtons.classList.add("hidden");
+    feedbackSuccess.classList.remove("hidden");
+    sendFeedback(true);
+  });
+
+  incorrectBtn.addEventListener("click", () => {
+    feedbackButtons.classList.add("hidden");
+    incorrectFeedback.classList.remove("hidden");
+  });
+
+  submitFeedback.addEventListener("click", () => {
+    const classification = document.getElementById(
+      "correctClassification"
+    ).value;
+    const comments = document.getElementById("feedbackComments").value;
+
+    if (!classification) {
+      alert("Please select the correct classification");
+      return;
+    }
+
+    incorrectFeedback.classList.add("hidden");
+    feedbackSuccess.classList.remove("hidden");
+    sendFeedback(false, classification, comments);
+  });
+
+  function sendFeedback(correct, classification = null, comments = null) {
+    fetch("/api/feedback", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        correct: correct,
+        classification: classification,
+        comments: comments,
+        result: currentResult,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Feedback submitted:", data);
+      })
+      .catch((error) => {
+        console.error("Error submitting feedback:", error);
+      });
+  }
+
+  function showAnalysisModal() {
+    const modal = document.getElementById("analysisModal");
+    modal.classList.remove("hidden");
+    resetModalSteps();
+  }
+
+  function hideAnalysisModal() {
+    const modal = document.getElementById("analysisModal");
+    modal.classList.add("hidden");
+  }
+
+  function resetModalSteps() {
+    for (let i = 1; i <= 5; i++) {
+      const step = document.getElementById(`step${i}`);
+      const spinner = document.getElementById(`step${i}-spinner`);
+      const check = document.getElementById(`step${i}-check`);
+
+      step.classList.remove("active", "completed");
+      spinner.classList.add("hidden");
+      check.classList.add("hidden");
+    }
+
+    document.getElementById("progressBar").style.width = "0%";
+    document.getElementById("overallProgress").textContent = "0%";
+  }
+
+  function updateStep(stepNumber, status) {
+    const step = document.getElementById(`step${stepNumber}`);
+    const spinner = document.getElementById(`step${stepNumber}-spinner`);
+    const check = document.getElementById(`step${stepNumber}-check`);
+
+    if (status === "active") {
+      step.classList.add("active");
+      step.classList.remove("completed");
+      spinner.classList.remove("hidden");
+      check.classList.add("hidden");
+    } else if (status === "completed") {
+      step.classList.remove("active");
+      step.classList.add("completed");
+      spinner.classList.add("hidden");
+      check.classList.remove("hidden");
+    }
+
+    // Update overall progress
+    const progress = (stepNumber / 5) * 100;
+    document.getElementById("progressBar").style.width = progress + "%";
+    document.getElementById("overallProgress").textContent =
+      Math.round(progress) + "%";
+  }
+
+  async function simulateAnalysisSteps(actualAnalysis) {
+    // Step 1: Processing Image
+    updateStep(1, "active");
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    updateStep(1, "completed");
+
+    // Step 2: Extracting Text
+    updateStep(2, "active");
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    updateStep(2, "completed");
+
+    // Step 3: Text Analysis
+    updateStep(3, "active");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    updateStep(3, "completed");
+
+    // Step 4: Image Analysis (run actual analysis in background)
+    updateStep(4, "active");
+    const resultPromise = actualAnalysis();
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    updateStep(4, "completed");
+
+    // Step 5: Generating Results
+    updateStep(5, "active");
+    const result = await resultPromise;
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    updateStep(5, "completed");
+
+    // Small delay before hiding modal
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    return result;
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,269 @@
+{% extends "base.html" %} {% block title %}ScamSigurado - Protect Yourself{%
+endblock %} {% block extra_head %}
+<style>
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .slide-up {
+    animation: slideUp 0.6s ease-out forwards;
+  }
+
+  .delay-1 {
+    animation-delay: 0.1s;
+    opacity: 0;
+  }
+  .delay-2 {
+    animation-delay: 0.2s;
+    opacity: 0;
+  }
+  .delay-3 {
+    animation-delay: 0.3s;
+    opacity: 0;
+  }
+  .delay-4 {
+    animation-delay: 0.4s;
+    opacity: 0;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .float-animation {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+</style>
+{% endblock %} {% block content %}
+<!-- Hero Section -->
+<div
+  class="bg-gradient-to-br from-blue-600 to-blue-700 text-white px-6 pt-8 pb-12 rounded-b-3xl shadow-lg"
+>
+  <div class="text-center slide-up">
+    <div
+      class="w-20 h-20 mx-auto mb-4 bg-white rounded-full flex items-center justify-center shadow-lg float-animation"
+    >
+      <i class="fas fa-shield-alt text-blue-600 text-3xl"></i>
+    </div>
+    <h1 class="text-3xl font-bold mb-2">ScamSigurado</h1>
+    <p class="text-blue-100 text-sm mb-6">
+      Sa ScamSigurado, talagang protektado!
+    </p>
+  </div>
+
+  <!-- CTA Button -->
+  <a href="/upload" class="block slide-up delay-1">
+    <div
+      class="bg-white text-blue-600 rounded-2xl p-5 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
+    >
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <h3 class="font-bold text-lg mb-1">Check Screenshot Now</h3>
+          <p class="text-xs text-gray-600">Upload & detect scams instantly</p>
+        </div>
+        <div
+          class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center"
+        >
+          <i class="fas fa-camera text-white text-xl"></i>
+        </div>
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- Stats Section -->
+<div class="px-6 -mt-6 slide-up delay-2">
+  <div class="bg-white rounded-2xl shadow-lg p-5">
+    <div class="grid grid-cols-3 gap-4 text-center">
+      <div>
+        <div class="text-2xl font-bold text-blue-600">98%</div>
+        <div class="text-xs text-gray-600 mt-1">Accuracy</div>
+      </div>
+      <div class="border-l border-r border-gray-200">
+        <div class="text-2xl font-bold text-blue-600">15K+</div>
+        <div class="text-xs text-gray-600 mt-1">Scans</div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold text-blue-600">5K+</div>
+        <div class="text-xs text-gray-600 mt-1">Protected</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert Banner -->
+<div class="px-6 mt-6 slide-up delay-3">
+  <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-4">
+    <div class="flex items-start">
+      <i class="fas fa-exclamation-triangle text-red-500 mt-0.5 mr-3"></i>
+      <div>
+        <p class="text-sm font-semibold text-red-800 mb-1">
+          ₱2.3B Lost to Scams in 2024
+        </p>
+        <p class="text-xs text-red-700">
+          Filipino victims lost billions. Don't be next.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- How It Works -->
+<div class="px-6 mt-8 slide-up delay-4">
+  <h2 class="text-xl font-bold text-gray-800 mb-4">How It Works</h2>
+
+  <div class="space-y-4">
+    <!-- Step 1 -->
+    <div class="flex items-start">
+      <div
+        class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mr-4"
+      >
+        <span class="text-blue-600 font-bold">1</span>
+      </div>
+      <div class="flex-1">
+        <h3 class="font-semibold text-gray-800 mb-1">Upload Screenshot</h3>
+        <p class="text-sm text-gray-600">
+          Take or upload a screenshot of suspicious messages, posts, or websites
+        </p>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="flex items-start">
+      <div
+        class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mr-4"
+      >
+        <span class="text-blue-600 font-bold">2</span>
+      </div>
+      <div class="flex-1">
+        <h3 class="font-semibold text-gray-800 mb-1">AI Analysis</h3>
+        <p class="text-sm text-gray-600">
+          Our advanced AI analyzes text patterns and visual elements for scam
+          indicators
+        </p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="flex items-start">
+      <div
+        class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mr-4"
+      >
+        <span class="text-blue-600 font-bold">3</span>
+      </div>
+      <div class="flex-1">
+        <h3 class="font-semibold text-gray-800 mb-1">Get Results</h3>
+        <p class="text-sm text-gray-600">
+          Receive instant detection results with confidence scores and
+          recommendations
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Why Trust Us -->
+<div class="px-6 mt-8 mb-6">
+  <div
+    class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white"
+  >
+    <h2 class="text-xl font-bold mb-4">Why Trust ScamSigurado?</h2>
+
+    <div class="space-y-3">
+      <div class="flex items-start">
+        <i class="fas fa-check-circle text-blue-200 mr-3 mt-1"></i>
+        <p class="text-sm text-blue-50">
+          Advanced AI trained on thousands of Filipino scam patterns
+        </p>
+      </div>
+      <div class="flex items-start">
+        <i class="fas fa-check-circle text-blue-200 mr-3 mt-1"></i>
+        <p class="text-sm text-blue-50">
+          Multimodal analysis - both text and visual detection
+        </p>
+      </div>
+      <div class="flex items-start">
+        <i class="fas fa-check-circle text-blue-200 mr-3 mt-1"></i>
+        <p class="text-sm text-blue-50">
+          Instant results with detailed confidence scores
+        </p>
+      </div>
+      <div class="flex items-start">
+        <i class="fas fa-check-circle text-blue-200 mr-3 mt-1"></i>
+        <p class="text-sm text-blue-50">
+          100% free and private - we don't store your data
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Final CTA -->
+<div class="px-6 mt-8 mb-24">
+  <a href="/upload" class="block">
+    <div
+      class="bg-blue-600 text-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+    >
+      <i class="fas fa-shield-alt text-4xl mb-3"></i>
+      <h3 class="text-xl font-bold mb-2">Protect Yourself Now</h3>
+      <p class="text-sm text-blue-100 mb-4">
+        Upload a screenshot to start detection
+      </p>
+      <div
+        class="bg-white text-blue-600 rounded-lg py-3 px-6 inline-flex items-center font-semibold"
+      >
+        <span>Get Started</span>
+        <i class="fas fa-arrow-right ml-2"></i>
+      </div>
+    </div>
+  </a>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  // Add smooth scroll behavior
+  document.querySelectorAll('a[href^="/"]').forEach((anchor) => {
+    anchor.addEventListener("click", function (e) {
+      if ("vibrate" in navigator) {
+        navigator.vibrate(10);
+      }
+    });
+  });
+
+  // Trigger animations on scroll for better performance
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: "0px 0px -50px 0px",
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = "1";
+        entry.target.style.transform = "translateY(0)";
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll(".slide-up").forEach((el) => observer.observe(el));
+</script>
+{% endblock %}

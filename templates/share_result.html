@@ -1,0 +1,289 @@
+warnings.filterwarnings('ignore')
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+          background: #ffffff;
+          width: 1080px;
+          height: 1920px;
+          position: relative;
+      }
+
+      .container {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+      }
+
+      /* Header */
+      .header {
+          background: #2563eb;
+          padding: 80px 60px;
+          text-align: center;
+          border-radius: 0 0 60px 60px;
+      }
+
+      .header h1 {
+          font-size: 72px;
+          font-weight: 700;
+          color: #ffffff;
+          margin-bottom: 20px;
+      }
+
+      .header p {
+          font-size: 36px;
+          color: #bfdbfe;
+      }
+
+      /* Main Content */
+      .content {
+          flex: 1;
+          padding: 80px;
+          display: flex;
+          flex-direction: column;
+          gap: 40px;
+      }
+
+      /* Status Card */
+      .status-card {
+          background: {{ status_bg }};
+          border-radius: 40px;
+          padding: 60px;
+          text-align: center;
+      }
+
+      .status-icon {
+          width: 140px;
+          height: 140px;
+          border-radius: 50%;
+          background: {{ status_color }};
+          margin: 0 auto 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+
+      .status-icon svg {
+          width: 80px;
+          height: 80px;
+          fill: #ffffff;
+      }
+
+      .status-text {
+          font-size: 52px;
+          font-weight: 700;
+          color: {{ status_color }};
+          text-transform: uppercase;
+          letter-spacing: 1px;
+      }
+
+      /* Confidence Card */
+      .confidence-card {
+          background: #f9fafb;
+          border-radius: 40px;
+          padding: 60px;
+      }
+
+      .confidence-card h2 {
+          font-size: 52px;
+          font-weight: 700;
+          color: #1f2937;
+          text-align: center;
+          margin-bottom: 40px;
+      }
+
+      .confidence-score {
+          text-align: center;
+          margin-bottom: 60px;
+      }
+
+      .confidence-number {
+          font-size: 96px;
+          font-weight: 700;
+          color: #2563eb;
+          line-height: 1;
+      }
+
+      .progress-bar-container {
+          background: #e5e7eb;
+          height: 40px;
+          border-radius: 20px;
+          overflow: hidden;
+          margin-bottom: 60px;
+      }
+
+      .progress-bar {
+          background: {{ status_color }};
+          height: 100%;
+          border-radius: 20px;
+          width: {{ confidence }}%;
+          transition: width 0.5s ease;
+      }
+
+      /* Sub Scores */
+      .sub-scores {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 30px;
+      }
+
+      .sub-score {
+          text-align: center;
+          padding: 40px;
+          background: #ffffff;
+          border-radius: 20px;
+      }
+
+      .sub-score-label {
+          font-size: 32px;
+          color: #6b7280;
+          margin-bottom: 20px;
+      }
+
+      .sub-score-value {
+          font-size: 48px;
+          font-weight: 700;
+          color: #1f2937;
+      }
+
+      /* Warning Card */
+      .warning-card {
+          background: #eff6ff;
+          border-radius: 40px;
+          padding: 60px;
+          text-align: center;
+      }
+
+      .warning-icon {
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          background: #2563eb;
+          margin: 0 auto 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+
+      .warning-icon svg {
+          width: 60px;
+          height: 60px;
+          fill: #ffffff;
+      }
+
+      .warning-text {
+          font-size: 38px;
+          color: #1f2937;
+          line-height: 1.6;
+      }
+
+      /* Footer */
+      .footer {
+          text-align: center;
+          padding: 60px;
+          color: #6b7280;
+      }
+
+      .footer p {
+          font-size: 32px;
+          margin-bottom: 15px;
+      }
+
+      .footer .timestamp {
+          font-size: 28px;
+      }
+
+      .footer .branding {
+          font-size: 32px;
+          color: #2563eb;
+          font-weight: 600;
+          margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1>ScamSigurado</h1>
+        <p>Scam Analysis Report</p>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Status Card -->
+        <div class="status-card">
+          <div class="status-icon">
+            {% if is_scam %}
+            <!-- Warning Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16v2h2v-2h-2zm0-6v4h2v-4h-2z"
+              />
+            </svg>
+            {% else %}
+            <!-- Checkmark Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+              />
+            </svg>
+            {% endif %}
+          </div>
+          <div class="status-text">{{ status_text }}</div>
+        </div>
+
+        <!-- Confidence Card -->
+        <div class="confidence-card">
+          <h2>Confidence Score</h2>
+          <div class="confidence-score">
+            <div class="confidence-number">{{ confidence }}%</div>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar"></div>
+          </div>
+          <div class="sub-scores">
+            <div class="sub-score">
+              <div class="sub-score-label">Text Analysis</div>
+              <div class="sub-score-value">{{ text_confidence }}%</div>
+            </div>
+            <div class="sub-score">
+              <div class="sub-score-label">Image Analysis</div>
+              <div class="sub-score-value">{{ image_confidence }}%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warning Card -->
+        <div class="warning-card">
+          <div class="warning-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+              />
+            </svg>
+          </div>
+          <div class="warning-text">{{ warning_message }}</div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p>Analyzed by ScamSigurado</p>
+        <p class="timestamp">{{ timestamp }}</p>
+        <p class="branding">Stay safe online</p>
+      </div>
+    </div>
+  </body>
+</html>

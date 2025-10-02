@@ -1,0 +1,327 @@
+{% extends "base.html" %} {% block title %}Settings - ScamShield{% endblock %}
+{% block extra_head %}
+<style>
+  /* Toggle Switch Styles */
+  .toggle-checkbox {
+    appearance: none;
+    width: 3rem;
+    height: 1.75rem;
+    background-color: #d1d5db;
+    border-radius: 9999px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .toggle-checkbox:checked {
+    background-color: #2563eb;
+  }
+
+  .toggle-checkbox::before {
+    content: "";
+    position: absolute;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-color: white;
+    border-radius: 50%;
+    top: 0.25rem;
+    left: 0.25rem;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .toggle-checkbox:checked::before {
+    transform: translateX(1.25rem);
+  }
+
+  /* Setting Item Hover Effect */
+  .setting-item {
+    transition: background-color 0.2s ease;
+  }
+
+  .setting-item:active {
+    background-color: #f3f4f6;
+  }
+
+  /* Language Option Styles */
+  .language-option {
+    transition: all 0.2s ease;
+  }
+
+  .language-option.active {
+    background-color: #eff6ff;
+    border-color: #2563eb;
+  }
+</style>
+{% endblock %} {% block content %}
+<!-- Header -->
+  <div
+    class="bg-brand text-center text-white px-6 py-8 rounded-b-3xl shadow-md"
+  >
+    <h1 class="text-4xl font-semibold mb-2">Settings</h1>
+    </p>
+  </div>
+
+<!-- Settings Content -->
+<div class="p-4">
+  <!-- Appearance Section -->
+  <div class="mb-6">
+    <h2 class="text-sm font-semibold text-gray-500 uppercase mb-3 px-1">
+      Appearance
+    </h2>
+
+    <!-- Dark Mode Toggle -->
+    <div class="bg-white rounded-lg shadow-sm">
+      <div class="setting-item p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div
+            class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"
+          >
+            <i class="fas fa-moon text-gray-700"></i>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900">Dark Mode</p>
+            <p class="text-sm text-gray-500">Switch to dark theme</p>
+          </div>
+        </div>
+        <input type="checkbox" id="darkModeToggle" class="toggle-checkbox" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Language Section -->
+  <div class="mb-6">
+    <h2 class="text-sm font-semibold text-gray-500 uppercase mb-3 px-1">
+      Language
+    </h2>
+
+    <div class="bg-white rounded-lg shadow-sm">
+      <!-- Current Language Display -->
+      <div
+        class="setting-item p-4 flex items-center justify-between cursor-pointer"
+        onclick="toggleLanguageOptions()"
+      >
+        <div class="flex items-center space-x-3">
+          <div
+            class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"
+          >
+            <i class="fas fa-language text-gray-700"></i>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900">Language</p>
+            <p class="text-sm text-gray-500" id="currentLanguage">English</p>
+          </div>
+        </div>
+        <i class="fas fa-chevron-right text-gray-400" id="languageChevron"></i>
+      </div>
+
+      <!-- Language Options (Hidden by default) -->
+      <div id="languageOptions" class="hidden border-t border-gray-100">
+        <!-- English Option -->
+        <div
+          class="language-option p-4 flex items-center justify-between cursor-pointer border-2 border-transparent"
+          onclick="selectLanguage('en', 'English')"
+        >
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">🇬🇧</span>
+            <div>
+              <p class="font-medium text-gray-900">English</p>
+              <p class="text-xs text-gray-500">Default language</p>
+            </div>
+          </div>
+          <i class="fas fa-check text-brand language-check" id="check-en"></i>
+        </div>
+
+        <!-- Filipino Option -->
+        <div
+          class="language-option p-4 flex items-center justify-between cursor-pointer border-2 border-transparent"
+          onclick="selectLanguage('fil', 'Filipino')"
+        >
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">🇵🇭</span>
+            <div>
+              <p class="font-medium text-gray-900">Filipino</p>
+              <p class="text-xs text-gray-500">Wikang Filipino</p>
+            </div>
+          </div>
+          <i
+            class="fas fa-check text-brand language-check hidden"
+            id="check-fil"
+          ></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy & Disclaimer Section -->
+  <div class="mb-6">
+    <h2 class="text-sm font-semibold text-gray-500 uppercase mb-3 px-1">
+      Privacy & Disclaimer
+    </h2>
+
+    <div class="bg-white rounded-lg shadow-sm">
+      <!-- Privacy Notice -->
+      <div class="p-4 border-b border-gray-100">
+        <div class="flex items-start space-x-3">
+          <div
+            class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0"
+          >
+            <i class="fas fa-shield-alt text-green-600"></i>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900 mb-1">Your Privacy Matters</p>
+            <p class="text-sm text-gray-600">
+              We <strong>do not store</strong> your uploaded screenshots. All
+              images are analyzed in real-time and immediately deleted after
+              processing.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="p-4">
+        <div class="flex items-start space-x-3">
+          <div
+            class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0"
+          >
+            <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900 mb-1">Always Verify</p>
+            <p class="text-sm text-gray-600">
+              Our AI provides guidance but is
+              <strong>not 100% accurate</strong>. Always verify suspicious
+              content through official channels and use your best judgment.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="bg-blue-50 rounded-lg p-4 flex items-start space-x-3">
+    <i class="fas fa-info-circle text-brand mt-1"></i>
+    <div>
+      <p class="text-sm text-gray-700">
+        <strong>Need help?</strong> Visit our support page or contact us for
+        assistance with any settings.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  // Dark Mode Toggle
+  const darkModeToggle = document.getElementById("darkModeToggle");
+  const currentTheme = localStorage.getItem("theme") || "light";
+  const currentLang = localStorage.getItem("language") || "en";
+
+  // Initialize dark mode state
+  if (currentTheme === "dark") {
+    darkModeToggle.checked = true;
+    document.body.classList.add("dark");
+  }
+
+  darkModeToggle.addEventListener("change", function () {
+    if (this.checked) {
+      localStorage.setItem("theme", "dark");
+      document.body.classList.add("dark");
+      showToast("Dark mode enabled", "success");
+    } else {
+      localStorage.setItem("theme", "light");
+      document.body.classList.remove("dark");
+      showToast("Light mode enabled", "success");
+    }
+  });
+
+  // Language Toggle Functions
+  function toggleLanguageOptions() {
+    const options = document.getElementById("languageOptions");
+    const chevron = document.getElementById("languageChevron");
+
+    if (options.classList.contains("hidden")) {
+      options.classList.remove("hidden");
+      chevron.classList.remove("fa-chevron-right");
+      chevron.classList.add("fa-chevron-down");
+    } else {
+      options.classList.add("hidden");
+      chevron.classList.remove("fa-chevron-down");
+      chevron.classList.add("fa-chevron-right");
+    }
+  }
+
+  function selectLanguage(code, name) {
+    // Update current language display
+    document.getElementById("currentLanguage").textContent = name;
+
+    // Update check marks
+    document.querySelectorAll(".language-check").forEach((check) => {
+      check.classList.add("hidden");
+    });
+    document.getElementById(`check-${code}`).classList.remove("hidden");
+
+    // Update active state
+    document.querySelectorAll(".language-option").forEach((option) => {
+      option.classList.remove("active");
+    });
+    event.currentTarget.classList.add("active");
+
+    // Save to localStorage
+    localStorage.setItem("language", code);
+
+    // Show toast
+    showToast(`Language changed to ${name}`, "success");
+
+    // Close options after selection
+    setTimeout(() => {
+      toggleLanguageOptions();
+    }, 300);
+  }
+
+  // Initialize language on page load
+  function initializeLanguage() {
+    const savedLang = localStorage.getItem("language") || "en";
+    const langName = savedLang === "en" ? "English" : "Filipino";
+
+    document.getElementById("currentLanguage").textContent = langName;
+    document.getElementById(`check-${savedLang}`).classList.remove("hidden");
+  }
+
+  // Toast notification function
+  function showToast(message, type = "info") {
+    const toastContainer = document.getElementById("toast-container");
+    const colors = {
+      success: "border-green-500",
+      error: "border-red-500",
+      info: "border-blue-500",
+    };
+    const icons = {
+      success: "fa-check-circle text-green-500",
+      error: "fa-exclamation-circle text-red-500",
+      info: "fa-info-circle text-blue-500",
+    };
+
+    const toast = document.createElement("div");
+    toast.className = `fade-in bg-white rounded-lg shadow-lg p-4 mb-2 flex items-start border-l-4 ${colors[type]}`;
+    toast.innerHTML = `
+      <i class="fas ${icons[type]} mr-3 mt-0.5"></i>
+      <p class="text-sm text-gray-700 flex-1">${message}</p>
+      <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600 ml-2">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  // Initialize on page load
+  document.addEventListener("DOMContentLoaded", initializeLanguage);
+</script>
+{% endblock %}
