@@ -1,0 +1,712 @@
+{% extends "base.html" %} {% block title %}Learn About Scams - ScamShield{%
+endblock %} {% block extra_head %}
+<style>
+  /* Message bubble animations */
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .message-left {
+    animation: slideInLeft 0.4s ease-out;
+  }
+
+  .message-right {
+    animation: slideInRight 0.4s ease-out;
+  }
+
+  .scam-badge {
+    animation: fadeIn 0.5s ease-out 0.8s both;
+  }
+
+  /* Carousel styles */
+  .carousel-container {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .carousel-track {
+    display: flex;
+    transition: transform 0.4s ease-in-out;
+  }
+
+  .carousel-slide {
+    min-width: 100%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    padding: 0; /* reset */
+  }
+
+  .dot {
+    transition: all 0.3s ease;
+  }
+
+  .dot.active {
+    background-color: #2563eb;
+    width: 24px;
+  }
+</style>
+{% endblock %} {% block content %}
+<!-- Header Section -->
+<div
+  class="bg-gradient-to-br from-blue-600 to-blue-700 text-white px-6 pt-8 pb-12 rounded-b-3xl shadow-lg"
+>
+  <div class="text-center slide-up">
+    <div
+      class="w-20 h-20 mx-auto mb-4 bg-white rounded-full flex items-center justify-center shadow-lg float-animation"
+    >
+      <i class="fas fa-shield-alt text-blue-600 text-3xl"></i>
+    </div>
+    <h1 class="text-3xl font-bold mb-2">Learn about Scams!</h1>
+    <p class="text-blue-100 text-sm mb-6">
+      Sa ScamSigurado, talagang protektado!
+    </p>
+  </div>
+</div>
+<!-- Replace the existing Carousel Container section with this fixed version -->
+
+<!-- Carousel Container -->
+<div class="py-6">
+  <!-- Carousel -->
+  <div class="carousel-container rounded-2xl mx-6">
+    <div class="carousel-track" id="carouselTrack">
+      <!-- Slide 1: Task Scam -->
+      <div class="carousel-slide">
+        <div class="bg-white rounded-2xl overflow-hidden">
+          <div class="p-3 bg-gray-50 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div
+                  class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-2"
+                >
+                  <i class="fas fa-tasks text-brand text-sm"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-800 text-sm">
+                    Scam Example
+                  </h3>
+                  <p class="text-xs text-gray-500">1 of 5</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="p-3 space-y-2.5 bg-gradient-to-b from-gray-50 to-white min-h-[220px]"
+          >
+            <div class="flex items-start space-x-2 message-left">
+              <div
+                class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+              <div
+                class="bg-gray-200 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-gray-800 leading-relaxed">
+                  Congratulations! You've been selected for our earning program.
+                  Complete simple tasks and earn ₱500-₱2,000 daily! First task:
+                  Like our page. Payment: ₱50
+                </p>
+                <span class="text-[10px] text-gray-500 mt-1 block"
+                  >10:23 AM</span
+                >
+              </div>
+            </div>
+
+            <div class="flex items-end justify-end space-x-2 message-right">
+              <div
+                class="bg-brand rounded-2xl rounded-tr-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-white leading-relaxed">
+                  Wow, that's great! I completed the task. When will I get paid?
+                </p>
+                <span class="text-[10px] text-blue-200 mt-1 block"
+                  >10:25 AM</span
+                >
+              </div>
+              <div
+                class="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-2 message-left">
+              <div
+                class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+              <div
+                class="bg-gray-200 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-gray-800 leading-relaxed">
+                  Good! To unlock bigger tasks (₱500-₱2,000), you need to pay
+                  ₱200 activation fee. Send to this GCash...
+                </p>
+                <span class="text-[10px] text-gray-500 mt-1 block"
+                  >10:26 AM</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-red-50 border-t-2 border-red-500 p-3 scam-badge">
+            <div class="flex items-start">
+              <div
+                class="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center mr-2 flex-shrink-0"
+              >
+                <i class="fas fa-exclamation-triangle text-white text-sm"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-red-900 mb-1 text-sm">
+                  Task Scam / "Easy Money" Scam
+                </h4>
+                <p class="text-xs text-red-800 leading-relaxed">
+                  Scammers promise easy money for simple tasks, then ask for
+                  payment to "unlock" higher earnings.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2: GCash Phishing -->
+      <div class="carousel-slide">
+        <div class="bg-white rounded-2xl overflow-hidden">
+          <div class="p-3 bg-gray-50 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div
+                  class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-2"
+                >
+                  <i class="fas fa-mobile-alt text-brand text-sm"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-800 text-sm">
+                    Scam Example
+                  </h3>
+                  <p class="text-xs text-gray-500">2 of 5</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="p-3 space-y-2.5 bg-gradient-to-b from-gray-50 to-white min-h-[220px]"
+          >
+            <div class="flex items-start space-x-2 message-left">
+              <div
+                class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+              <div
+                class="bg-gray-200 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-gray-800 leading-relaxed">
+                  GCASH ALERT: Your account has been compromised. Click this
+                  link immediately to secure your account:
+                  gcash-security[.]xyz/verify
+                </p>
+                <span class="text-[10px] text-gray-500 mt-1 block"
+                  >2:45 PM</span
+                >
+              </div>
+            </div>
+
+            <div class="flex items-end justify-end space-x-2 message-right">
+              <div
+                class="bg-brand rounded-2xl rounded-tr-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-white leading-relaxed">
+                  Oh no! I'll click it right away. Should I enter my MPIN?
+                </p>
+                <span class="text-[10px] text-blue-200 mt-1 block"
+                  >2:46 PM</span
+                >
+              </div>
+              <div
+                class="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-2 message-left">
+              <div
+                class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+              <div
+                class="bg-gray-200 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-gray-800 leading-relaxed">
+                  Yes! Enter your mobile number, MPIN, and OTP to verify your
+                  identity.
+                </p>
+                <span class="text-[10px] text-gray-500 mt-1 block"
+                  >2:47 PM</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-red-50 border-t-2 border-red-500 p-3 scam-badge">
+            <div class="flex items-start">
+              <div
+                class="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center mr-2 flex-shrink-0"
+              >
+                <i class="fas fa-shield-alt text-white text-sm"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-red-900 mb-1 text-sm">
+                  SMS Phishing / GCash Hack
+                </h4>
+                <p class="text-xs text-red-800 leading-relaxed">
+                  Fake messages claiming your account is compromised. The link
+                  steals your credentials and OTP.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Gambling Scam -->
+      <div class="carousel-slide">
+        <div class="bg-white rounded-2xl overflow-hidden">
+          <div class="p-3 bg-gray-50 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div
+                  class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-2"
+                >
+                  <i class="fas fa-dice text-brand text-sm"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-800 text-sm">
+                    Scam Example
+                  </h3>
+                  <p class="text-xs text-gray-500">3 of 5</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="p-3 space-y-2.5 bg-gradient-to-b from-gray-50 to-white min-h-[220px]"
+          >
+            <div class="flex items-start space-x-2 message-left">
+              <div
+                class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+              <div
+                class="bg-gray-200 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-gray-800 leading-relaxed">
+                  🎰 Join our VIP casino! I won ₱50,000 in 2 hours! Min deposit
+                  ₱500. Get ₱1,000 bonus! 100% legit! 💰💰💰
+                </p>
+                <span class="text-[10px] text-gray-500 mt-1 block"
+                  >8:15 PM</span
+                >
+              </div>
+            </div>
+
+            <div class="flex items-end justify-end space-x-2 message-right">
+              <div
+                class="bg-brand rounded-2xl rounded-tr-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-white leading-relaxed">
+                  Really? That's amazing! I'll deposit ₱1,000 to start. Can I
+                  withdraw anytime?
+                </p>
+                <span class="text-[10px] text-blue-200 mt-1 block"
+                  >8:17 PM</span
+                >
+              </div>
+              <div
+                class="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-2 message-left">
+              <div
+                class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+              <div
+                class="bg-gray-200 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-gray-800 leading-relaxed">
+                  Yes! But you need ₱10,000 turnover first. Withdrawal fee is
+                  ₱500. Keep playing!
+                </p>
+                <span class="text-[10px] text-gray-500 mt-1 block"
+                  >8:18 PM</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-red-50 border-t-2 border-red-500 p-3 scam-badge">
+            <div class="flex items-start">
+              <div
+                class="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center mr-2 flex-shrink-0"
+              >
+                <i class="fas fa-coins text-white text-sm"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-red-900 mb-1 text-sm">
+                  Illegal Online Gambling Scam
+                </h4>
+                <p class="text-xs text-red-800 leading-relaxed">
+                  Fake casino sites with impossible withdrawal requirements and
+                  hidden fees.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Romance Investment Scam -->
+      <div class="carousel-slide">
+        <div class="bg-white rounded-2xl overflow-hidden">
+          <div class="p-3 bg-gray-50 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div
+                  class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-2"
+                >
+                  <i class="fas fa-heart text-brand text-sm"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-800 text-sm">
+                    Scam Example
+                  </h3>
+                  <p class="text-xs text-gray-500">4 of 5</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="p-3 space-y-2.5 bg-gradient-to-b from-gray-50 to-white min-h-[220px]"
+          >
+            <div class="flex items-start space-x-2 message-left">
+              <div
+                class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+              <div
+                class="bg-gray-200 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-gray-800 leading-relaxed">
+                  Hi! I'm investing in crypto and making great returns. I can
+                  teach you. I care about your future 💕
+                </p>
+                <span class="text-[10px] text-gray-500 mt-1 block"
+                  >11:30 AM</span
+                >
+              </div>
+            </div>
+
+            <div class="flex items-end justify-end space-x-2 message-right">
+              <div
+                class="bg-brand rounded-2xl rounded-tr-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-white leading-relaxed">
+                  Thank you! You're so kind. I'll invest ₱20,000. I trust you
+                  completely.
+                </p>
+                <span class="text-[10px] text-blue-200 mt-1 block"
+                  >11:45 AM</span
+                >
+              </div>
+              <div
+                class="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-2 message-left">
+              <div
+                class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+              <div
+                class="bg-gray-200 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-gray-800 leading-relaxed">
+                  Your investment grew to ₱35,000! Pay ₱5,000 tax to withdraw.
+                  Send it now!
+                </p>
+                <span class="text-[10px] text-gray-500 mt-1 block"
+                  >2 days later</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-red-50 border-t-2 border-red-500 p-3 scam-badge">
+            <div class="flex items-start">
+              <div
+                class="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center mr-2 flex-shrink-0"
+              >
+                <i class="fas fa-heartbeat text-white text-sm"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-red-900 mb-1 text-sm">
+                  Romance Investment Scam
+                </h4>
+                <p class="text-xs text-red-800 leading-relaxed">
+                  Scammers build romantic relationships, then push fake
+                  investments.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5: Fake Online Seller -->
+      <div class="carousel-slide">
+        <div class="bg-white rounded-2xl overflow-hidden">
+          <div class="p-3 bg-gray-50 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div
+                  class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-2"
+                >
+                  <i class="fas fa-shopping-cart text-brand text-sm"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-800 text-sm">
+                    Scam Example
+                  </h3>
+                  <p class="text-xs text-gray-500">5 of 5</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="p-3 space-y-2.5 bg-gradient-to-b from-gray-50 to-white min-h-[220px]"
+          >
+            <div class="flex items-start space-x-2 message-left">
+              <div
+                class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+              <div
+                class="bg-gray-200 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-gray-800 leading-relaxed">
+                  iPhone 15 Pro Max - BRAND NEW ✨ Only ₱25,000! Original from
+                  Dubai. Full payment first! 100% legit!
+                </p>
+                <span class="text-[10px] text-gray-500 mt-1 block"
+                  >3:20 PM</span
+                >
+              </div>
+            </div>
+
+            <div class="flex items-end justify-end space-x-2 message-right">
+              <div
+                class="bg-brand rounded-2xl rounded-tr-sm px-3 py-2 max-w-[70%]"
+              >
+                <p class="text-xs text-white leading-relaxed">
+                  Wow! That's so cheap! I'll send payment now via GCash. Please
+                  ship it today!
+                </p>
+                <span class="text-[10px] text-blue-200 mt-1 block"
+                  >3:22 PM</span
+                >
+              </div>
+              <div
+                class="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-center py-3">
+              <div
+                class="bg-gray-300 rounded-full px-3 py-1.5 text-xs text-gray-600"
+              >
+                <i class="fas fa-user-slash mr-1.5"></i>
+                User blocked you
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-red-50 border-t-2 border-red-500 p-3 scam-badge">
+            <div class="flex items-start">
+              <div
+                class="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center mr-2 flex-shrink-0"
+              >
+                <i class="fas fa-store-slash text-white text-sm"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-red-900 mb-1 text-sm">
+                  Fake Online Seller Scam
+                </h4>
+                <p class="text-xs text-red-800 leading-relaxed">
+                  Too-good-to-be-true prices. After payment, they block you and
+                  disappear.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Dots -->
+  <div class="flex justify-center items-center space-x-2 mt-5 px-6">
+    <button
+      class="dot w-2 h-2 rounded-full bg-gray-300 active"
+      onclick="goToSlide(0)"
+    ></button>
+    <button
+      class="dot w-2 h-2 rounded-full bg-gray-300"
+      onclick="goToSlide(1)"
+    ></button>
+    <button
+      class="dot w-2 h-2 rounded-full bg-gray-300"
+      onclick="goToSlide(2)"
+    ></button>
+    <button
+      class="dot w-2 h-2 rounded-full bg-gray-300"
+      onclick="goToSlide(3)"
+    ></button>
+    <button
+      class="dot w-2 h-2 rounded-full bg-gray-300"
+      onclick="goToSlide(4)"
+    ></button>
+  </div>
+
+  <!-- Navigation Arrows -->
+  <div class="flex justify-between items-center mt-4 px-6">
+    <button
+      onclick="previousSlide()"
+      class="flex items-center space-x-2 px-4 py-2 bg-white rounded-full shadow-md hover:shadow-lg text-gray-700 hover:text-brand text-sm transition-all"
+    >
+      <i class="fas fa-chevron-left text-xs"></i>
+      <span class="font-medium">Previous</span>
+    </button>
+    <button
+      onclick="nextSlide()"
+      class="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-full shadow-md hover:shadow-lg text-sm transition-all"
+    >
+      <span class="font-medium">Next</span>
+      <i class="fas fa-chevron-right text-xs"></i>
+    </button>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  let currentSlide = 0;
+  const totalSlides = 5;
+  const track = document.getElementById("carouselTrack");
+  const dots = document.querySelectorAll(".dot");
+
+  function updateCarousel() {
+    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+    // Update dots
+    dots.forEach((dot, index) => {
+      if (index === currentSlide) {
+        dot.classList.add("active");
+      } else {
+        dot.classList.remove("active");
+      }
+    });
+
+    // Haptic feedback
+    if ("vibrate" in navigator) {
+      navigator.vibrate(10);
+    }
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateCarousel();
+  }
+
+  function previousSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    updateCarousel();
+  }
+
+  function goToSlide(index) {
+    currentSlide = index;
+    updateCarousel();
+  }
+
+  // Touch swipe support
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  const carousel = document.querySelector(".carousel-container");
+
+  carousel.addEventListener("touchstart", (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+
+  carousel.addEventListener("touchend", (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  });
+
+  function handleSwipe() {
+    const swipeThreshold = 50;
+    const diff = touchStartX - touchEndX;
+
+    if (Math.abs(diff) > swipeThreshold) {
+      if (diff > 0) {
+        // Swipe left - next slide
+        nextSlide();
+      } else {
+        // Swipe right - previous slide
+        previousSlide();
+      }
+    }
+  }
+
+  // Auto-advance carousel (optional - uncomment to enable)
+  // setInterval(nextSlide, 5000);
+</script>
+{% endblock %}
