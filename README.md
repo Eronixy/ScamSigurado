@@ -79,7 +79,7 @@ pip install -r requirements.txt
 
   1. Download the installer from [https://github.com/UB-Mannheim/tesseract/wiki](https://github.com/UB-Mannheim/tesseract/wiki)
   2. Install and add the path to your system environment variables PATH.
-  3. Example path: `C:\Program Files\Tesseract-OCR\tesseract.exe`
+  3. Example path: `C:\Program Files\Tesseract-OCR`
 
 ---
 
