@@ -12,6 +12,12 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+      };
+    </script>
+
     <!-- Font Awesome for icons -->
     <link
       rel="stylesheet"
@@ -19,7 +25,6 @@
     />
 
     <style>
-      /* Custom animations and styles */
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -30,40 +35,32 @@
           transform: translateY(0);
         }
       }
-
       .fade-in {
         animation: fadeIn 0.3s ease-out;
       }
 
-      /* Safe area for iOS devices */
       body {
         padding-bottom: env(safe-area-inset-bottom);
       }
 
-      /* Primary brand color */
       .bg-brand {
         background-color: #2563eb;
       }
-
       .text-brand {
         color: #2563eb;
       }
-
       .border-brand {
         border-color: #2563eb;
       }
 
-      /* Smooth transitions */
       * {
         transition: all 0.2s ease;
       }
 
-      /* Bottom nav shadow */
       .bottom-nav {
         box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
       }
 
-      /* Upload button pulse effect */
       @keyframes pulse-ring {
         0% {
           transform: scale(1);
@@ -91,20 +88,25 @@
 
     {% block extra_head %}{% endblock %}
   </head>
-  <body class="bg-gray-50 min-h-screen pb-20">
+
+  <body
+    class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen pb-20"
+  >
     <!-- Main Content Area -->
-    <main class="max-w-md mx-auto min-h-screen">
+    <main class="max-w-md mx-auto min-h-screen px-4">
       {% block content %}{% endblock %}
     </main>
 
     <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white bottom-nav z-50">
+    <nav
+      class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 bottom-nav border-t border-gray-200 dark:border-gray-700 z-50"
+    >
       <div class="max-w-md mx-auto px-4 py-2">
         <div class="flex items-center justify-around">
           <!-- Home -->
           <a
             href="/"
-            class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-50 {% if active_page == 'home' %}text-blue-600{% else %}text-gray-600{% endif %}"
+            class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'home' %}text-blue-600{% else %}text-gray-600 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-home text-xl mb-1"></i>
             <span class="text-xs font-medium">Home</span>
@@ -113,13 +115,13 @@
           <!-- Learn -->
           <a
             href="/learn"
-            class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-50 {% if active_page == 'learn' %}text-blue-600{% else %}text-gray-600{% endif %}"
+            class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'learn' %}text-blue-600{% else %}text-gray-600 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-graduation-cap text-xl mb-1"></i>
             <span class="text-xs font-medium">Learn</span>
           </a>
 
-          <!-- Upload (Center - Emphasized) -->
+          <!-- Upload -->
           <a href="/upload" class="relative flex flex-col items-center -mt-6">
             <div
               class="relative {% if active_page == 'upload' %}upload-pulse{% endif %}"
@@ -131,24 +133,24 @@
               </div>
             </div>
             <span
-              class="text-xs font-medium mt-1 {% if active_page == 'upload' %}text-blue-600{% else %}text-gray-600{% endif %}"
+              class="text-xs font-medium mt-1 {% if active_page == 'upload' %}text-blue-600{% else %}text-gray-600 dark:text-gray-300{% endif %}"
               >Upload</span
             >
           </a>
 
-          <!-- About -->
+          <!-- Results -->
           <a
-            href="/about"
-            class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-50 {% if active_page == 'about' %}text-blue-600{% else %}text-gray-600{% endif %}"
+            href="/results"
+            class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'results' %}text-blue-600{% else %}text-gray-600 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-info-circle text-xl mb-1"></i>
-            <span class="text-xs font-medium">About</span>
+            <span class="text-xs font-medium">Results</span>
           </a>
 
           <!-- Settings -->
           <a
             href="/settings"
-            class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-50 {% if active_page == 'settings' %}text-blue-600{% else %}text-gray-600{% endif %}"
+            class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'settings' %}text-blue-600{% else %}text-gray-600 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-cog text-xl mb-1"></i>
             <span class="text-xs font-medium">Settings</span>
@@ -157,7 +159,7 @@
       </div>
     </nav>
 
-    <!-- Toast Notification Container -->
+    <!-- Toast Notifications -->
     <div
       id="toast-container"
       class="fixed top-4 right-4 left-4 z-50 max-w-md mx-auto"
@@ -165,15 +167,17 @@
       {% with messages = get_flashed_messages(with_categories=true) %} {% if
       messages %} {% for category, message in messages %}
       <div
-        class="fade-in bg-white rounded-lg shadow-lg p-4 mb-2 flex items-start border-l-4 {% if category == 'success' %}border-green-500{% elif category == 'error' %}border-red-500{% else %}border-blue-500{% endif %}"
+        class="fade-in bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-2 flex items-start border-l-4 {% if category == 'success' %}border-green-500{% elif category == 'error' %}border-red-500{% else %}border-blue-500{% endif %}"
       >
         <i
           class="fas {% if category == 'success' %}fa-check-circle text-green-500{% elif category == 'error' %}fa-exclamation-circle text-red-500{% else %}fa-info-circle text-blue-500{% endif %} mr-3 mt-0.5"
         ></i>
-        <p class="text-sm text-gray-700 flex-1">{{ message }}</p>
+        <p class="text-sm text-gray-700 dark:text-gray-200 flex-1">
+          {{ message }}
+        </p>
         <button
           onclick="this.parentElement.remove()"
-          class="text-gray-400 hover:text-gray-600 ml-2"
+          class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
         >
           <i class="fas fa-times"></i>
         </button>
@@ -184,7 +188,17 @@
     {% block extra_scripts %}{% endblock %}
 
     <script>
-      // Auto-dismiss toasts after 5 seconds
+      // Initialize dark mode on page load
+      (function () {
+        const theme = localStorage.getItem("theme") || "light";
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      })();
+
+      // Toast auto-dismiss
       document.addEventListener("DOMContentLoaded", function () {
         const toasts = document.querySelectorAll("#toast-container > div");
         toasts.forEach((toast) => {
@@ -195,13 +209,22 @@
         });
       });
 
-      // Add haptic feedback for mobile devices (if supported)
-      document.querySelectorAll("a, button").forEach((element) => {
-        element.addEventListener("click", () => {
-          if ("vibrate" in navigator) {
-            navigator.vibrate(10);
-          }
+      // Haptic feedback
+      document.querySelectorAll("a, button").forEach((el) => {
+        el.addEventListener("click", () => {
+          if ("vibrate" in navigator) navigator.vibrate(10);
         });
+      });
+
+      // Listen for theme changes from other tabs/windows
+      window.addEventListener("storage", function (e) {
+        if (e.key === "theme") {
+          if (e.newValue === "dark") {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
+        }
       });
     </script>
   </body>
