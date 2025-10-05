@@ -7,7 +7,7 @@
       name="description"
       content="Detect scams by uploading screenshots - Stay safe online"
     />
-    <title>{% block title %}ScamShield - Protect Yourself{% endblock %}</title>
+    <title>{% block title %}ScamSigurado{% endblock %}</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -109,7 +109,9 @@
             class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'home' %}text-blue-600{% else %}text-gray-600 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-home text-xl mb-1"></i>
-            <span class="text-xs font-medium">Home</span>
+            <span class="text-xs font-medium" data-translate-base="navHome"
+              >Home</span
+            >
           </a>
 
           <!-- Learn -->
@@ -118,7 +120,9 @@
             class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'learn' %}text-blue-600{% else %}text-gray-600 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-graduation-cap text-xl mb-1"></i>
-            <span class="text-xs font-medium">Learn</span>
+            <span class="text-xs font-medium" data-translate-base="navLearn"
+              >Learn</span
+            >
           </a>
 
           <!-- Upload -->
@@ -134,6 +138,7 @@
             </div>
             <span
               class="text-xs font-medium mt-1 {% if active_page == 'upload' %}text-blue-600{% else %}text-gray-600 dark:text-gray-300{% endif %}"
+              data-translate-base="navUpload"
               >Upload</span
             >
           </a>
@@ -144,7 +149,9 @@
             class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'results' %}text-blue-600{% else %}text-gray-600 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-info-circle text-xl mb-1"></i>
-            <span class="text-xs font-medium">Results</span>
+            <span class="text-xs font-medium" data-translate-base="navResults"
+              >Results</span
+            >
           </a>
 
           <!-- Settings -->
@@ -153,7 +160,9 @@
             class="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'settings' %}text-blue-600{% else %}text-gray-600 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-cog text-xl mb-1"></i>
-            <span class="text-xs font-medium">Settings</span>
+            <span class="text-xs font-medium" data-translate-base="navSettings"
+              >Settings</span
+            >
           </a>
         </div>
       </div>
@@ -188,6 +197,37 @@
     {% block extra_scripts %}{% endblock %}
 
     <script>
+      // Base translations for navigation and common elements
+      const baseTranslations = {
+        en: {
+          navHome: "Home",
+          navLearn: "Learn",
+          navUpload: "Upload",
+          navResults: "Results",
+          navSettings: "Settings",
+        },
+        fil: {
+          navHome: "Home",
+          navLearn: "Matuto",
+          navUpload: "I-upload",
+          navResults: "Resulta",
+          navSettings: "Setting",
+        },
+      };
+
+      // Function to apply base translations
+      function applyBaseTranslations() {
+        const lang = localStorage.getItem("language") || "en";
+        const t = baseTranslations[lang];
+
+        document.querySelectorAll("[data-translate-base]").forEach((el) => {
+          const key = el.getAttribute("data-translate-base");
+          if (t[key]) {
+            el.textContent = t[key];
+          }
+        });
+      }
+
       // Initialize dark mode on page load
       (function () {
         const theme = localStorage.getItem("theme") || "light";
@@ -198,8 +238,11 @@
         }
       })();
 
-      // Toast auto-dismiss
+      // Apply translations on page load
       document.addEventListener("DOMContentLoaded", function () {
+        applyBaseTranslations();
+
+        // Toast auto-dismiss
         const toasts = document.querySelectorAll("#toast-container > div");
         toasts.forEach((toast) => {
           setTimeout(() => {
@@ -224,6 +267,10 @@
           } else {
             document.documentElement.classList.remove("dark");
           }
+        }
+        // Listen for language changes as well
+        if (e.key === "language") {
+          applyBaseTranslations();
         }
       });
     </script>

@@ -1,32 +1,44 @@
-{% extends "base.html" %} {% block title %}Upload Screenshot - ScamShield{%
+{% extends "base.html" %} {% block title %}Upload Screenshot - ScamSigurado{%
 endblock %} {% block content %}
 <div class="fade-in pb-6">
   <!-- Header Section -->
   <div
     class="bg-brand text-center text-white px-6 py-8 rounded-b-3xl shadow-md"
   >
-    <h1 class="text-4xl font-semibold mb-2">ScamSigurado</h1>
-    <p class="text-blue-100 text-sm">
+    <h1 class="text-4xl font-semibold mb-2" data-translate="uploadTitle">
+      ScamSigurado
+    </h1>
+    <p class="text-blue-100 text-sm" data-translate="uploadSubtitle">
       Upload a screenshot to detect potential scams
     </p>
   </div>
 
   <!-- Upload Card -->
   <div class="px-4 mt-6">
-    <div class="bg-white rounded-2xl shadow-sm p-6 mb-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-4">
       <!-- Drop Zone -->
       <div
         id="dropZone"
-        class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-brand hover:bg-blue-50 transition-all"
+        class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-brand hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
       >
         <div id="dropZoneContent">
           <div
-            class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4"
+            class="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
           >
             <i class="fas fa-cloud-upload-alt text-4xl text-brand"></i>
           </div>
-          <p class="text-gray-800 font-medium mb-1">Tap to upload screenshot</p>
-          <p class="text-gray-500 text-sm">PNG, JPG, or JPEG (Max 10MB)</p>
+          <p
+            class="text-gray-800 dark:text-gray-200 font-medium mb-1"
+            data-translate="uploadTap"
+          >
+            Tap to upload screenshot
+          </p>
+          <p
+            class="text-gray-500 dark:text-gray-400 text-sm"
+            data-translate="uploadFormats"
+          >
+            PNG, JPG, or JPEG (Max 10MB)
+          </p>
         </div>
 
         <!-- Image Preview (Hidden Initially) -->
@@ -38,12 +50,12 @@ endblock %} {% block content %}
             />
             <button
               id="clearImageBtn"
-              class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-100"
+              class="absolute top-2 right-2 w-8 h-8 bg-white dark:bg-gray-700 rounded-full shadow-md flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600"
             >
-              <i class="fas fa-times text-gray-600"></i>
+              <i class="fas fa-times text-gray-600 dark:text-gray-300"></i>
             </button>
           </div>
-          <p id="fileName" class="text-sm text-gray-600"></p>
+          <p id="fileName" class="text-sm text-gray-600 dark:text-gray-400"></p>
         </div>
 
         <input type="file" id="fileInput" class="hidden" accept="image/*" />
@@ -53,42 +65,54 @@ endblock %} {% block content %}
       <button
         id="analyzeBtn"
         disabled
-        class="w-full mt-6 bg-brand text-white font-semibold py-4 rounded-xl hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+        class="w-full mt-6 bg-brand text-white font-semibold py-4 rounded-xl hover:bg-blue-700 transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed flex items-center justify-center"
       >
-        <span id="analyzeText">Select an image to analyze</span>
+        <span id="analyzeText" data-translate="uploadSelectImage"
+          >Select an image to analyze</span
+        >
         <i id="loadingSpinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
       </button>
     </div>
 
     <!-- Advanced Settings Card -->
-    <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden mb-4"
+    >
       <button
         id="advancedToggle"
-        class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+        class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
       >
         <div class="flex items-center">
           <i class="fas fa-sliders-h text-brand mr-3"></i>
-          <span class="font-medium text-gray-800">Advanced Settings</span>
+          <span
+            class="font-medium text-gray-800 dark:text-gray-200"
+            data-translate="uploadAdvanced"
+          >
+            Advanced Settings
+          </span>
         </div>
         <i
           id="advancedArrow"
-          class="fas fa-chevron-down text-gray-400 transition-transform"
+          class="fas fa-chevron-down text-gray-400 dark:text-gray-500 transition-transform"
         ></i>
       </button>
 
       <div
         id="advancedSettings"
-        class="hidden px-6 pb-6 border-t border-gray-100"
+        class="hidden px-6 pb-6 border-t border-gray-100 dark:border-gray-700"
       >
         <div class="pt-4 space-y-4">
           <!-- Text Analysis Model -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              <i class="fas fa-font text-brand mr-2"></i>Text Analysis Model
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              <i class="fas fa-font text-brand mr-2"></i>
+              <span data-translate="uploadTextModel">Text Analysis Model</span>
             </label>
             <select
               id="textModel"
-              class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-brand focus:border-transparent"
+              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand focus:border-transparent"
             >
               <option value="svm" selected>SVM (Support Vector Machine)</option>
               <option value="rf">Random Forest</option>
@@ -99,12 +123,17 @@ endblock %} {% block content %}
 
           <!-- CNN Model -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              <i class="fas fa-image text-brand mr-2"></i>Image Analysis Model
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              <i class="fas fa-image text-brand mr-2"></i>
+              <span data-translate="uploadImageModel"
+                >Image Analysis Model</span
+              >
             </label>
             <select
               id="cnnModel"
-              class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-brand focus:border-transparent"
+              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand focus:border-transparent"
             >
               <option value="alexnet">AlexNet</option>
               <option value="vggnet">VGGNet</option>
@@ -116,14 +145,19 @@ endblock %} {% block content %}
 
           <!-- Model Weights -->
           <div class="pt-2">
-            <label class="block text-sm font-medium text-gray-700 mb-3"
-              >Model Weights</label
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
+              data-translate="uploadWeights"
             >
+              Model Weights
+            </label>
 
             <div class="space-y-3">
               <div>
-                <div class="flex justify-between text-xs text-gray-600 mb-1">
-                  <span>Text Analysis</span>
+                <div
+                  class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1"
+                >
+                  <span data-translate="uploadTextAnalysis">Text Analysis</span>
                   <span id="textWeightValue" class="font-semibold text-brand"
                     >60%</span
                   >
@@ -134,13 +168,17 @@ endblock %} {% block content %}
                   min="0"
                   max="100"
                   value="60"
-                  class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 accent-brand"
+                  class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-gray-600 accent-brand"
                 />
               </div>
 
               <div>
-                <div class="flex justify-between text-xs text-gray-600 mb-1">
-                  <span>Image Analysis</span>
+                <div
+                  class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1"
+                >
+                  <span data-translate="uploadImageAnalysis"
+                    >Image Analysis</span
+                  >
                   <span id="cnnWeightValue" class="font-semibold text-brand"
                     >40%</span
                   >
@@ -151,7 +189,7 @@ endblock %} {% block content %}
                   min="0"
                   max="100"
                   value="40"
-                  class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 accent-brand"
+                  class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-gray-600 accent-brand"
                 />
               </div>
             </div>
@@ -161,167 +199,28 @@ endblock %} {% block content %}
     </div>
 
     <!-- Info Card -->
-    <div class="bg-blue-50 rounded-2xl p-4 flex items-start">
+    <div
+      class="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 flex items-start"
+    >
       <div
         class="w-10 h-10 bg-brand rounded-full flex items-center justify-center flex-shrink-0 mr-3"
       >
         <i class="fas fa-info text-white"></i>
       </div>
       <div>
-        <p class="text-sm text-gray-700 font-medium mb-1">How it works</p>
-        <p class="text-xs text-gray-600">
+        <p
+          class="text-sm text-gray-700 dark:text-gray-300 font-medium mb-1"
+          data-translate="uploadInfoTitle"
+        >
+          How it works
+        </p>
+        <p
+          class="text-xs text-gray-600 dark:text-gray-400"
+          data-translate="uploadInfoDesc"
+        >
           Our AI analyzes both text and visual elements in your screenshot to
           detect potential scams with high accuracy.
         </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Results Section (Hidden Initially) -->
-  <div id="resultsSection" class="hidden px-4 mt-6">
-    <!-- Main Result Card -->
-    <div class="bg-white rounded-2xl shadow-sm p-6 mb-4">
-      <div class="text-center">
-        <div
-          id="resultIcon"
-          class="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"
-        ></div>
-        <h3 id="resultTitle" class="text-xl font-bold mb-2"></h3>
-        <p id="resultDescription" class="text-gray-600 text-sm"></p>
-      </div>
-    </div>
-
-    <!-- Confidence Score Card -->
-    <div class="bg-white rounded-2xl shadow-sm p-6 mb-4">
-      <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
-        <i class="fas fa-chart-bar text-brand mr-2"></i>Confidence Score
-      </h4>
-
-      <div class="flex items-center mb-4">
-        <div class="flex-1 bg-gray-200 rounded-full h-3 mr-3">
-          <div
-            id="confidenceBar"
-            class="h-3 rounded-full transition-all duration-500"
-          ></div>
-        </div>
-        <span id="confidenceText" class="font-bold text-lg text-brand"></span>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-gray-100">
-        <div class="bg-gray-50 rounded-lg p-3">
-          <p class="text-xs text-gray-500 mb-1">Text Analysis</p>
-          <p id="textConfidence" class="font-semibold text-gray-800"></p>
-        </div>
-        <div class="bg-gray-50 rounded-lg p-3">
-          <p class="text-xs text-gray-500 mb-1">Image Analysis</p>
-          <p id="imageConfidence" class="font-semibold text-gray-800"></p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Share Card -->
-    <div class="bg-white rounded-2xl shadow-sm p-6 mb-4">
-      <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
-        <i class="fas fa-share-alt text-brand mr-2"></i>Share Results
-      </h4>
-      <p class="text-sm text-gray-600 mb-4">
-        Download or share your analysis results
-      </p>
-
-      <div class="grid grid-cols-2 gap-3">
-        <button
-          id="downloadBtn"
-          class="bg-brand hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center"
-        >
-          <i class="fas fa-download mr-2"></i>Download
-        </button>
-        <button
-          id="shareBtn"
-          class="bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center"
-        >
-          <i class="fas fa-share-nodes mr-2"></i>Share
-        </button>
-      </div>
-
-      <!-- Share Success Message -->
-      <div id="shareSuccess" class="hidden mt-4 p-3 bg-green-50 rounded-lg">
-        <p class="text-sm text-green-700 flex items-center">
-          <i class="fas fa-check-circle mr-2"></i>
-          <span>Image saved successfully!</span>
-        </p>
-      </div>
-
-      <!-- Share Loading -->
-      <div id="shareLoading" class="hidden mt-4 p-3 bg-blue-50 rounded-lg">
-        <p class="text-sm text-brand flex items-center">
-          <i class="fas fa-spinner fa-spin mr-2"></i>
-          <span>Creating shareable image...</span>
-        </p>
-      </div>
-    </div>
-
-    <!-- Feedback Card -->
-    <div class="bg-white rounded-2xl shadow-sm p-6">
-      <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
-        <i class="fas fa-comment-dots text-brand mr-2"></i>Help Us Improve
-      </h4>
-      <p class="text-sm text-gray-600 mb-4">Was this analysis correct?</p>
-
-      <div id="feedbackButtons" class="grid grid-cols-2 gap-3 mb-4">
-        <button
-          id="correctBtn"
-          class="bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center"
-        >
-          <i class="fas fa-check mr-2"></i>Correct
-        </button>
-        <button
-          id="incorrectBtn"
-          class="bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center"
-        >
-          <i class="fas fa-times mr-2"></i>Incorrect
-        </button>
-      </div>
-
-      <!-- Incorrect Feedback Form -->
-      <div
-        id="incorrectFeedback"
-        class="hidden space-y-3 pt-3 border-t border-gray-100"
-      >
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Correct classification</label
-          >
-          <select
-            id="correctClassification"
-            class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-brand focus:border-transparent"
-          >
-            <option value="">Select correct classification...</option>
-            <option value="scam">This is a scam</option>
-            <option value="legitimate">This is legitimate</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Additional comments</label
-          >
-          <textarea
-            id="feedbackComments"
-            rows="3"
-            class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-brand focus:border-transparent text-sm"
-            placeholder="Tell us more (optional)"
-          ></textarea>
-        </div>
-        <button
-          id="submitFeedback"
-          class="w-full bg-brand hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-medium transition-colors"
-        >
-          Submit Feedback
-        </button>
-      </div>
-
-      <div id="feedbackSuccess" class="hidden text-center py-4">
-        <i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>
-        <p class="text-green-600 font-medium">Thank you for your feedback!</p>
       </div>
     </div>
   </div>
@@ -332,19 +231,25 @@ endblock %} {% block content %}
     class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
   >
     <div
-      class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in"
+      class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in"
     >
       <!-- Header -->
       <div class="text-center mb-6">
         <div
-          class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4"
+          class="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
         >
           <i class="fas fa-shield-alt text-4xl text-brand"></i>
         </div>
-        <h3 class="text-2xl font-bold text-gray-800 mb-2">
+        <h3
+          class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2"
+          data-translate="modalAnalyzing"
+        >
           Analyzing Screenshot
         </h3>
-        <p class="text-sm text-gray-600">
+        <p
+          class="text-sm text-gray-600 dark:text-gray-400"
+          data-translate="modalWait"
+        >
           Please wait while we scan for potential scams
         </p>
       </div>
@@ -354,16 +259,24 @@ endblock %} {% block content %}
         <!-- Step 1: Upload -->
         <div
           id="step1"
-          class="flex items-center p-4 rounded-xl bg-gray-50 transition-all"
+          class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
         >
           <div
-            class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4 flex-shrink-0"
+            class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mr-4 flex-shrink-0"
           >
             <i class="fas fa-upload text-white"></i>
           </div>
           <div class="flex-1">
-            <p class="font-semibold text-gray-800">Processing Image</p>
-            <p class="text-xs text-gray-500">
+            <p
+              class="font-semibold text-gray-800 dark:text-gray-200"
+              data-translate="modalStep1Title"
+            >
+              Processing Image
+            </p>
+            <p
+              class="text-xs text-gray-500 dark:text-gray-400"
+              data-translate="modalStep1Desc"
+            >
               Preparing screenshot for analysis
             </p>
           </div>
@@ -378,16 +291,26 @@ endblock %} {% block content %}
         <!-- Step 2: Text Extraction -->
         <div
           id="step2"
-          class="flex items-center p-4 rounded-xl bg-gray-50 transition-all"
+          class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
         >
           <div
-            class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4 flex-shrink-0"
+            class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mr-4 flex-shrink-0"
           >
             <i class="fas fa-font text-white"></i>
           </div>
           <div class="flex-1">
-            <p class="font-semibold text-gray-800">Extracting Text</p>
-            <p class="text-xs text-gray-500">Reading content from image</p>
+            <p
+              class="font-semibold text-gray-800 dark:text-gray-200"
+              data-translate="modalStep2Title"
+            >
+              Extracting Text
+            </p>
+            <p
+              class="text-xs text-gray-500 dark:text-gray-400"
+              data-translate="modalStep2Desc"
+            >
+              Reading content from image
+            </p>
           </div>
           <div id="step2-spinner" class="hidden">
             <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
@@ -400,16 +323,24 @@ endblock %} {% block content %}
         <!-- Step 3: Text Analysis -->
         <div
           id="step3"
-          class="flex items-center p-4 rounded-xl bg-gray-50 transition-all"
+          class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
         >
           <div
-            class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4 flex-shrink-0"
+            class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mr-4 flex-shrink-0"
           >
             <i class="fas fa-brain text-white"></i>
           </div>
           <div class="flex-1">
-            <p class="font-semibold text-gray-800">Text Analysis</p>
-            <p class="text-xs text-gray-500">
+            <p
+              class="font-semibold text-gray-800 dark:text-gray-200"
+              data-translate="modalStep3Title"
+            >
+              Text Analysis
+            </p>
+            <p
+              class="text-xs text-gray-500 dark:text-gray-400"
+              data-translate="modalStep3Desc"
+            >
               Scanning for suspicious language
             </p>
           </div>
@@ -424,16 +355,26 @@ endblock %} {% block content %}
         <!-- Step 4: Image Analysis -->
         <div
           id="step4"
-          class="flex items-center p-4 rounded-xl bg-gray-50 transition-all"
+          class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
         >
           <div
-            class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4 flex-shrink-0"
+            class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mr-4 flex-shrink-0"
           >
             <i class="fas fa-image text-white"></i>
           </div>
           <div class="flex-1">
-            <p class="font-semibold text-gray-800">Visual Analysis</p>
-            <p class="text-xs text-gray-500">Examining image patterns</p>
+            <p
+              class="font-semibold text-gray-800 dark:text-gray-200"
+              data-translate="modalStep4Title"
+            >
+              Visual Analysis
+            </p>
+            <p
+              class="text-xs text-gray-500 dark:text-gray-400"
+              data-translate="modalStep4Desc"
+            >
+              Examining image patterns
+            </p>
           </div>
           <div id="step4-spinner" class="hidden">
             <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
@@ -446,16 +387,26 @@ endblock %} {% block content %}
         <!-- Step 5: Final Result -->
         <div
           id="step5"
-          class="flex items-center p-4 rounded-xl bg-gray-50 transition-all"
+          class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
         >
           <div
-            class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4 flex-shrink-0"
+            class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mr-4 flex-shrink-0"
           >
             <i class="fas fa-chart-line text-white"></i>
           </div>
           <div class="flex-1">
-            <p class="font-semibold text-gray-800">Generating Results</p>
-            <p class="text-xs text-gray-500">Calculating confidence scores</p>
+            <p
+              class="font-semibold text-gray-800 dark:text-gray-200"
+              data-translate="modalStep5Title"
+            >
+              Generating Results
+            </p>
+            <p
+              class="text-xs text-gray-500 dark:text-gray-400"
+              data-translate="modalStep5Desc"
+            >
+              Calculating confidence scores
+            </p>
           </div>
           <div id="step5-spinner" class="hidden">
             <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
@@ -468,11 +419,13 @@ endblock %} {% block content %}
 
       <!-- Overall Progress Bar -->
       <div class="mb-4">
-        <div class="flex justify-between text-xs text-gray-600 mb-2">
-          <span>Overall Progress</span>
+        <div
+          class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-2"
+        >
+          <span data-translate="modalProgress">Overall Progress</span>
           <span id="overallProgress">0%</span>
         </div>
-        <div class="w-full bg-gray-200 rounded-full h-2">
+        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
           <div
             id="progressBar"
             class="bg-brand h-2 rounded-full transition-all duration-500"
@@ -484,7 +437,6 @@ endblock %} {% block content %}
   </div>
 </div>
 {% endblock %} {% block extra_scripts %}
-
 <style>
   @keyframes scale-in {
     from {
@@ -501,30 +453,131 @@ endblock %} {% block content %}
     animation: scale-in 0.3s ease-out;
   }
 
-  #analysisModal .bg-gray-50 {
+  #analysisModal .bg-gray-50,
+  #analysisModal .dark .bg-gray-700 {
     transition: all 0.3s ease;
   }
 
-  #analysisModal .bg-gray-50.active {
+  #analysisModal .bg-gray-50.active,
+  .dark #analysisModal .bg-gray-700.active {
     background-color: #eff6ff;
     border: 2px solid #2563eb;
   }
 
-  #analysisModal .bg-gray-50.active .bg-gray-300 {
+  .dark #analysisModal .bg-gray-700.active {
+    background-color: #1e3a8a;
+  }
+
+  #analysisModal .bg-gray-50.active .bg-gray-300,
+  .dark #analysisModal .bg-gray-700.active .bg-gray-600 {
     background-color: #2563eb;
   }
 
-  #analysisModal .bg-gray-50.completed {
+  #analysisModal .bg-gray-50.completed,
+  .dark #analysisModal .bg-gray-700.completed {
     background-color: #f0fdf4;
   }
 
-  #analysisModal .bg-gray-50.completed .bg-gray-300 {
+  .dark #analysisModal .bg-gray-700.completed {
+    background-color: #14532d;
+  }
+
+  #analysisModal .bg-gray-50.completed .bg-gray-300,
+  .dark #analysisModal .bg-gray-700.completed .bg-gray-600 {
     background-color: #22c55e;
   }
 </style>
 
 <script>
+  // Translations for upload page
+  const translations = {
+    en: {
+      uploadTitle: "ScamSigurado",
+      uploadSubtitle: "Upload a screenshot to detect potential scams",
+      uploadTap: "Tap to upload screenshot",
+      uploadFormats: "PNG, JPG, or JPEG (Max 10MB)",
+      uploadSelectImage: "Select an image to analyze",
+      uploadAnalyze: "Analyze Screenshot",
+      uploadAdvanced: "Advanced Settings",
+      uploadTextModel: "Text Analysis Model",
+      uploadImageModel: "Image Analysis Model",
+      uploadWeights: "Model Weights",
+      uploadTextAnalysis: "Text Analysis",
+      uploadImageAnalysis: "Image Analysis",
+      uploadInfoTitle: "How it works",
+      uploadInfoDesc:
+        "Our AI analyzes both text and visual elements in your screenshot to detect potential scams with high accuracy.",
+      modalAnalyzing: "Analyzing Screenshot",
+      modalWait: "Please wait while we scan for potential scams",
+      modalStep1Title: "Processing Image",
+      modalStep1Desc: "Preparing screenshot for analysis",
+      modalStep2Title: "Extracting Text",
+      modalStep2Desc: "Reading content from image",
+      modalStep3Title: "Text Analysis",
+      modalStep3Desc: "Scanning for suspicious language",
+      modalStep4Title: "Visual Analysis",
+      modalStep4Desc: "Examining image patterns",
+      modalStep5Title: "Generating Results",
+      modalStep5Desc: "Calculating confidence scores",
+      modalProgress: "Overall Progress",
+      errorFileType: "Please select an image file (PNG, JPG, or JPEG)",
+      errorFileSize: "File size must be less than 10MB",
+      errorAnalysis: "Analysis failed: ",
+    },
+    fil: {
+      uploadTitle: "ScamSigurado",
+      uploadSubtitle:
+        "Mag-upload ng screenshot para madetect ang mga posibleng scam",
+      uploadTap: "Pindutin para mag-upload ng screenshot",
+      uploadFormats: "PNG, JPG, o JPEG (Max 10MB)",
+      uploadSelectImage: "Pumili ng larawan para suriin",
+      uploadAnalyze: "Suriin ang Screenshot",
+      uploadAdvanced: "Advanced na Setting",
+      uploadTextModel: "Text Analysis Model",
+      uploadImageModel: "Image Analysis Model",
+      uploadWeights: "Timbang ng Model",
+      uploadTextAnalysis: "Text Analysis",
+      uploadImageAnalysis: "Image Analysis",
+      uploadInfoTitle: "Paano ito gumagana",
+      uploadInfoDesc:
+        "Sinusuri ng aming AI ang text at visual elements sa iyong screenshot para madetect ang mga potensyal na scam nang may mataas na accuracy.",
+      modalAnalyzing: "Sinusuri ang Screenshot",
+      modalWait:
+        "Mangyaring maghintay habang sinusuri namin ang mga posibleng scam",
+      modalStep1Title: "Pinoproseso ang Larawan",
+      modalStep1Desc: "Inihahanda ang screenshot para sa pagsusuri",
+      modalStep2Title: "Kinukuha ang Text",
+      modalStep2Desc: "Binabasa ang content mula sa larawan",
+      modalStep3Title: "Text Analysis",
+      modalStep3Desc: "Sinusuri ang mga kahina-hinalang salita",
+      modalStep4Title: "Visual Analysis",
+      modalStep4Desc: "Sinusuri ang mga pattern sa larawan",
+      modalStep5Title: "Ginagawa ang mga Resulta",
+      modalStep5Desc: "Kinakalkula ang confidence scores",
+      modalProgress: "Kabuuang Progress",
+      errorFileType: "Mangyaring pumili ng image file (PNG, JPG, o JPEG)",
+      errorFileSize: "Ang laki ng file ay dapat mas mababa sa 10MB",
+      errorAnalysis: "Nabigo ang pagsusuri: ",
+    },
+  };
+
+  // Apply translations
+  function applyTranslations() {
+    const lang = localStorage.getItem("language") || "en";
+    const t = translations[lang];
+
+    document.querySelectorAll("[data-translate]").forEach((el) => {
+      const key = el.getAttribute("data-translate");
+      if (t[key]) {
+        el.textContent = t[key];
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    // Apply translations on load
+    applyTranslations();
+
     const dropZone = document.getElementById("dropZone");
     const fileInput = document.getElementById("fileInput");
     const analyzeBtn = document.getElementById("analyzeBtn");
@@ -549,6 +602,10 @@ endblock %} {% block content %}
     let selectedFile = null;
     let originalImageData = null;
 
+    // Get current language
+    const lang = localStorage.getItem("language") || "en";
+    const t = translations[lang];
+
     // Drop zone click
     dropZone.addEventListener("click", () => fileInput.click());
 
@@ -558,16 +615,28 @@ endblock %} {% block content %}
     // Drag and drop
     dropZone.addEventListener("dragover", (e) => {
       e.preventDefault();
-      dropZone.classList.add("border-brand", "bg-blue-50");
+      dropZone.classList.add(
+        "border-brand",
+        "bg-blue-50",
+        "dark:bg-blue-900/20"
+      );
     });
 
     dropZone.addEventListener("dragleave", () => {
-      dropZone.classList.remove("border-brand", "bg-blue-50");
+      dropZone.classList.remove(
+        "border-brand",
+        "bg-blue-50",
+        "dark:bg-blue-900/20"
+      );
     });
 
     dropZone.addEventListener("drop", (e) => {
       e.preventDefault();
-      dropZone.classList.remove("border-brand", "bg-blue-50");
+      dropZone.classList.remove(
+        "border-brand",
+        "bg-blue-50",
+        "dark:bg-blue-900/20"
+      );
       const files = e.dataTransfer.files;
       if (files.length > 0) {
         fileInput.files = files;
@@ -611,13 +680,13 @@ endblock %} {% block content %}
 
       // Validate file type
       if (!file.type.match("image.*")) {
-        alert("Please select an image file (PNG, JPG, or JPEG)");
+        alert(t.errorFileType);
         return;
       }
 
       // Validate file size (10MB)
       if (file.size > 10 * 1024 * 1024) {
-        alert("File size must be less than 10MB");
+        alert(t.errorFileSize);
         return;
       }
 
@@ -632,7 +701,7 @@ endblock %} {% block content %}
         dropZoneContent.classList.add("hidden");
         imagePreviewContent.classList.remove("hidden");
         analyzeBtn.disabled = false;
-        analyzeText.textContent = "Analyze Screenshot";
+        analyzeText.textContent = t.uploadAnalyze;
       };
       reader.readAsDataURL(file);
     }
@@ -646,7 +715,7 @@ endblock %} {% block content %}
       dropZoneContent.classList.remove("hidden");
       imagePreviewContent.classList.add("hidden");
       analyzeBtn.disabled = true;
-      analyzeText.textContent = "Select an image to analyze";
+      analyzeText.textContent = t.uploadSelectImage;
     }
 
     async function analyzeImage() {
@@ -710,7 +779,7 @@ endblock %} {% block content %}
       } catch (error) {
         console.error("Error:", error);
         analysisModal.classList.add("hidden");
-        alert("Analysis failed: " + error.message);
+        alert(t.errorAnalysis + error.message);
       }
     }
 
@@ -730,8 +799,8 @@ endblock %} {% block content %}
         const check = document.getElementById(`step${step.id}-check`);
 
         // Activate step
-        stepEl.classList.remove("bg-gray-50");
-        stepEl.classList.add("bg-blue-50");
+        stepEl.classList.remove("bg-gray-50", "dark:bg-gray-700");
+        stepEl.classList.add("bg-blue-50", "dark:bg-blue-900/30");
         spinner.classList.remove("hidden");
 
         // Update progress bar
@@ -746,10 +815,25 @@ endblock %} {% block content %}
         // Complete step
         spinner.classList.add("hidden");
         check.classList.remove("hidden");
-        stepEl.classList.remove("bg-blue-50");
-        stepEl.classList.add("bg-green-50");
+        stepEl.classList.remove("bg-blue-50", "dark:bg-blue-900/30");
+        stepEl.classList.add("bg-green-50", "dark:bg-green-900/30");
       }
     }
+
+    // Listen for language changes
+    window.addEventListener("storage", function (e) {
+      if (e.key === "language") {
+        applyTranslations();
+        // Update button text if image is selected
+        if (selectedFile) {
+          const lang = localStorage.getItem("language") || "en";
+          analyzeText.textContent = translations[lang].uploadAnalyze;
+        } else {
+          const lang = localStorage.getItem("language") || "en";
+          analyzeText.textContent = translations[lang].uploadSelectImage;
+        }
+      }
+    });
   });
 </script>
 {% endblock %}
