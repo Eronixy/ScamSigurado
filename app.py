@@ -75,28 +75,69 @@ class ScamDetector:
         except Exception as e:
             print(f"Error loading models: {e}")
     
+    
     def extract_text_from_image(self, image_path):
         try:
             img = cv2.imread(image_path)
-            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
-            gray = cv2.medianBlur(gray, 3)
-            thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                        cv2.THRESH_BINARY, 11, 2)
-            custom_config = r'--oem 3 --psm 6'
-            extracted_text = pytesseract.image_to_string(thresh, config=custom_config)
-            return extracted_text.strip()
+            if img is None:
+                return ""
+
+            # Step 1: Grayscale + contrast boost
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            gray = cv2.convertScaleAbs(gray, alpha=1.7, beta=15)
+
+            # Step 2: Denoise but keep edges
+            gray = cv2.bilateralFilter(gray, 11, 75, 75)
+
+            # Step 3: Threshold — adapt to lighting
+            thresh = cv2.adaptiveThreshold(
+                gray, 255,
+                cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                cv2.THRESH_BINARY_INV,
+                35, 15
+            )
+
+            # Step 4: Morphological cleanup (remove noise + connect letters)
+            kernel = np.ones((2, 2), np.uint8)
+            thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
+            thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+
+            # Step 5: Invert for Tesseract
+            thresh = cv2.bitwise_not(thresh)
+
+            # Step 6: OCR config — focus on text symbols only
+            custom_config = (
+                r'--oem 3 --psm 6 '
+                r'-c preserve_interword_spaces=1 '
+                r'-c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:/.-@ '
+            )
+
+            text = pytesseract.image_to_string(thresh, config=custom_config)
+            return text.strip()
+
         except Exception as e:
             print(f"Error extracting text: {e}")
             return ""
-    
+
     def preprocess_text(self, text):
         if not text:
             return ""
+
         text = text.lower()
-        text = re.sub(r'[^\w\s]', ' ', text)
-        text = ' '.join(text.split())
-        return text
+
+        # Remove timestamps
+        text = re.sub(r'\b\d{1,2}:\d{2}\s?(?:am|pm|a\.m\.|p\.m\.)?\b', '', text)
+
+        # Keep URLs, emails, dots, and hyphens (important for scam detection)
+        text = re.sub(r'[^a-z0-9@:/.\-\s]', ' ', text)
+
+        # Normalize currency symbols (₱, $, etc.)
+        text = re.sub(r'[₱$]+', ' money ', text)
+
+        # Replace multiple spaces with one
+        text = re.sub(r'\s+', ' ', text)
+
+        return text.strip()
     
     def preprocess_image_for_cnn(self, image_path, model_name='efficientnet'):
         try:
@@ -302,185 +343,6 @@ def preprocess_image_opencv(image_path):
         print(f"Error in preprocessing: {e}")
         return None
 
-def analyze_layout_and_text_regions(image_path):
-    """
-    Analyze image layout to detect text-rich regions and generate heatmap data.
-    Returns coordinates and confidence scores for text regions.
-    """
-    try:
-        # Read image
-        img = cv2.imread(image_path)
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        
-        height, width = gray.shape
-        
-        # Create heatmap overlay
-        heatmap = np.zeros((height, width), dtype=np.float32)
-        
-        # Method 1: Text detection using connected components
-        # Apply binary threshold
-        _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-        
-        # Morphological operations to connect text regions
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 3))
-        dilated = cv2.dilate(binary, kernel, iterations=2)
-        
-        # Find contours (text regions)
-        contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        
-        text_regions = []
-        for contour in contours:
-            x, y, w, h = cv2.boundingRect(contour)
-            area = w * h
-            
-            # Filter out very small or very large regions
-            if area > 500 and area < (width * height * 0.8):
-                aspect_ratio = w / float(h) if h > 0 else 0
-                
-                # Text typically has certain aspect ratios
-                if 0.1 < aspect_ratio < 20:
-                    text_regions.append({
-                        'x': int(x),
-                        'y': int(y),
-                        'width': int(w),
-                        'height': int(h),
-                        'area': int(area),
-                        'aspect_ratio': float(aspect_ratio)
-                    })
-                    
-                    # Add to heatmap with Gaussian blur
-                    cv2.rectangle(heatmap, (x, y), (x + w, y + h), 1.0, -1)
-        
-        # Method 2: Edge detection for suspicious elements
-        edges = cv2.Canny(gray, 50, 150)
-        edge_density = cv2.GaussianBlur(edges.astype(np.float32) / 255.0, (51, 51), 0)
-        
-        # Combine text regions and edge density
-        heatmap = cv2.GaussianBlur(heatmap, (51, 51), 0)
-        combined_heatmap = 0.7 * heatmap + 0.3 * edge_density
-        
-        # Normalize to 0-1 range
-        if combined_heatmap.max() > 0:
-            combined_heatmap = combined_heatmap / combined_heatmap.max()
-        
-        # Method 3: Detect high-contrast regions (often used in scams)
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        enhanced = clahe.apply(gray)
-        contrast_map = cv2.Laplacian(enhanced, cv2.CV_64F)
-        contrast_map = np.abs(contrast_map)
-        contrast_map = cv2.GaussianBlur(contrast_map, (21, 21), 0)
-        contrast_map = (contrast_map - contrast_map.min()) / (contrast_map.max() - contrast_map.min() + 1e-8)
-        
-        # Final combined heatmap
-        final_heatmap = 0.5 * combined_heatmap + 0.3 * contrast_map
-        
-        # Create colored heatmap overlay
-        heatmap_colored = cv2.applyColorMap((final_heatmap * 255).astype(np.uint8), cv2.COLORMAP_JET)
-        heatmap_colored = cv2.cvtColor(heatmap_colored, cv2.COLOR_BGR2RGB)
-        
-        # Blend with original image
-        overlay = cv2.addWeighted(img_rgb, 0.6, heatmap_colored, 0.4, 0)
-        
-        # Encode heatmap
-        _, buffer_heat = cv2.imencode('.png', overlay)
-        heatmap_base64 = base64.b64encode(buffer_heat).decode('utf-8')
-        
-        # Calculate statistics
-        text_density = len(text_regions) / ((width * height) / 10000)  # regions per 100x100 pixels
-        total_text_area = sum(region['area'] for region in text_regions)
-        text_coverage = (total_text_area / (width * height)) * 100
-        
-        # Detect layout characteristics
-        layout_score = analyze_layout_characteristics(img_rgb, text_regions)
-        
-        return {
-            'heatmap': f'data:image/png;base64,{heatmap_base64}',
-            'text_regions': text_regions[:20],  # Limit to top 20 regions
-            'statistics': {
-                'total_regions': len(text_regions),
-                'text_density': round(float(text_density), 2),
-                'text_coverage': round(float(text_coverage), 2),
-                'layout_score': round(float(layout_score), 2)
-            }
-        }
-        
-    except Exception as e:
-        print(f"Error in layout analysis: {e}")
-        traceback.print_exc()
-        return None
-
-def analyze_layout_characteristics(img, text_regions):
-    """
-    Analyze layout characteristics that might indicate scam content.
-    Returns a suspicion score (0-1).
-    """
-    try:
-        height, width, _ = img.shape
-        score = 0.0
-        
-        # Check for center-heavy text (common in scam popups)
-        center_regions = [r for r in text_regions 
-                         if 0.3 * width < r['x'] + r['width']/2 < 0.7 * width and
-                            0.3 * height < r['y'] + r['height']/2 < 0.7 * height]
-        if len(text_regions) > 0:
-            center_ratio = len(center_regions) / len(text_regions)
-            if center_ratio > 0.6:
-                score += 0.3
-        
-        # Check for large text regions (urgency indicators)
-        if text_regions:
-            avg_area = sum(r['area'] for r in text_regions) / len(text_regions)
-            large_regions = [r for r in text_regions if r['area'] > avg_area * 2]
-            if len(large_regions) > 0:
-                score += 0.2
-        
-        # Check for high text density (cluttered, overwhelming)
-        total_text_area = sum(r['area'] for r in text_regions)
-        coverage = total_text_area / (width * height)
-        if coverage > 0.4:
-            score += 0.2
-        elif coverage < 0.05:
-            score += 0.1  # Very little text also suspicious
-        
-        # Check color analysis - bright/saturated colors
-        hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
-        saturation = hsv[:, :, 1].mean()
-        if saturation > 150:  # High saturation (bright colors)
-            score += 0.3
-        
-        return min(score, 1.0)
-        
-    except Exception as e:
-        print(f"Error analyzing layout characteristics: {e}")
-        return 0.0
-
-def generate_detailed_heatmap_data(image_path, scam_confidence):
-    """
-    Generate detailed heatmap data including text regions and suspicious areas.
-    This replaces the simple radial gradient approach.
-    """
-    try:
-        layout_data = analyze_layout_and_text_regions(image_path)
-        
-        if not layout_data:
-            return None
-        
-        # Adjust heatmap intensity based on scam confidence
-        intensity_multiplier = scam_confidence
-        
-        return {
-            'heatmap_image': layout_data['heatmap'],
-            'text_regions': layout_data['text_regions'],
-            'statistics': layout_data['statistics'],
-            'intensity': float(intensity_multiplier),
-            'layout_suspicion': layout_data['statistics']['layout_score']
-        }
-        
-    except Exception as e:
-        print(f"Error generating heatmap data: {e}")
-        return None
-
 def detect_urls(text):
     """Extract URLs from text"""
     url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
@@ -504,6 +366,72 @@ def detect_high_risk_keywords(text):
     
     return detected
 
+def generate_gradcam_heatmap(image_path, model_name, detector, intensity=0.5):
+    """Generate Grad-CAM heatmap supporting all CNN models"""
+    try:
+        if model_name not in detector.cnn_models:
+            print(f"Model {model_name} not found for Grad-CAM.")
+            return None
+
+        model = detector.cnn_models[model_name]
+
+        # Preprocess image
+        img_array = detector.preprocess_image_for_cnn(image_path, model_name)
+        if img_array is None:
+            return None
+
+        # Get the last convolutional layer based on model type
+        layer_map = {
+            'vggnet': 'block5_conv3',
+            'resnet': 'conv5_block3_out',
+            'mobilenet': 'conv_pw_13_relu',
+            'efficientnet': 'top_conv',
+            'alexnet': 'conv5'
+        }
+        last_conv_layer_name = layer_map.get(model_name)
+        if last_conv_layer_name not in [layer.name for layer in model.layers]:
+            print(f"Layer {last_conv_layer_name} not found in {model_name}")
+            return None
+
+        grad_model = tf.keras.models.Model(
+            [model.inputs],
+            [model.get_layer(last_conv_layer_name).output, model.output]
+        )
+
+        with tf.GradientTape() as tape:
+            conv_outputs, predictions = grad_model(img_array)
+            loss = predictions[:, 0]
+
+        grads = tape.gradient(loss, conv_outputs)
+        pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+        conv_outputs = conv_outputs[0]
+
+        heatmap = tf.reduce_mean(tf.multiply(pooled_grads, conv_outputs), axis=-1)
+        heatmap = np.maximum(heatmap, 0)
+        heatmap /= np.max(heatmap) if np.max(heatmap) != 0 else 1
+
+        # Load original image
+        img = cv2.imread(image_path)
+        img = cv2.resize(img, (224, 224))
+
+        if hasattr(heatmap, 'numpy'):
+            heatmap = heatmap.numpy()
+
+        # No second .numpy() call here
+        heatmap = cv2.resize(heatmap, (img.shape[1], img.shape[0]))
+        heatmap = np.uint8(255 * heatmap)
+        heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+
+        superimposed_img = cv2.addWeighted(img, 1 - intensity, heatmap, intensity, 0)
+
+        # Encode as base64
+        _, buffer = cv2.imencode('.png', superimposed_img)
+        img_base64 = base64.b64encode(buffer).decode('utf-8')
+        return f"data:image/png;base64,{img_base64}"
+
+    except Exception as e:
+        print(f"Error generating Grad-CAM for {model_name}: {e}")
+        return None
 
 # Initialize detector
 detector = ScamDetector()
@@ -561,7 +489,7 @@ def analyze():
             
             # Generate detailed heatmap with layout analysis
             scam_confidence = result.get('combined_probability', 0.5)
-            heatmap_data = generate_detailed_heatmap_data(filepath, scam_confidence)
+            gradcam_image = generate_gradcam_heatmap(filepath, cnn_model, detector)
             
             # Detect URLs and high-risk keywords
             extracted_text = result.get('extracted_text', '')
@@ -584,10 +512,7 @@ def analyze():
                     # Enhanced data
                     'original_image': preprocessed_images['original'] if preprocessed_images else None,
                     'preprocessed_image': preprocessed_images['preprocessed'] if preprocessed_images else None,
-                    'heatmap': heatmap_data['heatmap_image'] if heatmap_data else None,
-                    'text_regions': heatmap_data['text_regions'] if heatmap_data else [],
-                    'layout_statistics': heatmap_data['statistics'] if heatmap_data else {},
-                    'layout_suspicion': heatmap_data['layout_suspicion'] if heatmap_data else 0.0,
+                    'heatmap': gradcam_image if gradcam_image else None,
                     'detected_urls': urls,
                     'high_risk_keywords': high_risk_keywords
                 }
@@ -635,4 +560,5 @@ def report_scam():
         return jsonify({'success': False, 'error': 'Failed to submit report'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)

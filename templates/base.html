@@ -12,6 +12,12 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
     <script>
       tailwind.config = {
         darkMode: "class",
@@ -90,11 +96,11 @@
         body {
           padding-bottom: 0;
         }
-        
+
         .bottom-nav {
           display: none;
         }
-        
+
         .desktop-nav {
           display: flex;
         }
@@ -114,14 +120,20 @@
     class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen md:pb-0 pb-20"
   >
     <!-- Desktop Sidebar Navigation -->
-    <nav class="desktop-nav fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-50 flex-col">
+    <nav
+      class="desktop-nav fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-50 flex-col"
+    >
       <div class="p-6">
         <!-- Logo -->
         <div class="flex items-center mb-8">
-          <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+          <div
+            class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-3"
+          >
             <i class="fas fa-shield-alt text-white text-lg"></i>
           </div>
-          <span class="text-xl font-bold text-gray-800 dark:text-gray-100">ScamSigurado</span>
+          <span class="text-xl font-bold text-gray-800 dark:text-gray-100"
+            >ScamSigurado</span
+          >
         </div>
 
         <!-- Navigation Links -->
@@ -131,7 +143,9 @@
             class="flex items-center py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'home' %}bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400{% else %}text-gray-700 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-home text-xl w-6"></i>
-            <span class="ml-3 font-medium" data-translate-base="navHome">Home</span>
+            <span class="ml-3 font-medium" data-translate-base="navHome"
+              >Home</span
+            >
           </a>
 
           <a
@@ -139,7 +153,9 @@
             class="flex items-center py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'learn' %}bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400{% else %}text-gray-700 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-graduation-cap text-xl w-6"></i>
-            <span class="ml-3 font-medium" data-translate-base="navLearn">Learn</span>
+            <span class="ml-3 font-medium" data-translate-base="navLearn"
+              >Learn</span
+            >
           </a>
 
           <a
@@ -147,7 +163,9 @@
             class="flex items-center py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'upload' %}bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400{% else %}text-gray-700 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-camera text-xl w-6"></i>
-            <span class="ml-3 font-medium" data-translate-base="navUpload">Upload</span>
+            <span class="ml-3 font-medium" data-translate-base="navUpload"
+              >Upload</span
+            >
           </a>
 
           <a
@@ -155,7 +173,9 @@
             class="flex items-center py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'results' %}bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400{% else %}text-gray-700 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-info-circle text-xl w-6"></i>
-            <span class="ml-3 font-medium" data-translate-base="navResults">Results</span>
+            <span class="ml-3 font-medium" data-translate-base="navResults"
+              >Results</span
+            >
           </a>
 
           <a
@@ -163,13 +183,17 @@
             class="flex items-center py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if active_page == 'settings' %}bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400{% else %}text-gray-700 dark:text-gray-300{% endif %}"
           >
             <i class="fas fa-cog text-xl w-6"></i>
-            <span class="ml-3 font-medium" data-translate-base="navSettings">Settings</span>
+            <span class="ml-3 font-medium" data-translate-base="navSettings"
+              >Settings</span
+            >
           </a>
         </div>
       </div>
 
       <!-- Bottom info -->
-      <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200 dark:border-gray-700">
+      <div
+        class="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200 dark:border-gray-700"
+      >
         <div class="text-xs text-gray-500 dark:text-gray-400 text-center">
           <p class="mb-1">Stay protected online</p>
           <p>© 2024 ScamSigurado</p>
@@ -178,9 +202,7 @@
     </nav>
 
     <!-- Main Content Area -->
-    <main class="md:ml-64 min-h-screen">
-      {% block content %}{% endblock %}
-    </main>
+    <main class="md:ml-64 min-h-screen">{% block content %}{% endblock %}</main>
 
     <!-- Mobile Bottom Navigation -->
     <nav

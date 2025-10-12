@@ -674,11 +674,15 @@ endblock %} {% block content %}
         try {
           if (typeof html2canvas !== "undefined") {
             const element = document.querySelector(".fade-in");
+            const isDark = document.documentElement.classList.contains("dark");
             const canvas = await html2canvas(element, {
               scale: 2,
-              logging: false,
               useCORS: true,
               allowTaint: true,
+              logging: false,
+              backgroundColor: isDark ? "#1f2937" : "#ffffff", // solid background, not transparent
+              foreignObjectRendering: false, // fixes semi-transparent layers in Tailwind/Dark Mode
+              removeContainer: true,
             });
 
             const link = document.createElement("a");
