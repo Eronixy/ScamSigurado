@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% block title %}ScamSigurado{%
-endblock %} {% block content %}
+{% extends "base.html" %} {% block title %}ScamSigurado{% endblock %} {% block
+content %}
 <div class="fade-in pb-6">
   <!-- Header Section -->
   <div
@@ -42,6 +42,71 @@ endblock %} {% block content %}
               id="overallConfidenceBar"
               class="h-3 rounded-full transition-all duration-500"
             ></div>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div
+          class="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-5"
+        >
+          <div class="flex items-start">
+            <i
+              class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mt-1 mr-3 flex-shrink-0 text-2xl"
+            ></i>
+            <p
+              class="text-base text-red-800 dark:text-red-300 font-semibold leading-relaxed"
+            >
+              <strong class="uppercase">Disclaimer:</strong> This analysis is
+              automated and should be used as a guide only. Always verify
+              suspicious messages through official channels and exercise caution
+              when sharing personal information or clicking links.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEEDBACK SECTION -->
+    <div class="feedback-wrapper mb-4">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
+        <h4
+          class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3 text-center"
+        >
+          Was this result accurate?
+        </h4>
+        <p class="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
+          Your feedback helps us improve our detection system.
+        </p>
+
+        <div id="feedbackButtons" class="grid grid-cols-2 gap-3">
+          <button
+            id="feedbackCorrect"
+            class="feedback-btn bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 border-2 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 py-4 rounded-xl font-semibold transition-colors flex flex-col items-center justify-center"
+          >
+            <i class="fas fa-check-circle text-2xl mb-2"></i>
+            <span>Yes, Accurate</span>
+          </button>
+          <button
+            id="feedbackIncorrect"
+            class="feedback-btn bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border-2 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 py-4 rounded-xl font-semibold transition-colors flex flex-col items-center justify-center"
+          >
+            <i class="fas fa-times-circle text-2xl mb-2"></i>
+            <span>No, Incorrect</span>
+          </button>
+        </div>
+
+        <!-- Thank You Message -->
+        <div id="feedbackThanks" class="hidden text-center mt-4">
+          <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+            <i class="fas fa-heart text-brand text-2xl mb-2"></i>
+            <p
+              class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
+            >
+              Thank you for your feedback!
+            </p>
+            <p class="text-xs text-gray-600 dark:text-gray-400">
+              Your input helps us improve our scam detection accuracy.
+            </p>
           </div>
         </div>
       </div>
@@ -360,22 +425,25 @@ endblock %} {% block content %}
       </a>
     </div>
   </div>
-<div
-  id="imageModal"
-  class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50"
->
-  <div class="relative mb-[5vh] mx-4 max-h-[70vh] flex items-center justify-center">
-    <span
-      id="modalClose"
-      class="absolute top-2 right-2 text-white text-2xl cursor-pointer z-50"
-      >&times;</span
+
+  <!-- Image Modal -->
+  <div
+    id="imageModal"
+    class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50"
+  >
+    <div
+      class="relative mb-[5vh] mx-4 max-h-[70vh] flex items-center justify-center"
     >
-    <img
-      id="modalImage"
-      class="rounded-lg mb-[5vh] max-h-[70vh] max-w-full object-contain"
-    />
-  </div>
-</div>
+      <span
+        id="modalClose"
+        class="absolute top-2 right-2 text-white text-2xl cursor-pointer z-50"
+        >&times;</span
+      >
+      <img
+        id="modalImage"
+        class="rounded-lg mb-[5vh] max-h-[70vh] max-w-full object-contain"
+      />
+    </div>
   </div>
 </div>
 
@@ -384,6 +452,41 @@ endblock %} {% block content %}
   document.addEventListener("DOMContentLoaded", function () {
     // Get results from sessionStorage
     const resultsDataString = sessionStorage.getItem("analysisResults");
+
+    const feedbackCorrect = document.getElementById("feedbackCorrect");
+    const feedbackIncorrect = document.getElementById("feedbackIncorrect");
+    const feedbackButtons = document.getElementById("feedbackButtons");
+    const feedbackThanks = document.getElementById("feedbackThanks");
+
+    function handleFeedback(isCorrect) {
+      // Hide buttons
+      feedbackButtons.classList.add("hidden");
+
+      // Show thank you message
+      feedbackThanks.classList.remove("hidden");
+      feedbackThanks.classList.add("fade-in");
+
+      // Here you can add code to send feedback to your backend
+      // For example:
+      // fetch('/api/feedback', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     result_id: resultId,
+      //     is_correct: isCorrect
+      //   })
+      // });
+
+      console.log("Feedback submitted:", isCorrect ? "Accurate" : "Incorrect");
+    }
+
+    feedbackCorrect.addEventListener("click", function () {
+      handleFeedback(true);
+    });
+
+    feedbackIncorrect.addEventListener("click", function () {
+      handleFeedback(false);
+    });
 
     const previewImages = [
       document.getElementById("originalImage"),
@@ -404,17 +507,17 @@ endblock %} {% block content %}
     });
 
     heatmapCanvas.addEventListener("click", () => {
-    modal.classList.remove("hidden");
+      modal.classList.remove("hidden");
 
-    // Create a temporary canvas at larger resolution
-    const scaleFactor = 3; // adjust as needed
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = heatmapCanvas.width * scaleFactor;
-    tempCanvas.height = heatmapCanvas.height * scaleFactor;
-    const tempCtx = tempCanvas.getContext("2d");
+      // Create a temporary canvas at larger resolution
+      const scaleFactor = 3; // adjust as needed
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = heatmapCanvas.width * scaleFactor;
+      tempCanvas.height = heatmapCanvas.height * scaleFactor;
+      const tempCtx = tempCanvas.getContext("2d");
 
-    // Draw original canvas scaled up
-    tempCtx.drawImage(
+      // Draw original canvas scaled up
+      tempCtx.drawImage(
         heatmapCanvas,
         0,
         0,
@@ -424,10 +527,10 @@ endblock %} {% block content %}
         0,
         tempCanvas.width,
         tempCanvas.height
-    );
+      );
 
-    // Use this higher-res image for modal
-    modalImg.src = tempCanvas.toDataURL();
+      // Use this higher-res image for modal
+      modalImg.src = tempCanvas.toDataURL();
     });
 
     // Close modal

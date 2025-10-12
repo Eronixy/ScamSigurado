@@ -56,7 +56,7 @@
     <!-- Dark Mode Toggle -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       <div
-        class="p-4 flex items-center justify-between transition-colors hover:bg-gray-50 dark:hover:bg-gray-750 active:bg-gray-100 dark:active:bg-gray-700"
+        class="p-4 flex items-center justify-between transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-700"
       >
         <div class="flex items-center space-x-3">
           <div
@@ -82,382 +82,383 @@
         <input type="checkbox" id="darkModeToggle" class="toggle-checkbox" />
       </div>
     </div>
-  </div>
 
-  <!-- Language Section -->
-  <div class="mb-6">
-    <h2
-      class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3 px-1"
-      data-translate-page="languageSection"
-    >
-      Language
-    </h2>
-
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-      <!-- Current Language Display -->
-      <div
-        class="p-4 flex items-center justify-between cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-750 active:bg-gray-100 dark:active:bg-gray-700"
-        onclick="toggleLanguageOptions()"
+    <!-- Language Section -->
+    <div class="mb-6">
+      <h2
+        class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3 px-1"
+        data-translate-page="languageSection"
       >
-        <div class="flex items-center space-x-3">
-          <div
-            class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center"
-          >
-            <i class="fas fa-language text-gray-700 dark:text-gray-300"></i>
-          </div>
-          <div>
-            <p
-              class="font-medium text-gray-900 dark:text-gray-100"
-              data-translate-page="language"
-            >
-              Language
-            </p>
-            <p
-              class="text-sm text-gray-500 dark:text-gray-400"
-              id="currentLanguage"
-            >
-              English
-            </p>
-          </div>
-        </div>
-        <i
-          class="fas fa-chevron-right text-gray-400 dark:text-gray-500"
-          id="languageChevron"
-        ></i>
-      </div>
+        Language
+      </h2>
 
-      <!-- Language Options (Hidden by default) -->
-      <div
-        id="languageOptions"
-        class="hidden border-t border-gray-100 dark:border-gray-700"
-      >
-        <!-- English Option -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <!-- Current Language Display -->
         <div
-          class="p-4 flex items-center justify-between cursor-pointer border-2 border-transparent transition-all hover:bg-gray-50 dark:hover:bg-gray-750 language-option"
-          onclick="selectLanguage('en', 'English')"
-          data-lang="en"
+          class="p-4 flex items-center justify-between cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-700"
+          onclick="toggleLanguageOptions()"
         >
           <div class="flex items-center space-x-3">
-            <span class="text-2xl">🇬🇧</span>
-            <div>
-              <p class="font-medium text-gray-900 dark:text-gray-100">
-                English
-              </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">
-                Default language
-              </p>
+            <div
+              class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center"
+            >
+              <i class="fas fa-language text-gray-700 dark:text-gray-300"></i>
             </div>
-          </div>
-          <i class="fas fa-check text-brand language-check" id="check-en"></i>
-        </div>
-
-        <!-- Filipino Option -->
-        <div
-          class="p-4 flex items-center justify-between cursor-pointer border-2 border-transparent transition-all hover:bg-gray-50 dark:hover:bg-gray-750 language-option"
-          onclick="selectLanguage('fil', 'Filipino')"
-          data-lang="fil"
-        >
-          <div class="flex items-center space-x-3">
-            <span class="text-2xl">🇵🇭</span>
             <div>
-              <p class="font-medium text-gray-900 dark:text-gray-100">
-                Filipino
+              <p
+                class="font-medium text-gray-900 dark:text-gray-100"
+                data-translate-page="language"
+              >
+                Language
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">
-                Wikang Filipino
+              <p
+                class="text-sm text-gray-500 dark:text-gray-400"
+                id="currentLanguage"
+              >
+                English
               </p>
             </div>
           </div>
           <i
-            class="fas fa-check text-brand language-check hidden"
-            id="check-fil"
+            class="fas fa-chevron-right text-gray-400 dark:text-gray-500"
+            id="languageChevron"
           ></i>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Privacy & Disclaimer Section -->
-  <div class="mb-6">
-    <h2
-      class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3 px-1"
-      data-translate-page="privacyDisclaimer"
-    >
-      Privacy & Disclaimer
-    </h2>
-
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-      <!-- Privacy Notice -->
-      <div class="p-4 border-b border-gray-100 dark:border-gray-700">
-        <div class="flex items-start space-x-3">
+        <!-- Language Options (Hidden by default) -->
+        <div
+          id="languageOptions"
+          class="hidden border-t border-gray-100 dark:border-gray-700"
+        >
+          <!-- English Option -->
           <div
-            class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0"
+            class="p-4 flex items-center justify-between cursor-pointer border-2 border-transparent transition-all hover:bg-gray-50 dark:hover:bg-gray-700 language-option"
+            onclick="selectLanguage('en', 'English')"
+            data-lang="en"
           >
-            <i class="fas fa-shield-alt text-green-600 dark:text-green-400"></i>
+            <div class="flex items-center space-x-3">
+              <span class="text-2xl">🇬🇧</span>
+              <div>
+                <p class="font-medium text-gray-900 dark:text-gray-100">
+                  English
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  Default language
+                </p>
+              </div>
+            </div>
+            <i class="fas fa-check text-brand language-check" id="check-en"></i>
           </div>
-          <div>
-            <p
-              class="font-medium text-gray-900 dark:text-gray-100 mb-1"
-              data-translate-page="privacyTitle"
-            >
-              Your Privacy Matters
-            </p>
-            <p
-              class="text-sm text-gray-600 dark:text-gray-300"
-              data-translate-page="privacyText"
-            >
-              We <strong>do not store</strong> your uploaded screenshots. All
-              images are analyzed in real-time and immediately deleted after
-              processing.
-            </p>
-          </div>
-        </div>
-      </div>
 
-      <!-- Disclaimer -->
-      <div class="p-4">
-        <div class="flex items-start space-x-3">
+          <!-- Filipino Option -->
           <div
-            class="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center flex-shrink-0"
+            class="p-4 flex items-center justify-between cursor-pointer border-2 border-transparent transition-all hover:bg-gray-50 dark:hover:bg-gray-700 language-option"
+            onclick="selectLanguage('fil', 'Filipino')"
+            data-lang="fil"
           >
+            <div class="flex items-center space-x-3">
+              <span class="text-2xl">🇵🇭</span>
+              <div>
+                <p class="font-medium text-gray-900 dark:text-gray-100">
+                  Filipino
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  Wikang Filipino
+                </p>
+              </div>
+            </div>
             <i
-              class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400"
+              class="fas fa-check text-brand language-check hidden"
+              id="check-fil"
             ></i>
           </div>
-          <div>
-            <p
-              class="font-medium text-gray-900 dark:text-gray-100 mb-1"
-              data-translate-page="disclaimerTitle"
+        </div>
+      </div>
+    </div>
+
+    <!-- Privacy & Disclaimer Section -->
+    <div class="mb-6">
+      <h2
+        class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3 px-1"
+        data-translate-page="privacyDisclaimer"
+      >
+        Privacy & Disclaimer
+      </h2>
+
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <!-- Privacy Notice -->
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700">
+          <div class="flex items-start space-x-3">
+            <div
+              class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0"
             >
-              Always Verify
-            </p>
-            <p
-              class="text-sm text-gray-600 dark:text-gray-300"
-              data-translate-page="disclaimerText"
+              <i
+                class="fas fa-shield-alt text-green-600 dark:text-green-400"
+              ></i>
+            </div>
+            <div>
+              <p
+                class="font-medium text-gray-900 dark:text-gray-100 mb-1"
+                data-translate-page="privacyTitle"
+              >
+                Your Privacy Matters
+              </p>
+              <p
+                class="text-sm text-gray-600 dark:text-gray-300"
+                data-translate-page="privacyText"
+              >
+                We <strong>do not store</strong> your uploaded screenshots. All
+                images are analyzed in real-time and immediately deleted after
+                processing.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="p-4">
+          <div class="flex items-start space-x-3">
+            <div
+              class="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center flex-shrink-0"
             >
-              Our AI provides guidance but is
-              <strong>not 100% accurate</strong>. Always verify suspicious
-              content through official channels and use your best judgment.
-            </p>
+              <i
+                class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400"
+              ></i>
+            </div>
+            <div>
+              <p
+                class="font-medium text-gray-900 dark:text-gray-100 mb-1"
+                data-translate-page="disclaimerTitle"
+              >
+                Always Verify
+              </p>
+              <p
+                class="text-sm text-gray-600 dark:text-gray-300"
+                data-translate-page="disclaimerText"
+              >
+                Our AI provides guidance but is
+                <strong>not 100% accurate</strong>. Always verify suspicious
+                content through official channels and use your best judgment.
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Info Card -->
-  <div
-    class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 flex items-start space-x-3"
-  >
-    <i class="fas fa-info-circle text-brand dark:text-blue-400 mt-1"></i>
-    <div>
-      <p
-        class="text-sm text-gray-700 dark:text-gray-300"
-        data-translate-page="helpText"
-      >
-        <strong data-translate-page="needHelp">Need help?</strong> Visit our
-        support page or contact us for assistance with any settings.
-      </p>
+    <!-- Info Card -->
+    <div
+      class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 flex items-start space-x-3"
+    >
+      <i class="fas fa-info-circle text-brand dark:text-blue-400 mt-1"></i>
+      <div>
+        <p
+          class="text-sm text-gray-700 dark:text-gray-300"
+          data-translate-page="helpText"
+        >
+          <strong data-translate-page="needHelp">Need help?</strong> Visit our
+          support page or contact us for assistance with any settings.
+        </p>
+      </div>
     </div>
   </div>
-</div>
 
-{% endblock %} {% block extra_scripts %}
-<script>
-  const pageTranslations = {
-    en: {
-      settingsTitle: "Settings",
-      appearance: "Appearance",
-      darkMode: "Dark Mode",
-      darkModeDesc: "Switch to dark theme",
-      language: "Language",
-      languageSection: "Language",
-      privacyDisclaimer: "Privacy & Disclaimer",
-      privacyTitle: "Your Privacy Matters",
-      privacyText:
-        "We do not store your uploaded screenshots. All images are analyzed in real-time and immediately deleted after processing.",
-      disclaimerTitle: "Always Verify",
-      disclaimerText:
-        "Our AI provides guidance but is not 100% accurate. Always verify suspicious content through official channels and use your best judgment.",
-      needHelp: "Need help?",
-      helpText:
-        "Visit our support page or contact us for assistance with any settings.",
-      darkModeEnabled: "Dark mode enabled",
-      lightModeEnabled: "Light mode enabled",
-      languageChanged: "Language changed to",
-    },
-    fil: {
-      settingsTitle: "Mga Setting",
-      appearance: "Hitsura",
-      darkMode: "Madilim na Mode",
-      darkModeDesc: "Lumipat sa madilim na tema",
-      language: "Wika",
-      languageSection: "Wika",
-      privacyDisclaimer: "Pribasiya at Disclaimer",
-      privacyTitle: "Mahalaga ang Iyong Pribasiya",
-      privacyText:
-        "Hindi namin sine-save ang iyong mga na-upload na screenshot. Lahat ng larawan ay sinusuri sa real-time at agad na tinatanggal pagkatapos ng pagsusuri.",
-      disclaimerTitle: "Laging I-verify",
-      disclaimerText:
-        "Ang aming AI ay nagbibigay ng gabay ngunit hindi 100% tumpak. Laging i-verify ang kahina-hinalang content sa pamamagitan ng opisyal na mga channel at gumamit ng iyong pinakamahusay na paghatol.",
-      needHelp: "Kailangan ng tulong?",
-      helpText:
-        "Bisitahin ang aming support page o makipag-ugnayan sa amin para sa tulong sa anumang mga setting.",
-      darkModeEnabled: "Na-enable ang madilim na mode",
-      lightModeEnabled: "Na-enable ang maliwanag na mode",
-      languageChanged: "Nabago ang wika sa",
-    },
-  };
+  {% endblock %} {% block extra_scripts %}
+  <script>
+    const pageTranslations = {
+      en: {
+        settingsTitle: "Settings",
+        appearance: "Appearance",
+        darkMode: "Dark Mode",
+        darkModeDesc: "Switch to dark theme",
+        language: "Language",
+        languageSection: "Language",
+        privacyDisclaimer: "Privacy & Disclaimer",
+        privacyTitle: "Your Privacy Matters",
+        privacyText:
+          "We do not store your uploaded screenshots. All images are analyzed in real-time and immediately deleted after processing.",
+        disclaimerTitle: "Always Verify",
+        disclaimerText:
+          "Our AI provides guidance but is not 100% accurate. Always verify suspicious content through official channels and use your best judgment.",
+        needHelp: "Need help?",
+        helpText:
+          "Visit our support page or contact us for assistance with any settings.",
+        darkModeEnabled: "Dark mode enabled",
+        lightModeEnabled: "Light mode enabled",
+        languageChanged: "Language changed to",
+      },
+      fil: {
+        settingsTitle: "Mga Setting",
+        appearance: "Hitsura",
+        darkMode: "Madilim na Mode",
+        darkModeDesc: "Lumipat sa madilim na tema",
+        language: "Wika",
+        languageSection: "Wika",
+        privacyDisclaimer: "Pribasiya at Disclaimer",
+        privacyTitle: "Mahalaga ang Iyong Pribasiya",
+        privacyText:
+          "Hindi namin sine-save ang iyong mga na-upload na screenshot. Lahat ng larawan ay sinusuri sa real-time at agad na tinatanggal pagkatapos ng pagsusuri.",
+        disclaimerTitle: "Laging I-verify",
+        disclaimerText:
+          "Ang aming AI ay nagbibigay ng gabay ngunit hindi 100% tumpak. Laging i-verify ang kahina-hinalang content sa pamamagitan ng opisyal na mga channel at gumamit ng iyong pinakamahusay na paghatol.",
+        needHelp: "Kailangan ng tulong?",
+        helpText:
+          "Bisitahin ang aming support page o makipag-ugnayan sa amin para sa tulong sa anumang mga setting.",
+        darkModeEnabled: "Na-enable ang madilim na mode",
+        lightModeEnabled: "Na-enable ang maliwanag na mode",
+        languageChanged: "Nabago ang wika sa",
+      },
+    };
 
-  function applyPageTranslations() {
-    const lang = localStorage.getItem("language") || "en";
-    const t = pageTranslations[lang];
+    function applyPageTranslations() {
+      const lang = localStorage.getItem("language") || "en";
+      const t = pageTranslations[lang];
 
-    // Apply translations to elements with data-translate-page attribute
-    document.querySelectorAll("[data-translate-page]").forEach((el) => {
-      const key = el.getAttribute("data-translate-page");
-      if (t[key]) {
-        // For input placeholders
-        if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
-          el.placeholder = t[key];
-        } else {
-          el.textContent = t[key];
+      // Apply translations to elements with data-translate-page attribute
+      document.querySelectorAll("[data-translate-page]").forEach((el) => {
+        const key = el.getAttribute("data-translate-page");
+        if (t[key]) {
+          // For input placeholders
+          if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+            el.placeholder = t[key];
+          } else {
+            el.textContent = t[key];
+          }
         }
+      });
+    }
+
+    // Call on page load
+    document.addEventListener("DOMContentLoaded", applyPageTranslations);
+
+    // Dark Mode Toggle
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const currentTheme = localStorage.getItem("theme") || "light";
+    const currentLang = localStorage.getItem("language") || "en";
+
+    // Initialize dark mode state
+    if (currentTheme === "dark") {
+      darkModeToggle.checked = true;
+      document.documentElement.classList.add("dark");
+    }
+
+    darkModeToggle.addEventListener("change", function () {
+      const lang = localStorage.getItem("language") || "en";
+      const t = pageTranslations[lang];
+
+      if (this.checked) {
+        localStorage.setItem("theme", "dark");
+        document.documentElement.classList.add("dark");
+        showToast(t.darkModeEnabled, "success");
+      } else {
+        localStorage.setItem("theme", "light");
+        document.documentElement.classList.remove("dark");
+        showToast(t.lightModeEnabled, "success");
       }
     });
-  }
 
-  // Call on page load
-  document.addEventListener("DOMContentLoaded", applyPageTranslations);
+    // Language Toggle Functions
+    function toggleLanguageOptions() {
+      const options = document.getElementById("languageOptions");
+      const chevron = document.getElementById("languageChevron");
 
-  // Dark Mode Toggle
-  const darkModeToggle = document.getElementById("darkModeToggle");
-  const currentTheme = localStorage.getItem("theme") || "light";
-  const currentLang = localStorage.getItem("language") || "en";
-
-  // Initialize dark mode state
-  if (currentTheme === "dark") {
-    darkModeToggle.checked = true;
-    document.documentElement.classList.add("dark");
-  }
-
-  darkModeToggle.addEventListener("change", function () {
-    const lang = localStorage.getItem("language") || "en";
-    const t = pageTranslations[lang];
-
-    if (this.checked) {
-      localStorage.setItem("theme", "dark");
-      document.documentElement.classList.add("dark");
-      showToast(t.darkModeEnabled, "success");
-    } else {
-      localStorage.setItem("theme", "light");
-      document.documentElement.classList.remove("dark");
-      showToast(t.lightModeEnabled, "success");
+      if (options.classList.contains("hidden")) {
+        options.classList.remove("hidden");
+        chevron.classList.remove("fa-chevron-right");
+        chevron.classList.add("fa-chevron-down");
+      } else {
+        options.classList.add("hidden");
+        chevron.classList.remove("fa-chevron-down");
+        chevron.classList.add("fa-chevron-right");
+      }
     }
-  });
 
-  // Language Toggle Functions
-  function toggleLanguageOptions() {
-    const options = document.getElementById("languageOptions");
-    const chevron = document.getElementById("languageChevron");
+    function selectLanguage(code, name) {
+      const lang = code;
+      const t = pageTranslations[lang];
 
-    if (options.classList.contains("hidden")) {
-      options.classList.remove("hidden");
-      chevron.classList.remove("fa-chevron-right");
-      chevron.classList.add("fa-chevron-down");
-    } else {
-      options.classList.add("hidden");
-      chevron.classList.remove("fa-chevron-down");
-      chevron.classList.add("fa-chevron-right");
-    }
-  }
+      // Update current language display
+      document.getElementById("currentLanguage").textContent = name;
 
-  function selectLanguage(code, name) {
-    const lang = code;
-    const t = pageTranslations[lang];
+      // Update check marks
+      document.querySelectorAll(".language-check").forEach((check) => {
+        check.classList.add("hidden");
+      });
+      document.getElementById(`check-${code}`).classList.remove("hidden");
 
-    // Update current language display
-    document.getElementById("currentLanguage").textContent = name;
-
-    // Update check marks
-    document.querySelectorAll(".language-check").forEach((check) => {
-      check.classList.add("hidden");
-    });
-    document.getElementById(`check-${code}`).classList.remove("hidden");
-
-    // Update active state - add visual feedback for selected language
-    document.querySelectorAll(".language-option").forEach((option) => {
-      option.classList.remove(
+      // Update active state - add visual feedback for selected language
+      document.querySelectorAll(".language-option").forEach((option) => {
+        option.classList.remove(
+          "bg-blue-50",
+          "dark:bg-blue-900/20",
+          "border-blue-500"
+        );
+      });
+      event.currentTarget.classList.add(
         "bg-blue-50",
         "dark:bg-blue-900/20",
         "border-blue-500"
       );
-    });
-    event.currentTarget.classList.add(
-      "bg-blue-50",
-      "dark:bg-blue-900/20",
-      "border-blue-500"
-    );
 
-    // Save to localStorage
-    localStorage.setItem("language", code);
+      // Save to localStorage
+      localStorage.setItem("language", code);
 
-    // Smooth fade transition while applying new translations
-    document.body.style.transition = "opacity 0.3s ease";
-    document.body.style.opacity = "0.6";
+      // Smooth fade transition while applying new translations
+      document.body.style.transition = "opacity 0.3s ease";
+      document.body.style.opacity = "0.6";
 
-    setTimeout(() => {
-      applyPageTranslations();
-      document.body.style.opacity = "1";
-    }, 250);
+      setTimeout(() => {
+        applyPageTranslations();
+        document.body.style.opacity = "1";
+      }, 250);
 
-    // Show toast with translated message
-    showToast(`${t.languageChanged} ${name}`, "success");
+      // Show toast with translated message
+      showToast(`${t.languageChanged} ${name}`, "success");
 
-    // Close options after selection
-    setTimeout(() => {
-      toggleLanguageOptions();
-    }, 300);
-  }
-
-  // Initialize language on page load
-  function initializeLanguage() {
-    const savedLang = localStorage.getItem("language") || "en";
-    const langName = savedLang === "en" ? "English" : "Filipino";
-
-    document.getElementById("currentLanguage").textContent = langName;
-    document.getElementById(`check-${savedLang}`).classList.remove("hidden");
-
-    // Set active state for current language
-    const activeOption = document.querySelector(
-      `.language-option[data-lang="${savedLang}"]`
-    );
-    if (activeOption) {
-      activeOption.classList.add(
-        "bg-blue-50",
-        "dark:bg-blue-900/20",
-        "border-blue-500"
-      );
+      // Close options after selection
+      setTimeout(() => {
+        toggleLanguageOptions();
+      }, 300);
     }
-  }
 
-  // Toast notification function
-  function showToast(message, type = "info") {
-    const toastContainer = document.getElementById("toast-container");
-    const colors = {
-      success: "border-green-500",
-      error: "border-red-500",
-      info: "border-blue-500",
-    };
-    const icons = {
-      success: "fa-check-circle text-green-500",
-      error: "fa-exclamation-circle text-red-500",
-      info: "fa-info-circle text-blue-500",
-    };
+    // Initialize language on page load
+    function initializeLanguage() {
+      const savedLang = localStorage.getItem("language") || "en";
+      const langName = savedLang === "en" ? "English" : "Filipino";
 
-    const toast = document.createElement("div");
-    toast.className = `fade-in bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-2 flex items-start border-l-4 ${colors[type]}`;
-    toast.innerHTML = `
+      document.getElementById("currentLanguage").textContent = langName;
+      document.getElementById(`check-${savedLang}`).classList.remove("hidden");
+
+      // Set active state for current language
+      const activeOption = document.querySelector(
+        `.language-option[data-lang="${savedLang}"]`
+      );
+      if (activeOption) {
+        activeOption.classList.add(
+          "bg-blue-50",
+          "dark:bg-blue-900/20",
+          "border-blue-500"
+        );
+      }
+    }
+
+    // Toast notification function
+    function showToast(message, type = "info") {
+      const toastContainer = document.getElementById("toast-container");
+      const colors = {
+        success: "border-green-500",
+        error: "border-red-500",
+        info: "border-blue-500",
+      };
+      const icons = {
+        success: "fa-check-circle text-green-500",
+        error: "fa-exclamation-circle text-red-500",
+        info: "fa-info-circle text-blue-500",
+      };
+
+      const toast = document.createElement("div");
+      toast.className = `fade-in bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-2 flex items-start border-l-4 ${colors[type]}`;
+      toast.innerHTML = `
       <i class="fas ${icons[type]} mr-3 mt-0.5"></i>
       <p class="text-sm text-gray-700 dark:text-gray-200 flex-1">${message}</p>
       <button onclick="this.parentElement.remove()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 ml-2">
@@ -465,14 +466,15 @@
       </button>
     `;
 
-    toastContainer.appendChild(toast);
+      toastContainer.appendChild(toast);
 
-    setTimeout(() => {
-      toast.style.opacity = "0";
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
 
-  document.addEventListener("DOMContentLoaded", initializeLanguage);
-</script>
-{% endblock %}
+    document.addEventListener("DOMContentLoaded", initializeLanguage);
+  </script>
+  {% endblock %}
+</div>
