@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, send_file
+from flask import Flask, render_template, request, redirect, url_for, jsonify, send_file, Response
+import json
 from tensorflow.keras.models import load_model
 import os
 import pickle
@@ -22,6 +23,9 @@ import tempfile
 from datetime import datetime
 import base64
 from io import BytesIO
+import queue
+import threading
+import time
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
@@ -82,34 +86,22 @@ class ScamDetector:
             if img is None:
                 return ""
 
-            # Step 1: Grayscale + contrast boost
+            # Light grayscale + contrast
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            gray = cv2.convertScaleAbs(gray, alpha=1.7, beta=15)
+            gray = cv2.convertScaleAbs(gray, alpha=1.4, beta=10)
 
-            # Step 2: Denoise but keep edges
-            gray = cv2.bilateralFilter(gray, 11, 75, 75)
-
-            # Step 3: Threshold — adapt to lighting
+            # Adaptive threshold — handles dark/light SMS themes
             thresh = cv2.adaptiveThreshold(
                 gray, 255,
                 cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                cv2.THRESH_BINARY_INV,
+                cv2.THRESH_BINARY,
                 35, 15
             )
 
-            # Step 4: Morphological cleanup (remove noise + connect letters)
-            kernel = np.ones((2, 2), np.uint8)
-            thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
-            thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
-
-            # Step 5: Invert for Tesseract
-            thresh = cv2.bitwise_not(thresh)
-
-            # Step 6: OCR config — focus on text symbols only
+            # OCR with basic config
             custom_config = (
                 r'--oem 3 --psm 6 '
-                r'-c preserve_interword_spaces=1 '
-                r'-c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:/.-@ '
+                r'-c preserve_interword_spaces=1'
             )
 
             text = pytesseract.image_to_string(thresh, config=custom_config)
@@ -311,34 +303,42 @@ class ScamDetector:
 
 
 def preprocess_image_opencv(image_path):
-    """Preprocess image using OpenCV and return base64 encoded images with layout analysis"""
+    """Preprocess image using OpenCV and return base64 encoded images showing OCR preprocessing steps"""
     try:
-        # Read original
         img = cv2.imread(image_path)
+        if img is None:
+            return ""
+
+        # Convert original to RGB for visualization
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        
-        # Convert to grayscale
+
+        # Step 1: Convert to grayscale (basic enhancement)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        
-        # Apply denoising
-        denoised = cv2.fastNlMeansDenoising(gray, None, 10, 7, 21)
-        
-        # Apply adaptive thresholding
-        thresh = cv2.adaptiveThreshold(denoised, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-                                       cv2.THRESH_BINARY, 11, 2)
-        
-        # Encode original
+
+        # Step 2: Light contrast normalization (gentle boost)
+        gray = cv2.convertScaleAbs(gray, alpha=1.4, beta=10)
+
+        # Step 3: Adaptive threshold (same as OCR version)
+        thresh = cv2.adaptiveThreshold(
+            gray, 255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY,
+            35, 15
+        )
+
+        # Encode original (RGB)
         _, buffer_orig = cv2.imencode('.png', img_rgb)
         img_orig_base64 = base64.b64encode(buffer_orig).decode('utf-8')
-        
-        # Encode preprocessed
+
+        # Encode preprocessed (final OCR-ready image)
         _, buffer_prep = cv2.imencode('.png', thresh)
         img_prep_base64 = base64.b64encode(buffer_prep).decode('utf-8')
-        
+
         return {
             'original': f'data:image/png;base64,{img_orig_base64}',
             'preprocessed': f'data:image/png;base64,{img_prep_base64}'
         }
+
     except Exception as e:
         print(f"Error in preprocessing: {e}")
         return None
@@ -433,6 +433,17 @@ def generate_gradcam_heatmap(image_path, model_name, detector, intensity=0.5):
         print(f"Error generating Grad-CAM for {model_name}: {e}")
         return None
 
+progress_queues = {}
+
+def send_progress(session_id, step, progress, message):
+    """Send progress update to specific session"""
+    if session_id in progress_queues:
+        progress_queues[session_id].put({
+            'step': step,
+            'progress': progress,
+            'message': message
+        })
+
 # Initialize detector
 detector = ScamDetector()
 
@@ -461,78 +472,123 @@ def settings():
 @app.route('/api/analyze', methods=['POST'])
 def analyze():
     try:
+        import uuid
+        session_id = str(uuid.uuid4())
+
         file = request.files.get('file')
         if not file or file.filename == '':
             return jsonify({'success': False, 'error': 'No file uploaded'}), 400
-    
+
         text_model = request.form.get('text_model', 'svm')
         cnn_model = request.form.get('cnn_model', 'efficientnet')
         text_weight = float(request.form.get('text_weight', 0.6))
         cnn_weight = float(request.form.get('cnn_weight', 0.4))
-        
+
         filename = f"temp_{file.filename}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        
-        try:
-            # Run main analysis
-            result = detector.analyze_screenshot(
-                filepath, 
-                text_model=text_model,
-                cnn_model=cnn_model,
-                text_weight=text_weight,
-                cnn_weight=cnn_weight
-            )
-            
-            # Get preprocessed images
-            preprocessed_images = preprocess_image_opencv(filepath)
-            
-            # Generate detailed heatmap with layout analysis
-            scam_confidence = result.get('combined_probability', 0.5)
-            gradcam_image = generate_gradcam_heatmap(filepath, cnn_model, detector)
-            
-            # Detect URLs and high-risk keywords
-            extracted_text = result.get('extracted_text', '')
-            urls = detect_urls(extracted_text)
-            high_risk_keywords = detect_high_risk_keywords(extracted_text)
-            
-            # Clean up temp file
-            os.remove(filepath)
-            
-            if result.get('success', False):
-                response_data = {
-                    'success': True,
-                    'prediction': 'scam' if result['is_scam'] else 'legitimate',
-                    'confidence': round(float(result['confidence']) / 100, 2),
-                    'text_confidence': round(float(result['text_confidence']) / 100, 2),
-                    'image_confidence': round(float(result['image_confidence']) / 100, 2),
-                    'extracted_text': result['extracted_text'],
-                    'feature_importance': result['feature_importance'],
-                    
-                    # Enhanced data
-                    'original_image': preprocessed_images['original'] if preprocessed_images else None,
-                    'preprocessed_image': preprocessed_images['preprocessed'] if preprocessed_images else None,
-                    'heatmap': gradcam_image if gradcam_image else None,
-                    'detected_urls': urls,
-                    'high_risk_keywords': high_risk_keywords
-                }
-                return jsonify(response_data)
-            else:
-                return jsonify({
-                    'success': False, 
-                    'error': result.get('error', 'Analysis failed')
-                }), 500
-            
-        except Exception as e:
-            if os.path.exists(filepath):
+
+        progress_queues[session_id] = queue.Queue()
+
+        def run_analysis():
+            try:
+                # Step 1: Preprocessing image
+                send_progress(session_id, 1, 20, "Preprocessing image...")
+                preprocessed_images = preprocess_image_opencv(filepath)
+                time.sleep(0.3)
+
+                # Step 2: Extracting text
+                send_progress(session_id, 2, 40, "Extracting text from image...")
+                extracted_text = detector.extract_text_from_image(filepath)
+                time.sleep(0.3)
+
+                # Step 3: Text + Image Analysis
+                send_progress(session_id, 3, 60, "Running text and image analysis...")
+                result = detector.analyze_screenshot(
+                    filepath,
+                    text_model=text_model,
+                    cnn_model=cnn_model,
+                    text_weight=text_weight,
+                    cnn_weight=cnn_weight
+                )
+                time.sleep(0.3)
+
+                # Step 4: Heatmap and URL detection
+                send_progress(session_id, 4, 80, "Generating Grad-CAM and detecting URLs...")
+                gradcam_image = generate_gradcam_heatmap(filepath, cnn_model, detector)
+                urls = detect_urls(result.get('extracted_text', ''))
+                high_risk_keywords = detect_high_risk_keywords(result.get('extracted_text', ''))
+                time.sleep(0.3)
+
+                # Step 5: Finalizing
+                send_progress(session_id, 5, 100, "Finalizing results...")
                 os.remove(filepath)
-            traceback.print_exc()
-            return jsonify({'success': False, 'error': str(e)}), 500
-            
+
+                if result.get('success', False):
+                    response_data = {
+                        'success': True,
+                        'prediction': 'scam' if result['is_scam'] else 'legitimate',
+                        'confidence': round(float(result['confidence']) / 100, 2),
+                        'text_confidence': round(float(result['text_confidence']) / 100, 2),
+                        'image_confidence': round(float(result['image_confidence']) / 100, 2),
+                        'extracted_text': result['extracted_text'],
+                        'feature_importance': result['feature_importance'],
+                        'original_image': preprocessed_images['original'] if preprocessed_images else None,
+                        'preprocessed_image': preprocessed_images['preprocessed'] if preprocessed_images else None,
+                        'heatmap': gradcam_image if gradcam_image else None,
+                        'detected_urls': urls,
+                        'high_risk_keywords': high_risk_keywords
+                    }
+
+                    send_progress(session_id, 'complete', 100, response_data)
+                else:
+                    send_progress(session_id, 'error', 0, result.get('error', 'Analysis failed'))
+
+            except Exception as e:
+                traceback.print_exc()
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+                send_progress(session_id, 'error', 0, str(e))
+            finally:
+                def cleanup():
+                    time.sleep(5)
+                    if session_id in progress_queues:
+                        del progress_queues[session_id]
+                threading.Thread(target=cleanup).start()
+
+        threading.Thread(target=run_analysis).start()
+        return jsonify({'success': True, 'session_id': session_id})
+
     except Exception as e:
         print(f"Error in analyze route: {e}")
         traceback.print_exc()
-        return jsonify({'success': False, 'error': 'Analysis failed'}), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/progress/<session_id>')
+def progress_stream(session_id):
+    """SSE endpoint for progress updates"""
+    def generate():
+        if session_id not in progress_queues:
+            yield f"data: {json.dumps({'error': 'Invalid session'})}\n\n"
+            return
+        
+        q = progress_queues[session_id]
+        
+        while True:
+            try:
+                # Wait for progress update with timeout
+                update = q.get(timeout=30)
+                yield f"data: {json.dumps(update)}\n\n"
+                
+                # If complete or error, stop streaming
+                if update.get('step') in ['complete', 'error']:
+                    break
+                    
+            except queue.Empty:
+                # Send keepalive
+                yield f": keepalive\n\n"
+    
+    return Response(generate(), mimetype='text/event-stream')
 
 
 @app.route('/api/feedback', methods=['POST'])

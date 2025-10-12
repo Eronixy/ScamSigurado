@@ -837,8 +837,9 @@ endblock %} {% block content %}
     async function analyzeImage() {
       if (!selectedFile) return;
 
-      // Show modal
+      // Show modal and reset progress
       analysisModal.classList.remove("hidden");
+      resetProgressSteps();
 
       // Get settings
       const textModel = document.getElementById("textModel").value;
@@ -855,85 +856,147 @@ endblock %} {% block content %}
       formData.append("cnn_weight", cnnWeight);
 
       try {
-        // Simulate progress steps
-        await simulateProgress();
-
-        // Make API call
+        // Start analysis and get session ID
         const response = await fetch("/api/analyze", {
           method: "POST",
           body: formData,
         });
 
         if (!response.ok) {
-          throw new Error("Analysis failed");
+          throw new Error("Failed to start analysis");
         }
 
-        const result = await response.json();
+        const { session_id } = await response.json();
 
-        if (result.success) {
-          // Store original image and results for results page
-          const resultsData = {
-            ...result,
-            original_image: originalImageData,
-            settings: {
-              text_model: textModel,
-              cnn_model: cnnModel,
-              text_weight: textWeight,
-              cnn_weight: cnnWeight,
-            },
-          };
+        // Connect to SSE for real-time progress updates
+        const eventSource = new EventSource(`/api/progress/${session_id}`);
 
-          // Store in sessionStorage and navigate to results
-          sessionStorage.setItem(
-            "analysisResults",
-            JSON.stringify(resultsData)
-          );
-          window.location.href = "/results";
-        } else {
-          throw new Error(result.error || "Analysis failed");
-        }
+        eventSource.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+
+          if (data.error) {
+            eventSource.close();
+            analysisModal.classList.add("hidden");
+            alert("Analysis error: " + data.error);
+            return;
+          }
+
+          if (data.step === "complete") {
+            eventSource.close();
+
+            // Store results
+            const resultsData = {
+              ...data.message,
+              original_image: originalImageData,
+              settings: {
+                text_model: textModel,
+                cnn_model: cnnModel,
+                text_weight: textWeight,
+                cnn_weight: cnnWeight,
+              },
+            };
+
+            // Navigate to results
+            sessionStorage.setItem(
+              "analysisResults",
+              JSON.stringify(resultsData)
+            );
+            window.location.href = "/results";
+          } else if (data.step === "error") {
+            eventSource.close();
+            analysisModal.classList.add("hidden");
+            alert("Analysis error: " + data.message);
+          } else {
+            // Update progress for specific step
+            updateStepProgress(data.step, data.progress, data.message);
+          }
+        };
+
+        eventSource.onerror = (error) => {
+          console.error("SSE Error:", error);
+          eventSource.close();
+          analysisModal.classList.add("hidden");
+          alert("Connection error. Please try again.");
+        };
       } catch (error) {
         console.error("Error:", error);
         analysisModal.classList.add("hidden");
-        alert(t.errorAnalysis + error.message);
+        alert("Analysis failed: " + error.message);
       }
     }
 
-    async function simulateProgress() {
-      const steps = [
-        { id: 1, duration: 800 },
-        { id: 2, duration: 1200 },
-        { id: 3, duration: 1500 },
-        { id: 4, duration: 1500 },
-        { id: 5, duration: 1000 },
-      ];
+    // ADD THESE NEW FUNCTIONS:
+    function resetProgressSteps() {
+      // Reset all steps to initial state
+      for (let i = 1; i <= 5; i++) {
+        const stepEl = document.getElementById(`step${i}`);
+        const spinner = document.getElementById(`step${i}-spinner`);
+        const check = document.getElementById(`step${i}-check`);
 
-      for (let i = 0; i < steps.length; i++) {
-        const step = steps[i];
-        const stepEl = document.getElementById(`step${step.id}`);
-        const spinner = document.getElementById(`step${step.id}-spinner`);
-        const check = document.getElementById(`step${step.id}-check`);
-
-        // Activate step
-        stepEl.classList.remove("bg-gray-50", "dark:bg-gray-700");
-        stepEl.classList.add("bg-blue-50", "dark:bg-blue-900/30");
-        spinner.classList.remove("hidden");
-
-        // Update progress bar
-        const progress = ((i + 1) / steps.length) * 100;
-        document.getElementById("progressBar").style.width = progress + "%";
-        document.getElementById("overallProgress").textContent =
-          Math.round(progress) + "%";
-
-        // Wait for step duration
-        await new Promise((resolve) => setTimeout(resolve, step.duration));
-
-        // Complete step
+        stepEl.classList.remove(
+          "bg-blue-50",
+          "dark:bg-blue-900/30",
+          "bg-green-50",
+          "dark:bg-green-900/30"
+        );
+        stepEl.classList.add("bg-gray-50", "dark:bg-gray-700");
         spinner.classList.add("hidden");
-        check.classList.remove("hidden");
-        stepEl.classList.remove("bg-blue-50", "dark:bg-blue-900/30");
-        stepEl.classList.add("bg-green-50", "dark:bg-green-900/30");
+        check.classList.add("hidden");
       }
+
+      // Reset progress bar
+      document.getElementById("progressBar").style.width = "0%";
+      document.getElementById("overallProgress").textContent = "0%";
+    }
+
+    function updateStepProgress(stepNum, overallProgress, message) {
+      // Update each step's visual state
+      for (let i = 1; i <= 5; i++) {
+        const stepEl = document.getElementById(`step${i}`);
+        const spinner = document.getElementById(`step${i}-spinner`);
+        const check = document.getElementById(`step${i}-check`);
+
+        if (i < stepNum) {
+          // Completed steps - green with checkmark
+          stepEl.classList.remove(
+            "bg-gray-50",
+            "dark:bg-gray-700",
+            "bg-blue-50",
+            "dark:bg-blue-900/30"
+          );
+          stepEl.classList.add("bg-green-50", "dark:bg-green-900/30");
+          spinner.classList.add("hidden");
+          check.classList.remove("hidden");
+        } else if (i === stepNum) {
+          // Current step - blue with spinner
+          stepEl.classList.remove(
+            "bg-gray-50",
+            "dark:bg-gray-700",
+            "bg-green-50",
+            "dark:bg-green-900/30"
+          );
+          stepEl.classList.add("bg-blue-50", "dark:bg-blue-900/30");
+          spinner.classList.remove("hidden");
+          check.classList.add("hidden");
+        } else {
+          // Future steps - gray
+          stepEl.classList.remove(
+            "bg-blue-50",
+            "dark:bg-blue-900/30",
+            "bg-green-50",
+            "dark:bg-green-900/30"
+          );
+          stepEl.classList.add("bg-gray-50", "dark:bg-gray-700");
+          spinner.classList.add("hidden");
+          check.classList.add("hidden");
+        }
+      }
+
+      // Update progress bar
+      document.getElementById("progressBar").style.width =
+        overallProgress + "%";
+      document.getElementById("overallProgress").textContent =
+        Math.round(overallProgress) + "%";
     }
 
     // Listen for language changes
