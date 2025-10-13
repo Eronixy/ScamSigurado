@@ -86,11 +86,19 @@ class ScamDetector:
             if img is None:
                 return ""
 
-            # Light grayscale + contrast
+            # Convert to grayscale
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+            # --- Auto-detect dark mode ---
+            mean_brightness = np.mean(gray)
+            is_dark_mode = mean_brightness < 100  # heuristic threshold
+            if is_dark_mode:
+                gray = cv2.bitwise_not(gray)
+
+            # Light contrast boost
             gray = cv2.convertScaleAbs(gray, alpha=1.4, beta=10)
 
-            # Adaptive threshold — handles dark/light SMS themes
+            # Adaptive threshold for text separation
             thresh = cv2.adaptiveThreshold(
                 gray, 255,
                 cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
@@ -98,14 +106,23 @@ class ScamDetector:
                 35, 15
             )
 
-            # OCR with basic config
+            # Optional denoising for cleaner OCR
+            thresh = cv2.fastNlMeansDenoising(thresh, None, 10, 7, 21)
+
+            # OCR configuration
             custom_config = (
                 r'--oem 3 --psm 6 '
                 r'-c preserve_interword_spaces=1'
             )
 
+            # Extract text
             text = pytesseract.image_to_string(thresh, config=custom_config)
-            return text.strip()
+            text = text.strip()
+
+            # (Optional) Debug info
+            print(f"Dark mode: {is_dark_mode} | Mean brightness: {mean_brightness:.2f}")
+
+            return text
 
         except Exception as e:
             print(f"Error extracting text: {e}")
@@ -303,7 +320,8 @@ class ScamDetector:
 
 
 def preprocess_image_opencv(image_path):
-    """Preprocess image using OpenCV and return base64 encoded images showing OCR preprocessing steps"""
+    """Preprocess image using OpenCV and return base64 encoded images showing OCR preprocessing steps.
+       Automatically handles dark mode (light text on dark background)."""
     try:
         img = cv2.imread(image_path)
         if img is None:
@@ -312,19 +330,28 @@ def preprocess_image_opencv(image_path):
         # Convert original to RGB for visualization
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        # Step 1: Convert to grayscale (basic enhancement)
+        # Step 1: Convert to grayscale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        # Step 2: Light contrast normalization (gentle boost)
+        # Step 2: Auto-detect dark mode by measuring brightness
+        mean_brightness = np.mean(gray)
+        is_dark_mode = mean_brightness < 100  # heuristic threshold
+        if is_dark_mode:
+            gray = cv2.bitwise_not(gray)  # invert colors for dark mode
+
+        # Step 3: Contrast normalization (gentle boost)
         gray = cv2.convertScaleAbs(gray, alpha=1.4, beta=10)
 
-        # Step 3: Adaptive threshold (same as OCR version)
+        # Step 4: Adaptive threshold for binarization
         thresh = cv2.adaptiveThreshold(
             gray, 255,
             cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
             cv2.THRESH_BINARY,
             35, 15
         )
+
+        # Step 5: Optional denoising (helps with dark screenshots)
+        thresh = cv2.fastNlMeansDenoising(thresh, None, 10, 7, 21)
 
         # Encode original (RGB)
         _, buffer_orig = cv2.imencode('.png', img_rgb)
@@ -336,7 +363,9 @@ def preprocess_image_opencv(image_path):
 
         return {
             'original': f'data:image/png;base64,{img_orig_base64}',
-            'preprocessed': f'data:image/png;base64,{img_prep_base64}'
+            'preprocessed': f'data:image/png;base64,{img_prep_base64}',
+            'is_dark_mode': is_dark_mode,
+            'mean_brightness': mean_brightness
         }
 
     except Exception as e:
