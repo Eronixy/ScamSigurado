@@ -1,7 +1,6 @@
 {% extends "base.html" %} {% block title %}ScamSigurado{% endblock %} {% block
 content %}
 <div class="fade-in pb-6">
-  <!-- Header Section -->
   <div
     class="bg-brand text-center text-white px-6 py-8 rounded-b-3xl shadow-md"
   >
@@ -10,7 +9,6 @@ content %}
   </div>
 
   <div class="px-4 mt-6">
-    <!-- Main Result Card -->
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-4">
       <div class="text-center">
         <div
@@ -26,7 +24,6 @@ content %}
           class="text-gray-600 dark:text-gray-400 text-sm mb-4"
         ></p>
 
-        <!-- Overall Confidence -->
         <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
           <div class="flex items-center justify-between mb-2">
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -45,7 +42,6 @@ content %}
           </div>
         </div>
 
-        <!-- Disclaimer -->
         <div
           class="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-5"
         >
@@ -66,7 +62,6 @@ content %}
       </div>
     </div>
 
-    <!-- FEEDBACK SECTION -->
     <div class="feedback-wrapper mb-4">
       <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
         <h4
@@ -95,7 +90,6 @@ content %}
           </button>
         </div>
 
-        <!-- Thank You Message -->
         <div id="feedbackThanks" class="hidden text-center mt-4">
           <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
             <i class="fas fa-heart text-brand text-2xl mb-2"></i>
@@ -112,9 +106,7 @@ content %}
       </div>
     </div>
 
-    <!-- Analysis Process Accordion -->
     <div class="space-y-3">
-      <!-- Step 1: Image Preprocessing -->
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
       >
@@ -175,7 +167,6 @@ content %}
         </div>
       </div>
 
-      <!-- Step 2: OCR Text Extraction -->
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
       >
@@ -229,7 +220,6 @@ content %}
         </div>
       </div>
 
-      <!-- Step 3: TF-IDF Analysis -->
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
       >
@@ -247,7 +237,11 @@ content %}
                 3. Text Analysis (TF-IDF)
               </h4>
               <p class="text-xs text-gray-500 dark:text-gray-400">
-                Feature importance scoring
+                Selected Model:
+                <span
+                  id="selectedTextModel"
+                  class="font-semibold text-brand"
+                ></span>
               </p>
             </div>
           </div>
@@ -281,7 +275,6 @@ content %}
         </div>
       </div>
 
-      <!-- Step 4: High-Risk Detection -->
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
       >
@@ -337,7 +330,6 @@ content %}
         </div>
       </div>
 
-      <!-- Step 5: Visual Analysis -->
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
       >
@@ -355,7 +347,11 @@ content %}
                 5. Visual Analysis (CNN)
               </h4>
               <p class="text-xs text-gray-500 dark:text-gray-400">
-                Deep learning image classification
+                Selected Model:
+                <span
+                  id="selectedImageModel"
+                  class="font-semibold text-brand"
+                ></span>
               </p>
             </div>
           </div>
@@ -398,9 +394,108 @@ content %}
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Action Buttons -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
+      >
+        <button
+          class="analysis-step-toggle w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          <div class="flex items-center">
+            <div
+              class="w-10 h-10 bg-yellow-50 dark:bg-gray-700 rounded-full flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-calculator text-yellow-600"></i>
+            </div>
+            <div class="text-left">
+              <h4 class="font-semibold text-gray-800 dark:text-gray-200">
+                6. Final Computation
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                Weighted confidence calculation
+              </p>
+            </div>
+          </div>
+          <i
+            class="fas fa-chevron-down text-gray-400 transform transition-transform"
+          ></i>
+        </button>
+        <div
+          class="analysis-step-content hidden px-6 pb-6 border-t border-gray-100 dark:border-gray-700"
+        >
+          <div class="pt-4 space-y-4">
+            <div>
+              <h5
+                class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3"
+              >
+                Model Weights
+              </h5>
+              <div class="space-y-3">
+                <div>
+                  <div
+                    class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1"
+                  >
+                    <span
+                      id="textWeightLabel"
+                      class="font-medium text-gray-700 dark:text-gray-300"
+                    ></span>
+                  </div>
+                  <div
+                    class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2"
+                  >
+                    <div
+                      id="textWeightBar"
+                      class="h-2 rounded-full bg-green-500"
+                    ></div>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1"
+                  >
+                    <span
+                      id="imageWeightLabel"
+                      class="font-medium text-gray-700 dark:text-gray-300"
+                    ></span>
+                  </div>
+                  <div
+                    class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2"
+                  >
+                    <div
+                      id="imageWeightBar"
+                      class="h-2 rounded-full bg-indigo-500"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h5
+                class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Final Calculation
+              </h5>
+              <div
+                class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-center"
+              >
+                <p
+                  class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-2"
+                >
+                  Overall Confidence
+                </p>
+                <code
+                  id="computationFormula"
+                  class="text-sm md:text-base text-gray-800 dark:text-gray-200 font-bold"
+                >
+                  </code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+
     <div class="mt-6 space-y-3">
       <button
         id="downloadBtn"
@@ -426,7 +521,6 @@ content %}
     </div>
   </div>
 
-  <!-- Image Modal -->
   <div
     id="imageModal"
     class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50"
@@ -449,6 +543,25 @@ content %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
+  // START: NEW HELPER FUNCTION
+  function getModelName(key) {
+    const names = {
+      // Text Models
+      svm: "SVM (Support Vector Machine)",
+      rf: "Random Forest",
+      nb: "Naive Bayes",
+
+      // Image Models
+      alexnet: "AlexNet",
+      vggnet: "VGGNet",
+      resnet: "ResNet",
+      mobilenet: "MobileNet",
+      efficientnet: "EfficientNet",
+    };
+    return names[key] || key; // Return the full name or the key if not found
+  }
+  // END: NEW HELPER FUNCTION
+
   document.addEventListener("DOMContentLoaded", function () {
     // Get results from sessionStorage
     const resultsDataString = sessionStorage.getItem("analysisResults");
@@ -660,6 +773,54 @@ content %}
     if (data.heatmap) {
       displayHeatmap(data.heatmap, data.original_image);
     }
+
+    // START: NEW/MODIFIED SECTION FOR COMPREHENSIVE RESULTS
+    // Get advanced settings data (with defaults)
+    // IMPORTANT: Your backend must provide these in the `data` object
+    const textModel = data.text_model || "svm"; // Default to 'svm'
+    const imageModel = data.image_model || "efficientnet"; // Default to 'efficientnet'
+    const textWeight = data.text_weight || 0.6; // Default to 0.6 (60%)
+    const imageWeight = data.image_weight || 0.4; // Default to 0.4 (40%)
+
+    // 1. Populate Selected Model Names
+    document.getElementById("selectedTextModel").textContent =
+      getModelName(textModel);
+    document.getElementById("selectedImageModel").textContent =
+      getModelName(imageModel);
+
+    // 2. Populate Step 6: Final Computation
+    const textWeightPercent = Math.round(textWeight * 100);
+    const imageWeightPercent = Math.round(imageWeight * 100);
+
+    document.getElementById("textWeightLabel").textContent =
+      `Text Weight (${textWeightPercent}%)`;
+    document.getElementById("textWeightBar").style.width =
+      textWeightPercent + "%";
+
+    document.getElementById("imageWeightLabel").textContent =
+      `Image Weight (${imageWeightPercent}%)`;
+    document.getElementById("imageWeightBar").style.width =
+      imageWeightPercent + "%";
+
+    // 3. Populate Computation Formula
+    // We use the raw float values for calculation, but display percentages
+    const textConfRaw = data.text_confidence || 0;
+    const imageConfRaw = data.image_confidence || 0;
+    const overallConfRaw = (
+      textConfRaw * textWeight +
+      imageConfRaw * imageWeight
+    ).toFixed(4); // Calculate for display
+    const overallConfPercent = Math.round(
+      parseFloat(overallConfRaw) > 1
+        ? parseFloat(overallConfRaw)
+        : parseFloat(overallConfRaw) * 100
+    );
+
+    const formulaHtml = `
+      (<span class="text-green-600">${textConf}%</span> * ${textWeightPercent}%) + (<span class="text-indigo-600">${imageConf}%</span> * ${imageWeightPercent}%) = <span class="text-brand text-lg">${overallConfPercent}%</span>
+    `;
+    document.getElementById("computationFormula").innerHTML = formulaHtml;
+    // END: NEW/MODIFIED SECTION
   }
 
   function displayHeatmap(heatmapSrc, originalSrc) {

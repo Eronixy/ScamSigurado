@@ -45,32 +45,117 @@ extra_head %}
     animation: fadeIn 0.5s ease-out 0.8s both;
   }
 
-  /* Carousel styles */
+/* Carousel styles */
+.carousel-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.4s ease-in-out;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+/* Fix: Make all slides the same height */
+.carousel-slide > div {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 500px; /* Adjust this value based on your tallest slide */
+}
+
+/* Fix: Make the message container grow to fill space */
+.carousel-slide .p-3.space-y-2\.5 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 280px; /* Fixed minimum height for message area */
+}
+
+.dot {
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background-color: #10b981;
+  width: 24px;
+}
+
+/* Optional: Add smooth animations for messages */
+.message-left,
+.message-right {
+  animation: fadeInMessage 0.3s ease-in;
+}
+
+@keyframes fadeInMessage {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile-specific fixes */
+@media (max-width: 768px) {
   .carousel-container {
-    overflow: hidden;
-    position: relative;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden;
   }
-
+  
   .carousel-track {
-    display: flex;
-    transition: transform 0.4s ease-in-out;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
-
+  
   .carousel-slide {
-    min-width: 100%;
-    flex-shrink: 0;
-    box-sizing: border-box;
-    padding: 0; /* reset */
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
   }
+  
+  /* Add equal padding to the card inside the slide */
+  .carousel-slide > div {
+    width: calc(100% - 2rem) !important; /* Equal margins: 1rem left + 1rem right */
+    max-width: calc(100% - 2rem) !important;
+    margin: 0 1rem !important; /* 1rem on both sides */
+  }
+}
 
-  .dot {
-    transition: all 0.3s ease;
+/* Extra small phones */
+@media (max-width: 375px) {
+  .carousel-slide > div {
+    width: calc(100% - 1.5rem) !important; /* 0.75rem on each side */
+    max-width: calc(100% - 1.5rem) !important;
+    margin: 0 0.75rem !important;
   }
+}
 
-  .dot.active {
-    background-color: #2563eb;
-    width: 24px;
+/* Larger phones */
+@media (min-width: 376px) and (max-width: 768px) {
+  .carousel-slide > div {
+    width: calc(100% - 2.5rem) !important; /* 1.25rem on each side */
+    max-width: calc(100% - 2.5rem) !important;
+    margin: 0 1.25rem !important;
   }
+}
 
   /* Card and List Styling */
   .scam-card {
@@ -86,7 +171,13 @@ extra_head %}
   .safe-list li {
     position: relative;
     padding-left: 1.5rem; /* Space for the check icon */
-  }
+    
+
+
+
+
+
+    
 
   .safe-list li::before {
     content: "\f058"; /* FontAwesome 'check-circle' icon */
@@ -112,7 +203,7 @@ extra_head %}
   >
     <div class="text-center slide-up">
       <h1 class="text-4xl font-semibold mb-2" data-translate="uploadTitle">
-        Learn about Scams!
+        Learn more about Scams!
       </h1>
     </div>
   </div>
@@ -1154,33 +1245,44 @@ extra_head %}
   // Touch swipe support
   let touchStartX = 0;
   let touchEndX = 0;
+  let touchStartY = 0;
+  let touchEndY = 0;
 
   const carousel = document.querySelector(".carousel-container");
 
   carousel.addEventListener("touchstart", (e) => {
     touchStartX = e.changedTouches[0].screenX;
-  });
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  carousel.addEventListener("touchmove", (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+  }, { passive: true });
 
   carousel.addEventListener("touchend", (e) => {
-    touchEndX = e.changedTouches[0].screenX;
     handleSwipe();
-  });
+  }, { passive: true });
 
   function handleSwipe() {
     const swipeThreshold = 50;
-    const diff = touchStartX - touchEndX;
+    const diffX = touchStartX - touchEndX;
+    const diffY = Math.abs(touchStartY - touchEndY);
 
-    if (Math.abs(diff) > swipeThreshold) {
-      if (diff > 0) {
-        // Swipe left - next slide
+    if (Math.abs(diffX) > swipeThreshold && Math.abs(diffX) > diffY) {
+      if (diffX > 0) {
         nextSlide();
       } else {
-        // Swipe right - previous slide
         previousSlide();
       }
     }
+    
+    touchStartX = 0;
+    touchEndX = 0;
+    touchStartY = 0;
+    touchEndY = 0;
   }
-
+    
   // --- Interactive Quiz Function ---
   function toggleAnswer(buttonElement) {
     const parentCard = buttonElement.closest(".bg-white");
