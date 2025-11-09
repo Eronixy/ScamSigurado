@@ -488,13 +488,13 @@ content %}
                   id="computationFormula"
                   class="text-sm md:text-base text-gray-800 dark:text-gray-200 font-bold"
                 >
-                  </code>
+                </code>
               </div>
             </div>
           </div>
         </div>
       </div>
-      </div>
+    </div>
 
     <div class="mt-6 space-y-3">
       <button
@@ -543,7 +543,6 @@ content %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-  // START: NEW HELPER FUNCTION
   function getModelName(key) {
     const names = {
       // Text Models
@@ -558,60 +557,38 @@ content %}
       mobilenet: "MobileNet",
       efficientnet: "EfficientNet",
     };
-    return names[key] || key; // Return the full name or the key if not found
+    return names[key] || key;
   }
-  // END: NEW HELPER FUNCTION
 
   document.addEventListener("DOMContentLoaded", function () {
-    // Get results from sessionStorage
     const resultsDataString = sessionStorage.getItem("analysisResults");
 
+    // Feedback logic
     const feedbackCorrect = document.getElementById("feedbackCorrect");
     const feedbackIncorrect = document.getElementById("feedbackIncorrect");
     const feedbackButtons = document.getElementById("feedbackButtons");
     const feedbackThanks = document.getElementById("feedbackThanks");
 
     function handleFeedback(isCorrect) {
-      // Hide buttons
       feedbackButtons.classList.add("hidden");
-
-      // Show thank you message
       feedbackThanks.classList.remove("hidden");
       feedbackThanks.classList.add("fade-in");
-
-      // Here you can add code to send feedback to your backend
-      // For example:
-      // fetch('/api/feedback', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     result_id: resultId,
-      //     is_correct: isCorrect
-      //   })
-      // });
-
       console.log("Feedback submitted:", isCorrect ? "Accurate" : "Incorrect");
     }
 
-    feedbackCorrect.addEventListener("click", function () {
-      handleFeedback(true);
-    });
+    feedbackCorrect.addEventListener("click", () => handleFeedback(true));
+    feedbackIncorrect.addEventListener("click", () => handleFeedback(false));
 
-    feedbackIncorrect.addEventListener("click", function () {
-      handleFeedback(false);
-    });
-
+    // Image Modal Logic
     const previewImages = [
       document.getElementById("originalImage"),
       document.getElementById("preprocessedImage"),
     ];
     const heatmapCanvas = document.getElementById("heatmapCanvas");
-
     const modal = document.getElementById("imageModal");
     const modalImg = document.getElementById("modalImage");
     const modalClose = document.getElementById("modalClose");
 
-    // Add click events to normal images
     previewImages.forEach((img) => {
       img.addEventListener("click", () => {
         modal.classList.remove("hidden");
@@ -621,15 +598,11 @@ content %}
 
     heatmapCanvas.addEventListener("click", () => {
       modal.classList.remove("hidden");
-
-      // Create a temporary canvas at larger resolution
-      const scaleFactor = 3; // adjust as needed
+      const scaleFactor = 3;
       const tempCanvas = document.createElement("canvas");
       tempCanvas.width = heatmapCanvas.width * scaleFactor;
       tempCanvas.height = heatmapCanvas.height * scaleFactor;
       const tempCtx = tempCanvas.getContext("2d");
-
-      // Draw original canvas scaled up
       tempCtx.drawImage(
         heatmapCanvas,
         0,
@@ -641,25 +614,15 @@ content %}
         tempCanvas.width,
         tempCanvas.height
       );
-
-      // Use this higher-res image for modal
       modalImg.src = tempCanvas.toDataURL();
     });
 
-    // Close modal
-    modalClose.addEventListener("click", () => {
-      modal.classList.add("hidden");
-      modalImg.src = "";
-    });
-
-    // Close modal when clicking outside image
+    modalClose.addEventListener("click", () => modal.classList.add("hidden"));
     modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        modal.classList.add("hidden");
-        modalImg.src = "";
-      }
+      if (e.target === modal) modal.classList.add("hidden");
     });
 
+    // Main data check
     if (!resultsDataString) {
       window.location.href = "/upload";
       return;
@@ -769,18 +732,24 @@ content %}
         data.preprocessed_image;
     }
 
-    // Heatmap - draw on canvas
+    // Heatmap
     if (data.heatmap) {
       displayHeatmap(data.heatmap, data.original_image);
     }
 
-    // START: NEW/MODIFIED SECTION FOR COMPREHENSIVE RESULTS
-    // Get advanced settings data (with defaults)
-    // IMPORTANT: Your backend must provide these in the `data` object
-    const textModel = data.text_model || "svm"; // Default to 'svm'
-    const imageModel = data.image_model || "efficientnet"; // Default to 'efficientnet'
-    const textWeight = data.text_weight || 0.6; // Default to 0.6 (60%)
-    const imageWeight = data.image_weight || 0.4; // Default to 0.4 (40%)
+    // START: ===== CORRECTED SECTION =====
+    // Get advanced settings from the 'settings' object passed in the data
+    const settings = data.settings || {}; // Get the settings object, or an empty one
+
+    // Read from the settings object, with defaults if it's missing
+    const textModel = settings.text_model || "svm";
+    const imageModel = settings.cnn_model || "efficientnet";
+    // Check for undefined, as 0 is a valid weight
+    const textWeight =
+      settings.text_weight !== undefined ? settings.text_weight : 0.6;
+    const imageWeight =
+      settings.cnn_weight !== undefined ? settings.cnn_weight : 0.4;
+    // END: ===== CORRECTED SECTION =====
 
     // 1. Populate Selected Model Names
     document.getElementById("selectedTextModel").textContent =
@@ -803,24 +772,18 @@ content %}
       imageWeightPercent + "%";
 
     // 3. Populate Computation Formula
-    // We use the raw float values for calculation, but display percentages
     const textConfRaw = data.text_confidence || 0;
     const imageConfRaw = data.image_confidence || 0;
-    const overallConfRaw = (
-      textConfRaw * textWeight +
-      imageConfRaw * imageWeight
-    ).toFixed(4); // Calculate for display
+    
+    // Use the actual confidence score calculated by the backend
     const overallConfPercent = Math.round(
-      parseFloat(overallConfRaw) > 1
-        ? parseFloat(overallConfRaw)
-        : parseFloat(overallConfRaw) * 100
+      data.confidence > 1 ? data.confidence : data.confidence * 100
     );
 
     const formulaHtml = `
       (<span class="text-green-600">${textConf}%</span> * ${textWeightPercent}%) + (<span class="text-indigo-600">${imageConf}%</span> * ${imageWeightPercent}%) = <span class="text-brand text-lg">${overallConfPercent}%</span>
     `;
     document.getElementById("computationFormula").innerHTML = formulaHtml;
-    // END: NEW/MODIFIED SECTION
   }
 
   function displayHeatmap(heatmapSrc, originalSrc) {
@@ -829,13 +792,10 @@ content %}
 
     const img = new Image();
     img.onload = function () {
-      // Set canvas size to match image
       const maxWidth = 300;
       const scale = maxWidth / img.width;
       canvas.width = maxWidth;
       canvas.height = img.height * scale;
-
-      // Draw heatmap
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     };
     img.src = heatmapSrc;
@@ -877,7 +837,6 @@ content %}
   }
 
   function displayHighRiskElements(text, urls, keywords) {
-    // High-risk keywords
     const keywordsList = document.getElementById("keywordsList");
     keywordsList.innerHTML = "";
 
@@ -894,7 +853,6 @@ content %}
         '<span class="text-xs text-gray-500 dark:text-gray-400">No high-risk keywords detected</span>';
     }
 
-    // URLs
     const urlsList = document.getElementById("urlsList");
     urlsList.innerHTML = "";
 
@@ -913,7 +871,7 @@ content %}
   }
 
   function setupEventListeners(data) {
-    // Accordion toggles - make sure they work
+    // Accordion toggles
     document.querySelectorAll(".analysis-step-toggle").forEach((button) => {
       button.addEventListener("click", function (e) {
         e.preventDefault();
@@ -944,8 +902,8 @@ content %}
               useCORS: true,
               allowTaint: true,
               logging: false,
-              backgroundColor: isDark ? "#1f2937" : "#ffffff", // solid background, not transparent
-              foreignObjectRendering: false, // fixes semi-transparent layers in Tailwind/Dark Mode
+              backgroundColor: isDark ? "#1f2937" : "#ffffff",
+              foreignObjectRendering: false,
               removeContainer: true,
             });
 
