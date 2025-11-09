@@ -1,6 +1,6 @@
-# ScamSigurado
+# ScamAlam
 
-ScamSigurado is a scam detection web application built with Flask, Tailwind CSS (via CDN), and JavaScript. It uses a multimodal approach to analyze both text and image content in uploaded screenshots to detect Filipino-targeted online scams.
+ScamAlam is a scam detection web application built with Flask, Tailwind CSS (via CDN), and JavaScript. It uses a multimodal approach to analyze both text and image content in uploaded screenshots to detect Filipino-targeted online scams.
 
 ---
 
@@ -8,7 +8,7 @@ ScamSigurado is a scam detection web application built with Flask, Tailwind CSS 
 
 ```
 
-ScamSigurado/
+ScamAlam/
 ├── app.py                     # Main Flask application
 ├── venv/                      # Python virtual environment
 ├── templates/
@@ -38,8 +38,8 @@ ScamSigurado/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Eronixy/ScamSigurado.git
-cd ScamSigurado
+git clone https://github.com/Eronixy/ScamAlam.git
+cd ScamAlam
 ````
 
 ### 2. Set up a virtual environment

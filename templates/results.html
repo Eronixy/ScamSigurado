@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}ScamSigurado{% endblock %} {% block
+{% extends "base.html" %} {% block title %}ScamAlam{% endblock %} {% block
 content %}
 <div class="fade-in pb-6">
   <div
@@ -908,7 +908,7 @@ content %}
             });
 
             const link = document.createElement("a");
-            link.download = `ScamSigurado_Analysis_${Date.now()}.png`;
+            link.download = `ScamAlam_Analysis_${Date.now()}.png`;
             link.href = canvas.toDataURL();
             link.click();
           } else {
@@ -934,22 +934,22 @@ content %}
 
           if (response.ok) {
             const blob = await response.blob();
-            const file = new File([blob], "ScamSigurado_Analysis.png", {
+            const file = new File([blob], "ScamAlam_Analysis.png", {
               type: "image/png",
             });
 
             if (navigator.share && navigator.canShare({ files: [file] })) {
               await navigator.share({
                 files: [file],
-                title: "ScamSigurado Analysis",
-                text: "Check out my scam analysis results from ScamSigurado!",
+                title: "ScamAlam Analysis",
+                text: "Check out my scam analysis results from ScamAlam!",
               });
             } else {
               // Fallback: download
               const url = URL.createObjectURL(blob);
               const link = document.createElement("a");
               link.href = url;
-              link.download = "ScamSigurado_Analysis.png";
+              link.download = "ScamAlam_Analysis.png";
               link.click();
               URL.revokeObjectURL(url);
               alert("Image has been downloaded to your device.");
