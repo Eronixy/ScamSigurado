@@ -1,239 +1,295 @@
 {% extends "base.html" %} {% block title %}Upload Screenshot - ScamAlam{%
 endblock %} {% block content %}
-<div class="fade-in pb-6">
-  <!-- Header Section -->
-  <div
-    class="bg-brand text-center text-white px-6 py-8 rounded-b-3xl shadow-md"
-  >
-    <h1 class="text-4xl font-semibold mb-2" data-translate="uploadTitle">
-      ScamAlam
-    </h1>
-    <p class="text-blue-100 text-sm" data-translate="uploadSubtitle">
-      Upload a screenshot to detect potential scams
-    </p>
-  </div>
-
-  <!-- Upload Card -->
-  <div class="px-4 mt-6">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-4">
-      <!-- Drop Zone -->
-      <div
-        id="dropZone"
-        class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-brand hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
-      >
-        <div id="dropZoneContent">
-          <div
-            class="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <i class="fas fa-cloud-upload-alt text-4xl text-brand"></i>
-          </div>
-          <p
-            class="text-gray-800 dark:text-gray-200 font-medium mb-1"
-            data-translate="uploadTap"
-          >
-            Tap to upload screenshot
-          </p>
-          <p
-            class="text-gray-500 dark:text-gray-400 text-sm"
-            data-translate="uploadFormats"
-          >
-            PNG, JPG, or JPEG (Max 10MB)
-          </p>
-        </div>
-
-        <!-- Image Preview (Hidden Initially) -->
-        <div id="imagePreviewContent" class="hidden">
-          <div class="relative">
-            <img
-              id="imagePreview"
-              class="max-w-full h-64 object-contain mx-auto rounded-lg mb-3"
-            />
-            <button
-              id="clearImageBtn"
-              class="absolute top-2 right-2 w-8 h-8 bg-white dark:bg-gray-700 rounded-full shadow-md flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600"
-            >
-              <i class="fas fa-times text-gray-600 dark:text-gray-300"></i>
-            </button>
-          </div>
-          <div class="flex justify-center space-x-3">
-            <button
-              id="cropImageBtn"
-              class="px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700"
-            >
-              <i class="fas fa-crop mr-2"></i> Crop
-            </button>
-          </div>
-          <p id="fileName" class="text-sm text-gray-600 dark:text-gray-400"></p>
-        </div>
-
-        <input type="file" id="fileInput" class="hidden" accept="image/*" />
+<div class="max-w-6xl mx-auto px-4 md:px-8 py-8">
+  <div class="fade-in pb-6">
+    <div
+      class="bg-gradient-to-br from-blue-600 to-blue-700 text-white px-6 pt-8 pb-12 rounded-b-3xl md:rounded-3xl shadow-lg"
+    >
+      <div class="text-center slide-up">
+        <h1 class="text-4xl font-semibold mb-2" data-translate="uploadTitle">
+          ScamAlam
+        </h1>
+        <p class="text-blue-100 text-sm" data-translate="uploadSubtitle">
+          Upload a screenshot to detect potential scams
+        </p>
       </div>
-
-      <!-- Analyze Button -->
-      <button
-        id="analyzeBtn"
-        disabled
-        class="w-full mt-6 bg-brand text-white font-semibold py-4 rounded-xl hover:bg-blue-700 transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed flex items-center justify-center"
-      >
-        <span id="analyzeText" data-translate="uploadSelectImage"
-          >Select an image to analyze</span
-        >
-        <i id="loadingSpinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
-      </button>
     </div>
 
-    <!-- Advanced Settings Card -->
-    <div
-      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden mb-4"
-    >
-      <button
-        id="advancedToggle"
-        class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-      >
-        <div class="flex items-center">
-          <i class="fas fa-sliders-h text-brand mr-3"></i>
-          <span
-            class="font-medium text-gray-800 dark:text-gray-200"
-            data-translate="uploadAdvanced"
-          >
-            Advanced Settings
-          </span>
-        </div>
-        <i
-          id="advancedArrow"
-          class="fas fa-chevron-down text-gray-400 dark:text-gray-500 transition-transform"
-        ></i>
-      </button>
-
+    <div class="py-6 space-y-4">
       <div
-        id="advancedSettings"
-        class="hidden px-6 pb-6 border-t border-gray-100 dark:border-gray-700"
+        class="upload-card bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden mb-4"
       >
-        <div class="pt-4 space-y-4">
-          <!-- Text Analysis Model -->
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        <button
+          id="advancedToggle"
+          class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          <div class="flex items-center">
+            <i class="fas fa-sliders-h text-brand mr-3"></i>
+            <span
+              class="font-medium text-gray-800 dark:text-gray-200"
+              data-translate="uploadAdvanced"
             >
-              <i class="fas fa-font text-brand mr-2"></i>
-              <span data-translate="uploadTextModel">Text Analysis Model</span>
-            </label>
-            <select
-              id="textModel"
-              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand focus:border-transparent"
-            >
-              <option value="svm" selected>SVM (Support Vector Machine)</option>
-              <option value="rf">Random Forest</option>
-              <option value="nb">Naive Bayes</option>
-              <!-- <option value="bert" disabled>BERT</option> -->
-            </select>
+              Analysis Settings
+            </span>
           </div>
+          <i
+            id="advancedArrow"
+            class="fas fa-chevron-down text-gray-400 dark:text-gray-500 transition-transform"
+          ></i>
+        </button>
 
-          <!-- CNN Model -->
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              <i class="fas fa-image text-brand mr-2"></i>
-              <span data-translate="uploadImageModel"
-                >Image Analysis Model</span
+        <div
+          id="advancedSettings"
+          class="hidden px-6 pb-6 border-t border-gray-100 dark:border-gray-700"
+        >
+          <div class="pt-4 space-y-4">
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
-            </label>
-            <select
-              id="cnnModel"
-              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand focus:border-transparent"
-            >
-              <option value="alexnet">AlexNet</option>
-              <option value="vggnet">VGGNet</option>
-              <option value="resnet">ResNet</option>
-              <option value="mobilenet">MobileNet</option>
-              <option value="efficientnet" selected>EfficientNet</option>
-            </select>
-          </div>
-
-          <!-- Model Weights -->
-          <div class="pt-2">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
-              data-translate="uploadWeights"
-            >
-              Model Weights
-            </label>
-
-            <div class="space-y-3">
-              <div>
-                <div
-                  class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1"
+                <i class="fas fa-font text-brand mr-2"></i>
+                <span data-translate="uploadTextModel"
+                  >Text Analysis Model</span
                 >
-                  <span data-translate="uploadTextAnalysis">Text Analysis</span>
-                  <span id="textWeightValue" class="font-semibold text-brand"
-                    >60%</span
-                  >
-                </div>
-                <input
-                  type="range"
-                  id="textWeight"
-                  min="0"
-                  max="100"
-                  value="60"
-                  class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-gray-600 accent-brand"
-                />
-              </div>
-
-              <div>
-                <div
-                  class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1"
+                <span
+                  class="ml-2 text-xs text-gray-500 dark:text-gray-400"
+                  data-translate="uploadTextModelHint"
                 >
-                  <span data-translate="uploadImageAnalysis"
-                    >Image Analysis</span
+                  (Analyzes message content)
+                </span>
+              </label>
+              <select
+                id="textModel"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand focus:border-transparent"
+              >
+                <option value="svm">SVM - Precise</option>
+                <option value="rf" selected>
+                  Random Forest - Best accuracy
+                </option>
+                <option value="nb">Naive Bayes - Fast analysis</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-image text-brand mr-2"></i>
+                <span data-translate="uploadImageModel"
+                  >Image Analysis Model</span
+                >
+                <span
+                  class="ml-2 text-xs text-gray-500 dark:text-gray-400"
+                  data-translate="uploadImageModelHint"
+                >
+                  (Detects visual patterns)
+                </span>
+              </label>
+              <select
+                id="cnnModel"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand focus:border-transparent"
+              >
+                <option value="alexnet">AlexNet - Fast processing</option>
+                <option value="vggnet">VGGNet - Deep analysis</option>
+                <option value="resnet" selected>ResNet - Best Accuracy</option>
+                <option value="mobilenet">MobileNet - Lightweight</option>
+                <option value="efficientnet">EfficientNet - Efficient</option>
+              </select>
+            </div>
+
+            <div class="pt-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                data-translate="uploadWeights"
+              >
+                Analysis Priority
+              </label>
+              <p
+                class="text-xs text-gray-500 dark:text-gray-400 mb-3"
+                data-translate="uploadWeightsHint"
+              >
+                Adjust how much each analysis type influences the final result
+              </p>
+
+              <div class="space-y-3">
+                <div>
+                  <div
+                    class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1"
                   >
-                  <span id="cnnWeightValue" class="font-semibold text-brand"
-                    >40%</span
+                    <span data-translate="uploadTextAnalysis"
+                      >Text Analysis</span
+                    >
+                    <span id="textWeightValue" class="font-semibold text-brand"
+                      >70%</span
+                    >
+                  </div>
+                  <input
+                    type="range"
+                    id="textWeight"
+                    min="0"
+                    max="100"
+                    value="70"
+                    class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-gray-600 accent-brand"
+                  />
+                  <p
+                    class="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                    data-translate="uploadTextWeightDesc"
                   >
+                    Higher values prioritize message content analysis
+                  </p>
                 </div>
-                <input
-                  type="range"
-                  id="cnnWeight"
-                  min="0"
-                  max="100"
-                  value="40"
-                  class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-gray-600 accent-brand"
-                />
+
+                <div>
+                  <div
+                    class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1"
+                  >
+                    <span data-translate="uploadImageAnalysis"
+                      >Image Analysis</span
+                    >
+                    <span id="cnnWeightValue" class="font-semibold text-brand"
+                      >30%</span
+                    >
+                  </div>
+                  <input
+                    type="range"
+                    id="cnnWeight"
+                    min="0"
+                    max="100"
+                    value="30"
+                    class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-gray-600 accent-brand"
+                  />
+                  <p
+                    class="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                    data-translate="uploadImageWeightDesc"
+                  >
+                    Higher values prioritize visual pattern detection
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Info Card -->
-    <div
-      class="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 flex items-start"
-    >
       <div
-        class="w-10 h-10 bg-brand rounded-full flex items-center justify-center flex-shrink-0 mr-3"
+        class="upload-card bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-4"
       >
-        <i class="fas fa-info text-white"></i>
+        <div
+          id="dropZone"
+          class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-brand hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
+        >
+          <div id="dropZoneContent">
+            <div
+              class="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-cloud-upload-alt text-4xl text-brand"></i>
+            </div>
+            <p
+              class="text-gray-800 dark:text-gray-200 font-medium mb-1"
+              data-translate="uploadTap"
+            >
+              Tap to upload screenshot
+            </p>
+            <p
+              class="text-gray-500 dark:text-gray-400 text-sm"
+              data-translate="uploadFormats"
+            >
+              PNG, JPG, or JPEG (Max 10MB)
+            </p>
+          </div>
+
+          <div id="imagePreviewContent" class="hidden">
+            <div class="relative">
+              <img
+                id="imagePreview"
+                class="max-w-full h-64 object-contain mx-auto rounded-lg mb-3"
+              />
+              <button
+                id="clearImageBtn"
+                class="absolute top-2 right-2 w-8 h-8 bg-white dark:bg-gray-700 rounded-full shadow-md flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600"
+              >
+                <i class="fas fa-times text-gray-600 dark:text-gray-300"></i>
+              </button>
+            </div>
+            <div class="flex justify-center space-x-3">
+              <button
+                id="cropImageBtn"
+                class="px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700"
+              >
+                <i class="fas fa-crop mr-2"></i>
+                <span data-translate="uploadCrop">Crop</span>
+              </button>
+            </div>
+            <p
+              id="fileName"
+              class="text-sm text-gray-600 dark:text-gray-400 mt-2"
+            ></p>
+          </div>
+
+          <input type="file" id="fileInput" class="hidden" accept="image/*" />
+        </div>
+
+        <button
+          id="analyzeBtn"
+          disabled
+          class="w-full mt-6 bg-brand text-white font-semibold py-4 rounded-xl hover:bg-blue-700 transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed flex items-center justify-center"
+        >
+          <span id="analyzeText" data-translate="uploadSelectImage"
+            >Select an image to analyze</span
+          >
+          <i id="loadingSpinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+        </button>
       </div>
-      <div>
-        <p
-          class="text-sm text-gray-700 dark:text-gray-300 font-medium mb-1"
-          data-translate="uploadInfoTitle"
-        >
-          How it works
-        </p>
-        <p
-          class="text-xs text-gray-600 dark:text-gray-400"
-          data-translate="uploadInfoDesc"
-        >
-          Our AI analyzes both text and visual elements in your screenshot to
-          detect potential scams with high accuracy.
-        </p>
+
+      <div
+        class="upload-card bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700"
+      >
+        <div class="flex items-start">
+          <div
+            class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0 mr-3"
+          >
+            <i class="fas fa-info-circle text-gray-600 dark:text-gray-400"></i>
+          </div>
+          <div>
+            <p
+              class="text-sm text-gray-700 dark:text-gray-300 font-medium mb-1"
+              data-translate="uploadInfoTitle"
+            >
+              How it works
+            </p>
+            <p
+              class="text-xs text-gray-600 dark:text-gray-400"
+              data-translate="uploadInfoDesc"
+            >
+              Our AI analyzes both text and visual elements in your screenshot
+              to detect potential scams with high accuracy.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="upload-card mt-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4"
+      >
+        <div class="flex items-start">
+          <i
+            class="fas fa-info-circle text-amber-600 dark:text-amber-400 mt-0.5 mr-3"
+          ></i>
+          <div>
+            <p
+              class="text-xs text-amber-800 dark:text-amber-200 leading-relaxed"
+              data-translate="uploadDisclaimer"
+            >
+              This tool provides automated analysis to assist your judgment.
+              Always verify suspicious messages through official channels before
+              taking action.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Analysis Progress Modal -->
   <div
     id="analysisModal"
     class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
@@ -241,7 +297,6 @@ endblock %} {% block content %}
     <div
       class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in"
     >
-      <!-- Header -->
       <div class="text-center mb-6">
         <div
           class="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -262,9 +317,7 @@ endblock %} {% block content %}
         </p>
       </div>
 
-      <!-- Progress Steps -->
       <div class="space-y-4 mb-6">
-        <!-- Step 1: Upload -->
         <div
           id="step1"
           class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
@@ -296,7 +349,6 @@ endblock %} {% block content %}
           </div>
         </div>
 
-        <!-- Step 2: Text Extraction -->
         <div
           id="step2"
           class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
@@ -328,7 +380,6 @@ endblock %} {% block content %}
           </div>
         </div>
 
-        <!-- Step 3: Text Analysis -->
         <div
           id="step3"
           class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
@@ -360,7 +411,6 @@ endblock %} {% block content %}
           </div>
         </div>
 
-        <!-- Step 4: Image Analysis -->
         <div
           id="step4"
           class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
@@ -392,7 +442,6 @@ endblock %} {% block content %}
           </div>
         </div>
 
-        <!-- Step 5: Final Result -->
         <div
           id="step5"
           class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
@@ -424,26 +473,9 @@ endblock %} {% block content %}
           </div>
         </div>
       </div>
-
-      <!-- Overall Progress Bar -->
-      <div class="mb-4">
-        <div
-          class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-2"
-        >
-          <span data-translate="modalProgress">Overall Progress</span>
-          <span id="overallProgress">0%</span>
-        </div>
-        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-          <div
-            id="progressBar"
-            class="bg-brand h-2 rounded-full transition-all duration-500"
-            style="width: 0%"
-          ></div>
-        </div>
-      </div>
     </div>
   </div>
-  <!-- Crop Modal -->
+
   <div
     id="cropModal"
     class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
@@ -451,7 +483,10 @@ endblock %} {% block content %}
     <div
       class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 w-full max-w-2xl"
     >
-      <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+      <h2
+        class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200"
+        data-translate="cropTitle"
+      >
         Crop Image
       </h2>
       <div class="w-full max-h-[70vh] overflow-auto flex justify-center">
@@ -461,12 +496,14 @@ endblock %} {% block content %}
         <button
           id="cancelCropBtn"
           class="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600"
+          data-translate="cropCancel"
         >
           Cancel
         </button>
         <button
           id="applyCropBtn"
           class="px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700"
+          data-translate="cropApply"
         >
           Apply
         </button>
@@ -476,6 +513,12 @@ endblock %} {% block content %}
 </div>
 {% endblock %} {% block extra_scripts %}
 <style>
+  .upload-card {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
   @keyframes scale-in {
     from {
       transform: scale(0.9);
@@ -527,7 +570,6 @@ endblock %} {% block content %}
 </style>
 
 <script>
-  // Translations for upload page
   const translations = {
     en: {
       uploadTitle: "ScamAlam",
@@ -536,15 +578,28 @@ endblock %} {% block content %}
       uploadFormats: "PNG, JPG, or JPEG (Max 10MB)",
       uploadSelectImage: "Select an image to analyze",
       uploadAnalyze: "Analyze Screenshot",
-      uploadAdvanced: "Advanced Settings",
+      uploadAdvanced: "Analysis Settings",
       uploadTextModel: "Text Analysis Model",
+      uploadTextModelHint: "(Analyzes message content)",
       uploadImageModel: "Image Analysis Model",
-      uploadWeights: "Model Weights",
+      uploadImageModelHint: "(Detects visual patterns)",
+      uploadWeights: "Analysis Priority",
+      uploadWeightsHint:
+        "Adjust how much each analysis type influences the final result",
       uploadTextAnalysis: "Text Analysis",
       uploadImageAnalysis: "Image Analysis",
+      uploadTextWeightDesc: "Higher values prioritize message content analysis",
+      uploadImageWeightDesc:
+        "Higher values prioritize visual pattern detection",
       uploadInfoTitle: "How it works",
       uploadInfoDesc:
         "Our AI analyzes both text and visual elements in your screenshot to detect potential scams with high accuracy.",
+      uploadDisclaimer:
+        "This tool provides automated analysis to assist your judgment. Always verify suspicious messages through official channels before taking action.",
+      uploadCrop: "Crop",
+      cropTitle: "Crop Image",
+      cropCancel: "Cancel",
+      cropApply: "Apply",
       modalAnalyzing: "Analyzing Screenshot",
       modalWait: "Please wait while we scan for potential scams",
       modalStep1Title: "Processing Image",
@@ -557,49 +612,57 @@ endblock %} {% block content %}
       modalStep4Desc: "Examining image patterns",
       modalStep5Title: "Generating Results",
       modalStep5Desc: "Calculating confidence scores",
-      modalProgress: "Overall Progress",
       errorFileType: "Please select an image file (PNG, JPG, or JPEG)",
       errorFileSize: "File size must be less than 10MB",
       errorAnalysis: "Analysis failed: ",
     },
     fil: {
       uploadTitle: "ScamAlam",
-      uploadSubtitle:
-        "Mag-upload ng screenshot para madetect ang mga posibleng scam",
-      uploadTap: "Pindutin para mag-upload ng screenshot",
+      uploadSubtitle: "I-upload ang screenshot para sa scam detection",
+      uploadTap: "Pindutin para mag-upload",
       uploadFormats: "PNG, JPG, o JPEG (Max 10MB)",
-      uploadSelectImage: "Pumili ng larawan para suriin",
+      uploadSelectImage: "Pumili ng larawan",
       uploadAnalyze: "Suriin ang Screenshot",
-      uploadAdvanced: "Advanced na Setting",
-      uploadTextModel: "Text Analysis Model",
-      uploadImageModel: "Image Analysis Model",
-      uploadWeights: "Timbang ng Model",
+      uploadAdvanced: "Mga Setting sa Pagsusuri",
+      uploadTextModel: "Model para sa Text",
+      uploadTextModelHint: "(Susuriin ang mensahe)",
+      uploadImageModel: "Model para sa Larawan",
+      uploadImageModelHint: "(Hahanap ng visual patterns)",
+      uploadWeights: "Prioridad ng Pagsusuri",
+      uploadWeightsHint:
+        "I-adjust kung gaano ka-importante ang bawat uri ng pagsusuri",
       uploadTextAnalysis: "Text Analysis",
       uploadImageAnalysis: "Image Analysis",
+      uploadTextWeightDesc:
+        "Mas mataas = mas importante ang content ng mensahe",
+      uploadImageWeightDesc: "Mas mataas = mas importante ang visual patterns",
       uploadInfoTitle: "Paano ito gumagana",
       uploadInfoDesc:
-        "Sinusuri ng aming AI ang text at visual elements sa iyong screenshot para madetect ang mga potensyal na scam nang may mataas na accuracy.",
+        "Sinusuri ng AI ang text at visual elements para madetect ang mga scam nang mataas ang accuracy.",
+      uploadDisclaimer:
+        "Ang tool na ito ay tumutulong sa iyong desisyon. Laging i-verify ang mga suspicious na mensahe sa official channels.",
+      uploadCrop: "I-crop",
+      cropTitle: "I-crop ang Larawan",
+      cropCancel: "Kanselahin",
+      cropApply: "I-apply",
       modalAnalyzing: "Sinusuri ang Screenshot",
-      modalWait:
-        "Mangyaring maghintay habang sinusuri namin ang mga posibleng scam",
+      modalWait: "Sandali lang habang sinusuri ang scam",
       modalStep1Title: "Pinoproseso ang Larawan",
-      modalStep1Desc: "Inihahanda ang screenshot para sa pagsusuri",
+      modalStep1Desc: "Inihahanda para sa pagsusuri",
       modalStep2Title: "Kinukuha ang Text",
-      modalStep2Desc: "Binabasa ang content mula sa larawan",
+      modalStep2Desc: "Binabasa ang content",
       modalStep3Title: "Text Analysis",
-      modalStep3Desc: "Sinusuri ang mga kahina-hinalang salita",
+      modalStep3Desc: "Sinusuri ang suspicious na salita",
       modalStep4Title: "Visual Analysis",
-      modalStep4Desc: "Sinusuri ang mga pattern sa larawan",
-      modalStep5Title: "Ginagawa ang mga Resulta",
-      modalStep5Desc: "Kinakalkula ang confidence scores",
-      modalProgress: "Kabuuang Progress",
-      errorFileType: "Mangyaring pumili ng image file (PNG, JPG, o JPEG)",
-      errorFileSize: "Ang laki ng file ay dapat mas mababa sa 10MB",
-      errorAnalysis: "Nabigo ang pagsusuri: ",
+      modalStep4Desc: "Sinusuri ang patterns",
+      modalStep5Title: "Ginagawa ang Resulta",
+      modalStep5Desc: "Kinakalkula ang confidence",
+      errorFileType: "Pumili ng image file (PNG, JPG, o JPEG)",
+      errorFileSize: "Hindi dapat lagpas sa 10MB ang file",
+      errorAnalysis: "Hindi natapos ang pagsusuri: ",
     },
   };
 
-  // Apply translations
   function applyTranslations() {
     const lang = localStorage.getItem("language") || "en";
     const t = translations[lang];
@@ -613,7 +676,6 @@ endblock %} {% block content %}
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    // Apply translations on load
     applyTranslations();
 
     const dropZone = document.getElementById("dropZone");
@@ -628,7 +690,6 @@ endblock %} {% block content %}
     const loadingSpinner = document.getElementById("loadingSpinner");
     const analysisModal = document.getElementById("analysisModal");
 
-    // Advanced settings
     const advancedToggle = document.getElementById("advancedToggle");
     const advancedSettings = document.getElementById("advancedSettings");
     const advancedArrow = document.getElementById("advancedArrow");
@@ -645,14 +706,14 @@ endblock %} {% block content %}
     const applyCropBtn = document.getElementById("applyCropBtn");
 
     cropImageBtn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevent clicking the drop zone
+      e.stopPropagation();
       if (!originalImageData) return;
       cropImage.src = originalImageData;
       cropModal.classList.remove("hidden");
 
       cropImage.onload = () => {
         cropper = new Cropper(cropImage, {
-          aspectRatio: NaN, // free crop
+          aspectRatio: NaN,
           viewMode: 1,
           background: false,
           movable: true,
@@ -672,19 +733,15 @@ endblock %} {% block content %}
         imageSmoothingQuality: "high",
       });
 
-      // Convert the cropped canvas to a blob and file object
       canvas.toBlob(
         (blob) => {
           if (!blob) return;
 
-          // Get the original filename or use default
           const originalName = selectedFile ? selectedFile.name : "image.jpg";
           const fileExtension = originalName.split(".").pop();
           const baseName =
             originalName.substring(0, originalName.lastIndexOf(".")) ||
             originalName;
-
-          // Replace selected file with cropped version
           selectedFile = new File(
             [blob],
             `${baseName}_cropped.${fileExtension}`,
@@ -693,18 +750,14 @@ endblock %} {% block content %}
             }
           );
 
-          // Update preview and originalImageData
-          // Clean up old blob URL to prevent memory leak
           if (originalImageData && originalImageData.startsWith("blob:")) {
             URL.revokeObjectURL(originalImageData);
           }
 
-          // Create new blob URL for preview
           const croppedDataUrl = URL.createObjectURL(blob);
           imagePreview.src = croppedDataUrl;
           originalImageData = croppedDataUrl;
 
-          // Update filename display
           fileName.textContent = selectedFile.name;
 
           cropper.destroy();
@@ -718,17 +771,13 @@ endblock %} {% block content %}
     let selectedFile = null;
     let originalImageData = null;
 
-    // Get current language
     const lang = localStorage.getItem("language") || "en";
     const t = translations[lang];
 
-    // Drop zone click
     dropZone.addEventListener("click", () => fileInput.click());
 
-    // File selection
     fileInput.addEventListener("change", handleFileSelect);
 
-    // Drag and drop
     dropZone.addEventListener("dragover", (e) => {
       e.preventDefault();
       dropZone.classList.add(
@@ -760,19 +809,16 @@ endblock %} {% block content %}
       }
     });
 
-    // Clear image
     clearImageBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       clearImage();
     });
 
-    // Advanced settings toggle
     advancedToggle.addEventListener("click", () => {
       advancedSettings.classList.toggle("hidden");
       advancedArrow.classList.toggle("rotate-180");
     });
 
-    // Weight sliders
     textWeightSlider.addEventListener("input", (e) => {
       const value = parseInt(e.target.value);
       textWeightValue.textContent = value + "%";
@@ -787,20 +833,17 @@ endblock %} {% block content %}
       textWeightValue.textContent = 100 - value + "%";
     });
 
-    // Analyze button
     analyzeBtn.addEventListener("click", analyzeImage);
 
     function handleFileSelect(e) {
       const file = e.target.files[0];
       if (!file) return;
 
-      // Validate file type
       if (!file.type.match("image.*")) {
         alert(t.errorFileType);
         return;
       }
 
-      // Validate file size (10MB)
       if (file.size > 10 * 1024 * 1024) {
         alert(t.errorFileSize);
         return;
@@ -808,7 +851,6 @@ endblock %} {% block content %}
 
       selectedFile = file;
 
-      // Show preview
       const reader = new FileReader();
       reader.onload = (event) => {
         originalImageData = event.target.result;
@@ -837,17 +879,14 @@ endblock %} {% block content %}
     async function analyzeImage() {
       if (!selectedFile) return;
 
-      // Show modal and reset progress
       analysisModal.classList.remove("hidden");
       resetProgressSteps();
 
-      // Get settings
       const textModel = document.getElementById("textModel").value;
       const cnnModel = document.getElementById("cnnModel").value;
       const textWeight = parseInt(textWeightSlider.value) / 100;
       const cnnWeight = parseInt(cnnWeightSlider.value) / 100;
 
-      // Prepare form data
       const formData = new FormData();
       formData.append("file", selectedFile);
       formData.append("text_model", textModel);
@@ -856,7 +895,6 @@ endblock %} {% block content %}
       formData.append("cnn_weight", cnnWeight);
 
       try {
-        // Start analysis and get session ID
         const response = await fetch("/api/analyze", {
           method: "POST",
           body: formData,
@@ -868,7 +906,6 @@ endblock %} {% block content %}
 
         const { session_id } = await response.json();
 
-        // Connect to SSE for real-time progress updates
         const eventSource = new EventSource(`/api/progress/${session_id}`);
 
         eventSource.onmessage = (event) => {
@@ -884,7 +921,6 @@ endblock %} {% block content %}
           if (data.step === "complete") {
             eventSource.close();
 
-            // Store results
             const resultsData = {
               ...data.message,
               original_image: originalImageData,
@@ -896,7 +932,6 @@ endblock %} {% block content %}
               },
             };
 
-            // Navigate to results
             sessionStorage.setItem(
               "analysisResults",
               JSON.stringify(resultsData)
@@ -907,8 +942,7 @@ endblock %} {% block content %}
             analysisModal.classList.add("hidden");
             alert("Analysis error: " + data.message);
           } else {
-            // Update progress for specific step
-            updateStepProgress(data.step, data.progress, data.message);
+            updateStepProgress(data.step, data.message);
           }
         };
 
@@ -925,71 +959,44 @@ endblock %} {% block content %}
       }
     }
 
-    // ADD THESE NEW FUNCTIONS:
     function resetProgressSteps() {
-      // Reset all steps to initial state
       for (let i = 1; i <= 5; i++) {
         const stepEl = document.getElementById(`step${i}`);
         const spinner = document.getElementById(`step${i}-spinner`);
         const check = document.getElementById(`step${i}-check`);
 
-        stepEl.classList.remove(
-          +"active",
-          +"completed",
-          "bg-blue-50",
-          "dark:bg-blue-900/30",
-          "bg-green-50",
-          "dark:bg-green-900/30"
-        );
-        stepEl.classList.add("bg-gray-50", "dark:bg-gray-700");
+        stepEl.classList.remove("active", "completed");
         spinner.classList.add("hidden");
         check.classList.add("hidden");
       }
-
-      // Reset progress bar
-      document.getElementById("progressBar").style.width = "0%";
-      document.getElementById("overallProgress").textContent = "0%";
     }
 
-    function updateStepProgress(stepNum, overallProgress, message) {
-      // Update each step's visual state
+    function updateStepProgress(stepNum, message) {
       for (let i = 1; i <= 5; i++) {
         const stepEl = document.getElementById(`step${i}`);
         const spinner = document.getElementById(`step${i}-spinner`);
         const check = document.getElementById(`step${i}-check`);
 
-        // Clear previous states first
         stepEl.classList.remove("active", "completed");
 
         if (i < stepNum) {
-          // Completed steps - green with checkmark
           stepEl.classList.add("completed");
           spinner.classList.add("hidden");
           check.classList.remove("hidden");
         } else if (i === stepNum) {
-          // Current step - blue with spinner
           stepEl.classList.add("active");
           spinner.classList.remove("hidden");
           check.classList.add("hidden");
         } else {
-          // Future steps - gray
           spinner.classList.add("hidden");
           check.classList.add("hidden");
         }
       }
-
-      // Update progress bar
-      document.getElementById("progressBar").style.width =
-        overallProgress + "%";
-      document.getElementById("overallProgress").textContent =
-        Math.round(overallProgress) + "%";
     }
 
-    // Listen for language changes
     window.addEventListener("storage", function (e) {
       if (e.key === "language") {
         applyTranslations();
-        // Update button text if image is selected
         if (selectedFile) {
           const lang = localStorage.getItem("language") || "en";
           analyzeText.textContent = translations[lang].uploadAnalyze;
