@@ -1,0 +1,1 @@
+"""ScamSigurado public application API."""
