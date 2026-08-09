@@ -1,10 +1,12 @@
-FROM node:24-alpine AS dependencies
+# Use Debian/glibc rather than Alpine/musl: Next.js and its native dependency
+# tree are more reliable there during container builds.
+FROM node:22-bookworm-slim AS dependencies
 WORKDIR /app
 RUN corepack enable
 COPY apps/web/package.json apps/web/pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-FROM node:24-alpine AS runner
+FROM node:22-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 RUN corepack enable

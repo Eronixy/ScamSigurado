@@ -1,7 +1,8 @@
 from datetime import timedelta
+from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_session
@@ -22,6 +23,10 @@ router = APIRouter(prefix="/v1", tags=["v1"])
 async def create_analysis(
     request: Request,
     file: UploadFile = File(description="PNG or JPEG screenshot"),
+    text_model: Annotated[Literal["rf", "svm", "nb"], Form()] = "rf",
+    image_model: Annotated[Literal["vggnet", "resnet", "mobilenet", "efficientnet"], Form()] = "vggnet",
+    text_weight: Annotated[float, Form(ge=0, le=1)] = 0.7,
+    image_weight: Annotated[float, Form(ge=0, le=1)] = 0.3,
     session: Session = Depends(get_session),
 ) -> AnalysisResult:
     settings = request.app.state.settings
@@ -31,7 +36,21 @@ async def create_analysis(
         session.add(analysis)
         session.commit()
         session.refresh(analysis)
-        result = request.app.state.ml_runtime_client.analyze(temporary_path, file.content_type)
+        if text_weight + image_weight <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="At least one model weight must be positive",
+            )
+        result = request.app.state.ml_runtime_client.analyze(
+            temporary_path,
+            file.content_type,
+            {
+                "text_model": text_model,
+                "image_model": image_model,
+                "text_weight": text_weight,
+                "image_weight": image_weight,
+            },
+        )
         analysis.status = "completed"
         analysis.prediction = result["prediction"]
         analysis.confidence = result["confidence"]

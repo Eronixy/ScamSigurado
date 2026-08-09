@@ -51,6 +51,10 @@ Compose is the simplest option.
 The API permits `http://localhost:3000` and `http://localhost:3001` by default.
 Set `WEB_ORIGINS` to a comma-separated list when your frontend runs elsewhere.
 
+When Docker starts the complete stack, the API waits for the ML runtime's
+readiness check before becoming available. The ML runtime can take a short time
+to load its models on the first start.
+
 ## Run the Local Stack
 
 ```bash

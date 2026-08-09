@@ -28,7 +28,7 @@ services:
       postgres:
         condition: service_healthy
       ml-runtime:
-        condition: service_started
+        condition: service_healthy
     command: ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
 
   ml-runtime:
@@ -41,6 +41,18 @@ services:
       ML_TEMP_DIR: /tmp/scamsigurado-ml
     expose:
       - "8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/internal/v1/ready')",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
 
   postgres:
     image: postgres:16

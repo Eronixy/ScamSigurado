@@ -19,13 +19,16 @@ class MLRuntimeClient:
         self.base_url = settings.ml_runtime_url.rstrip("/")
         self.timeout = settings.ml_runtime_timeout_seconds
 
-    def analyze(self, upload_path: Path, content_type: str | None) -> dict[str, Any]:
+    def analyze(
+        self, upload_path: Path, content_type: str | None, options: dict[str, Any]
+    ) -> dict[str, Any]:
         headers = {"content-type": content_type or "application/octet-stream"}
         try:
             with upload_path.open("rb") as uploaded_file:
                 response = httpx.post(
                     f"{self.base_url}/internal/v1/analyze",
                     files={"file": ("screenshot", uploaded_file, headers["content-type"])},
+                    data=options,
                     timeout=self.timeout,
                 )
             if 400 <= response.status_code < 500:
