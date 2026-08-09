@@ -1,9 +1,8 @@
-import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 import { AboutModal } from "./about-modal";
 import { AdvancedModal } from "./advanced-modal";
-import { IconPill } from "./icon-pill";
 
 export function SiteHeader() {
   return (
@@ -14,7 +13,15 @@ export function SiteHeader() {
           className="flex items-center gap-3"
           href="/"
         >
-          <IconPill icon={ShieldCheck} label="ScamSigurado" tone="yellow" />
+          <Image
+            alt=""
+            aria-hidden="true"
+            className="size-12 shrink-0 sm:size-14"
+            height={56}
+            src="/icon.svg"
+            unoptimized
+            width={56}
+          />
           <span className="leading-none">
             <span className="block font-black text-lg tracking-[-0.08em] sm:text-2xl">
               SCAM
