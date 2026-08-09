@@ -1,109 +1,112 @@
-# ScamAlam
+# ScamSigurado
 
-ScamAlam is a scam detection web application built with Flask, Tailwind CSS (via CDN), and JavaScript. It uses a multimodal approach to analyze both text and image content in uploaded screenshots to detect Filipino-targeted online scams.
+ScamSigurado is a multimodal scam-detection web application for uploaded
+screenshots. It is intended to help users assess a screenshot,
+not to replace careful judgment or report complex social-engineering attacks.
 
----
+## Architecture
 
-## 📁 Project Structure
-
+```text
+Next.js web UI -> Public FastAPI API -> Private FastAPI ML runtime
+                           |
+                     PostgreSQL records
 ```
 
-ScamAlam/
-├── app.py                     # Main Flask application
-├── venv/                      # Python virtual environment
-├── templates/
-│   └── index.html             # Main frontend page using Jinja2
-├── static/
-│   └── custom.js              # JavaScript for frontend behavior
-├── models/                    # Folder for ML/DL model files
-├── uploads/                   # Folder for temporary uploads
-├── archive/                   # Folder for storing screenshots or saved data
-├── requirements.txt           # Python dependencies list
-└── README.md                  # Project setup and info
+| Area            | Location              | Responsibility                                                 |
+| --------------- | --------------------- | -------------------------------------------------------------- |
+| Product UI      | `apps/web`            | Next.js App Router upload, crop, status, and result experience |
+| Public API      | `apps/api`            | Upload validation, result records, and ML orchestration        |
+| ML runtime      | `services/ml-runtime` | OCR plus text and image model inference                        |
+| Model artifacts | `models`              | Versioned model files loaded only by the ML runtime            |
+| Legacy archive  | `legacy`              | Original Flask implementation retained for reference only      |
 
-````
+The default analysis configuration is Random Forest for text, VGG16 for image
+classification, and a 70% text / 30% image weighting.
 
----
+## Prerequisites
 
-## ⚙️ Requirements
+- Node.js 20.9+ with Corepack/pnpm
+- Python 3.11 and [uv](https://docs.astral.sh/uv/)
+- Docker Desktop or Docker Engine for the complete local stack
 
-- Python 3.8+
-- `virtualenv` or `venv` for managing dependencies
-- Tesseract OCR (installed separately)
+Tesseract OCR is installed automatically in the ML Docker image. Install it
+locally only when running the ML runtime outside Docker.
 
----
+## Run locally
 
-## 🚀 Setup Instructions
-
-### 1. Clone the repository
+The fastest way to start the complete application is Docker Compose:
 
 ```bash
-git clone https://github.com/Eronixy/ScamAlam.git
-cd ScamAlam
-````
-
-### 2. Set up a virtual environment
-
-```bash
-python3 -m venv venv
-source venv/bin/activate        # On Windows: venv\Scripts\activate
+docker compose up --build
 ```
 
-### 3. Install dependencies
+This starts:
+
+- Web UI: `http://localhost:3000`
+- Public API and API docs: `http://localhost:8000` and `http://localhost:8000/docs`
+- PostgreSQL: `localhost:5432`
+- Private ML runtime: available only to the API container
+
+To stop the stack, press `Ctrl+C`. To run it in the background, use
+`docker compose up -d --build`.
+
+### Run services individually
 
 ```bash
-pip install -r requirements.txt
+# Terminal 1: public API
+cd apps/api
+uv sync
+uv run alembic upgrade head
+uv run uvicorn app.main:app --reload --port 8000
+
+# Terminal 2: ML runtime
+cd services/ml-runtime
+uv sync
+uv run uvicorn app.main:app --reload --port 8001
+
+# Terminal 3: web UI
+cd apps/web
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
-> If you don't have `requirements.txt`, you can create one with:
->
-> ```bash
-> pip freeze > requirements.txt
-> ```
+Copy each service's `.env.example` file when overriding defaults. Never commit
+real database URLs or other secrets.
 
-### 4. Install Tesseract OCR
-
-* **Linux (Debian/Ubuntu):**
-
-  ```bash
-  sudo apt install tesseract-ocr
-  ```
-
-* **macOS (with Homebrew):**
-
-  ```bash
-  brew install tesseract
-  ```
-
-* **Windows:**
-
-  1. Download the installer from [https://github.com/UB-Mannheim/tesseract/wiki](https://github.com/UB-Mannheim/tesseract/wiki)
-  2. Install and add the path to your system environment variables PATH.
-  3. Example path: `C:\Program Files\Tesseract-OCR`
-
----
-
-### 5. Run the Flask app
+## Verify changes
 
 ```bash
-python app.py
+cd apps/web && pnpm lint && pnpm build
+UV_CACHE_DIR=/tmp/scamsigurado-uv-cache uv run --project apps/api python -m compileall app migrations
+UV_CACHE_DIR=/tmp/scamsigurado-uv-cache uv run --project services/ml-runtime python -m compileall app
 ```
 
-Then open your browser and go to:
-👉 `http://127.0.0.1:5000/`
+For a manual smoke test, open the web app, upload a PNG or JPEG screenshot,
+crop it if needed, then wait for the result page. The public API validates the
+file type, contents, size, and image dimensions before it calls the ML runtime.
 
----
+## Deployment
 
-## 🧠 Authors
+The showcase deployment uses Vercel for the website, one AWS EC2 instance for
+Caddy + FastAPI + the private ML runtime, and Amazon RDS PostgreSQL for durable
+records:
 
-* Irron Jovic Jun V. Brosoto
-* Jezrielle Anne G. Padlan
-* Julia Kyla C. Rustia
-* Catherine C. Tabigne
+```text
+Browser -> Vercel HTTPS -> /api rewrite -> EC2 Caddy -> API -> ML runtime
+                                                   -> RDS PostgreSQL
+```
 
----
+No purchased domain is required; Vercel provides a `*.vercel.app` URL. The
+detailed beginner-friendly instructions are in [DEPLOYMENT.md](DEPLOYMENT.md).
 
-## 📄 License
+## Authors
 
-This project is for academic and research purposes only. Commercial use is not permitted without prior consent.
+- Irron Jovic Jun V. Brosoto
+- Jezrielle Anne G. Padlan
+- Julia Kyla C. Rustia
+- Catherine C. Tabigne
 
+## Usage notice
+
+This project is for academic and research purposes only. Commercial use is not
+permitted without prior consent.
