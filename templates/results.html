@@ -1,0 +1,980 @@
+{% extends "base.html" %} {% block title %}ScamAlam{% endblock %} {% block
+content %}
+<div id="page-top" class="fade-in pb-6">
+  <div
+    class="bg-brand text-center text-white px-6 py-8 rounded-b-3xl shadow-md"
+  >
+    <h1 class="text-3xl font-semibold mb-2">Analysis Results</h1>
+  </div>
+
+  <div class="px-4 mt-6">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-4">
+      <div class="text-center">
+        <div
+          id="resultIcon"
+          class="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"
+        ></div>
+        <h3
+          id="resultTitle"
+          class="text-xl font-bold mb-2 dark:text-gray-100"
+        ></h3>
+        <p
+          id="resultDescription"
+          class="text-gray-600 dark:text-gray-400 text-sm mb-4"
+        ></p>
+
+        <div
+          id="overall-confidence-section"
+          class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Threat Level</span
+            >
+            <span
+              id="overallConfidence"
+              class="text-2xl font-bold"
+            ></span>
+          </div>
+          <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3">
+            <div
+              id="overallConfidenceBar"
+              class="h-3 rounded-full transition-all duration-500"
+            ></div>
+          </div>
+
+          <p
+            class="text-base text-gray-600 dark:text-gray-400 font-medium mt-4 text-center"
+          >
+            This score is the result of a
+            <a
+              href="#computation-section"
+              class="text-brand hover:underline font-bold"
+              >Multimodal Approach</a
+            >,
+            weighting both the
+            <strong
+              id="selectedTextModelName"
+              class="text-gray-800 dark:text-gray-200"
+            ></strong
+            > and <strong
+              id="selectedImageModelName"
+              class="text-gray-800 dark:text-gray-200"
+            ></strong
+            > model outputs.
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="md:grid md:grid-cols-2 md:divide-x md:divide-gray-100 dark:md:divide-gray-700 pt-6 border-t border-gray-100 dark:border-gray-700 mt-6"
+      >
+        <div class="md:pr-6">
+          <div class="flex items-center mb-4">
+            <div
+              class="w-10 h-10 bg-green-50 dark:bg-gray-700 rounded-full flex items-center justify-center mr-3 flex-shrink-0"
+            >
+              <i class="fas fa-chart-bar text-green-600"></i>
+            </div>
+            <div class="text-left">
+              <h4
+                class="text-lg font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Text Analysis (TF-IDF)
+              </h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Selected Text Model:
+                <strong
+                  id="selectedTextModel"
+                  class="font-semibold text-brand"
+                ></strong>
+              </p>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span
+                class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >Text Classification</span
+              >
+              <span
+                id="textConfidence"
+                class="text-lg font-bold text-brand"
+              ></span>
+            </div>
+            <div
+              class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mb-4"
+            >
+              <div
+                id="textConfidenceBar"
+                class="h-2 rounded-full transition-all duration-500"
+              ></div>
+            </div>
+            <div id="featureImportanceList" class="space-y-2"></div>
+          </div>
+        </div>
+
+        <div
+          class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700 md:mt-0 md:pt-0 md:border-t-0 md:pl-6"
+        >
+          <div class="flex items-center mb-4">
+            <div
+              class="w-10 h-10 bg-indigo-50 dark:bg-gray-700 rounded-full flex items-center justify-center mr-3 flex-shrink-0"
+            >
+              <i class="fas fa-eye text-indigo-600"></i>
+            </div>
+            <div class="text-left">
+              <h4
+                class="text-lg font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Visual Analysis (CNN)
+              </h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Selected Image Model:
+                <strong
+                  id="selectedImageModel"
+                  class="font-semibold text-brand"
+                ></strong>
+              </p>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span
+                class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >Image Classification</span
+              >
+              <span
+                id="imageConfidence"
+                class="text-lg font-bold text-brand"
+              ></span>
+            </div>
+            <div
+              class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mb-4"
+            >
+              <div
+                id="imageConfidenceBar"
+                class="h-2 rounded-full transition-all duration-500"
+              ></div>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                Attention Heatmap
+              </p>
+              <div class="relative inline-block">
+                <canvas
+                  id="heatmapCanvas"
+                  class="rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer"
+                ></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="computation-section"
+        class="pt-6 border-t border-gray-100 dark:border-gray-700 mt-6 space-y-4"
+      >
+        <h4
+          class="text-lg font-semibold text-gray-800 dark:text-gray-200 -mb-2"
+        >
+          Multimodal Computation
+        </h4>
+        <div>
+          <h5
+            class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 text-center"
+          >
+            Selected Model Weights
+          </h5>
+          <div class="space-y-3">
+            <div>
+              <div
+                class="flex justify-between items-center text-xs text-gray-600 dark:text-gray-400 mb-1"
+              >
+                <span class="font-medium text-gray-700 dark:text-gray-300"
+                  >Text Weight:</span
+                >
+                <span
+                  id="textWeightPercent"
+                  class="font-semibold text-gray-800 dark:text-gray-200"
+                ></span>
+              </div>
+              <div
+                class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2"
+              >
+                <div
+                  id="textWeightBar"
+                  class="h-2 rounded-full bg-green-500"
+                ></div>
+              </div>
+            </div>
+            <div>
+              <div
+                class="flex justify-between items-center text-xs text-gray-600 dark:text-gray-400 mb-1"
+              >
+                <span class="font-medium text-gray-700 dark:text-gray-300"
+                  >Image Weight:</span
+                >
+                <span
+                  id="imageWeightPercent"
+                  class="font-semibold text-gray-800 dark:text-gray-200"
+                ></span>
+              </div>
+              <div
+                class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2"
+              >
+                <div
+                  id="imageWeightBar"
+                  class="h-2 rounded-full bg-indigo-500"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h5
+            class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 text-center"
+          >
+            Final Calculation
+          </h5>
+          <div
+            class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-center"
+          >
+            <code
+              id="computationFormula"
+              class="block text-sm md:text-base text-gray-800 dark:text-gray-200 font-bold mb-3"
+            >
+            </code>
+            <div
+              class="w-20 h-px bg-gray-300 dark:bg-gray-600 mx-auto"
+            ></div>
+            <a
+              href="#page-top"
+              id="finalConfidencePercent"
+              class="block text-2xl font-bold mt-3 hover:underline"
+            ></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
+      >
+        <div
+          class="analysis-step-header px-6 py-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-700 cursor-pointer"
+        >
+          <div class="flex items-center">
+            <div
+              class="w-10 h-10 bg-blue-50 dark:bg-gray-700 rounded-full flex items-center justify-center mr-3 flex-shrink-0"
+            >
+              <i class="fas fa-image text-brand"></i>
+            </div>
+            <div class="text-left">
+              <h4 class="font-semibold text-gray-800 dark:text-gray-200">
+                Image Preprocessing
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                OpenCV image enhancement
+              </p>
+            </div>
+          </div>
+          <i
+            class="fas fa-chevron-down accordion-icon text-gray-400 transition-transform"
+          ></i>
+        </div>
+        <div class="analysis-step-content px-6 pb-6 pt-4">
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="text-center">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Original Image
+                </p>
+                <img
+                  id="originalImage"
+                  class="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer"
+                />
+              </div>
+              <div class="text-center">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Preprocessed
+                </p>
+                <img
+                  id="preprocessedImage"
+                  class="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer"
+                />
+              </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+              <p class="text-xs text-gray-600 dark:text-gray-400">
+                <i class="fas fa-check-circle text-green-500 mr-1"></i>
+                Applied grayscale conversion, noise reduction, and contrast
+                enhancement
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
+      >
+        <div
+          class="analysis-step-header px-6 py-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-700 cursor-pointer"
+        >
+          <div class="flex items-center">
+            <div
+              class="w-10 h-10 bg-purple-50 dark:bg-gray-700 rounded-full flex items-center justify-center mr-3 flex-shrink-0"
+            >
+              <i class="fas fa-font text-purple-600"></i>
+            </div>
+            <div class="text-left">
+              <h4 class="font-semibold text-gray-800 dark:text-gray-200">
+                OCR Text Extraction
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                Tesseract OCR processing
+              </p>
+            </div>
+          </div>
+          <i
+            class="fas fa-chevron-down accordion-icon text-gray-400 transition-transform"
+          ></i>
+        </div>
+        <div class="analysis-step-content px-6 pb-6 pt-4 hidden">
+          <div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-3">
+              <p
+                class="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium"
+              >
+                Extracted Text:
+              </p>
+              <p
+                id="extractedText"
+                class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap max-h-40 overflow-y-auto"
+              ></p>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-gray-500 dark:text-gray-400"
+                >Characters detected:</span
+              >
+              <span
+                id="charCount"
+                class="font-semibold text-gray-700 dark:text-gray-300"
+              ></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
+      >
+        <div
+          class="analysis-step-header px-6 py-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-700 cursor-pointer"
+        >
+          <div class="flex items-center">
+            <div
+              class="w-10 h-10 bg-red-50 dark:bg-gray-700 rounded-full flex items-center justify-center mr-3 flex-shrink-0"
+            >
+              <i class="fas fa-exclamation-triangle text-red-600"></i>
+            </div>
+            <div class="text-left">
+              <h4 class="font-semibold text-gray-800 dark:text-gray-200">
+                High-Risk Detection
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                Suspicious keywords & URLs
+              </p>
+            </div>
+          </div>
+          <i
+            class="fas fa-chevron-down accordion-icon text-gray-400 transition-transform"
+          ></i>
+        </div>
+        <div class="analysis-step-content px-6 pb-6 pt-4 hidden">
+          <div class="space-y-3">
+            <div
+              id="highRiskKeywords"
+              class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3"
+            >
+              <p
+                class="text-xs font-medium text-red-800 dark:text-red-300 mb-2"
+              >
+                <i class="fas fa-keyword mr-1"></i> High-Risk Keywords
+              </p>
+              <div id="keywordsList" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div
+              id="suspiciousUrls"
+              class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-3"
+            >
+              <p
+                class="text-xs font-medium text-orange-800 dark:text-orange-300 mb-2"
+              >
+                <i class="fas fa-link mr-1"></i> Suspicious URLs
+              </p>
+              <div id="urlsList" class="space-y-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mt-6"
+    >
+      <div class="flex items-start">
+        <i
+          class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mt-1 mr-3 flex-shrink-0 text-2xl"
+        ></i>
+        <p
+          class="text-sm text-red-800 dark:text-red-300 font-semibold leading-relaxed"
+        >
+          <strong class="uppercase">Disclaimer:</strong> This analysis is
+          automated and should be used as a guide only. Always verify suspicious
+          messages through official channels and exercise caution when sharing
+          personal information or clicking links.
+        </p>
+      </div>
+    </div>
+
+    <div class="feedback-wrapper mt-4 mb-4">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
+        <h4
+          class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3 text-center"
+        >
+          Was this result accurate?
+        </h4>
+        <p class="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
+          Your feedback helps us improve our detection system.
+        </p>
+
+        <div id="feedbackButtons" class="grid grid-cols-2 gap-3">
+          <button
+            id="feedbackCorrect"
+            class="feedback-btn bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 border-2 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 py-4 rounded-xl font-semibold transition-colors flex flex-col items-center justify-center"
+          >
+            <i class="fas fa-check-circle text-2xl mb-2"></i>
+            <span>Yes, Accurate</span>
+          </button>
+          <button
+            id="feedbackIncorrect"
+            class="feedback-btn bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border-2 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 py-4 rounded-xl font-semibold transition-colors flex flex-col items-center justify-center"
+          >
+            <i class="fas fa-times-circle text-2xl mb-2"></i>
+            <span>No, Incorrect</span>
+          </button>
+        </div>
+
+        <div id="feedbackThanks" class="hidden text-center mt-4">
+          <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+            <i class="fas fa-heart text-brand text-2xl mb-2"></i>
+            <p
+              class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
+            >
+              Thank you for your feedback!
+            </p>
+            <p class="text-xs text-gray-600 dark:text-gray-400">
+              Your input helps us improve our scam detection accuracy.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-6 space-y-3">
+      <button
+        id="downloadBtn"
+        class="w-full bg-brand hover:bg-blue-700 text-white py-4 rounded-xl font-semibold transition-colors flex items-center justify-center"
+      >
+        <i class="fas fa-download mr-2"></i>
+        Download Full Report
+      </button>
+      <button
+        id="shareBtn"
+        class="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 py-4 rounded-xl font-semibold transition-colors flex items-center justify-center"
+      >
+        <i class="fas fa-share-nodes mr-2"></i>
+        Share via Messaging App
+      </button>
+      <a
+        href="/upload"
+        class="block w-full bg-white dark:bg-gray-800 border-2 border-brand hover:bg-blue-50 dark:hover:bg-gray-700 text-brand py-4 rounded-xl font-semibold transition-colors text-center"
+      >
+        <i class="fas fa-redo mr-2"></i>
+        Analyze Another Screenshot
+      </a>
+    </div>
+  </div>
+
+  <div
+    id="imageModal"
+    class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50"
+  >
+    <div
+      class="relative mb-[5vh] mx-4 max-h-[70vh] flex items-center justify-center"
+    >
+      <span
+        id="modalClose"
+        class="absolute top-2 right-2 text-white text-2xl cursor-pointer z-50"
+        >&times;</span
+      >
+      <img
+        id="modalImage"
+        class="rounded-lg mb-[5vh] max-h-[70vh] max-w-full object-contain"
+      />
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  function getModelName(key) {
+    const names = {
+      // Text Models
+      svm: "SVM (Support Vector Machine)",
+      rf: "Random Forest",
+      nb: "Naive Bayes",
+
+      // Image Models
+      alexnet: "AlexNet",
+      vggnet: "VGGNet",
+      resnet: "ResNet",
+      mobilenet: "MobileNet",
+      efficientnet: "EfficientNet",
+    };
+    return names[key] || key;
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const resultsDataString = sessionStorage.getItem("analysisResults");
+
+    // Feedback logic
+    const feedbackCorrect = document.getElementById("feedbackCorrect");
+    const feedbackIncorrect = document.getElementById("feedbackIncorrect");
+    const feedbackButtons = document.getElementById("feedbackButtons");
+    const feedbackThanks = document.getElementById("feedbackThanks");
+
+    function handleFeedback(isCorrect) {
+      feedbackButtons.classList.add("hidden");
+      feedbackThanks.classList.remove("hidden");
+      feedbackThanks.classList.add("fade-in");
+      console.log("Feedback submitted:", isCorrect ? "Accurate" : "Incorrect");
+    }
+
+    feedbackCorrect.addEventListener("click", () => handleFeedback(true));
+    feedbackIncorrect.addEventListener("click", () => handleFeedback(false));
+
+    // Image Modal Logic
+    const previewImages = [
+      document.getElementById("originalImage"),
+      document.getElementById("preprocessedImage"),
+    ];
+    const heatmapCanvas = document.getElementById("heatmapCanvas");
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+    const modalClose = document.getElementById("modalClose");
+
+    previewImages.forEach((img) => {
+      img.addEventListener("click", () => {
+        modal.classList.remove("hidden");
+        modalImg.src = img.src;
+      });
+    });
+
+    heatmapCanvas.addEventListener("click", () => {
+      modal.classList.remove("hidden");
+      const scaleFactor = 3;
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = heatmapCanvas.width * scaleFactor;
+      tempCanvas.height = heatmapCanvas.height * scaleFactor;
+      const tempCtx = tempCanvas.getContext("2d");
+      tempCtx.drawImage(
+        heatmapCanvas,
+        0,
+        0,
+        heatmapCanvas.width,
+        heatmapCanvas.height,
+        0,
+        0,
+        tempCanvas.width,
+        tempCanvas.height
+      );
+      modalImg.src = tempCanvas.toDataURL();
+    });
+
+    modalClose.addEventListener("click", () => modal.classList.add("hidden"));
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.classList.add("hidden");
+    });
+
+    // Main data check
+    if (!resultsDataString) {
+      window.location.href = "/upload";
+      return;
+    }
+
+    let resultsData;
+    try {
+      resultsData = JSON.parse(resultsDataString);
+    } catch (error) {
+      console.error("Error parsing results:", error);
+      window.location.href = "/upload";
+      return;
+    }
+
+    displayResults(resultsData);
+    setupEventListeners(resultsData);
+
+    // Call accordion setup function
+    setupAccordions();
+  });
+
+  function setupAccordions() {
+    const analysisHeaders = document.querySelectorAll(".analysis-step-header");
+
+    analysisHeaders.forEach((header, index) => {
+      const content = header.nextElementSibling;
+      const icon = header.querySelector(".accordion-icon");
+
+      // Start all closed, except the first one.
+      if (index > 0) {
+        content.classList.add("hidden");
+      } else {
+        icon.classList.add("rotate-180"); // First one is open, icon rotated
+      }
+
+      header.addEventListener("click", () => {
+        content.classList.toggle("hidden");
+        icon.classList.toggle("rotate-180");
+      });
+    });
+  }
+
+  function displayResults(data) {
+    const isScam = data.prediction === "scam" || data.is_scam;
+    const confidence = Math.round(
+      data.confidence > 1 ? data.confidence : data.confidence * 100
+    );
+    const confidenceColorClass = isScam ? "text-red-600" : "text-green-600";
+
+    // Main result
+    const resultIcon = document.getElementById("resultIcon");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultDescription = document.getElementById("resultDescription");
+
+    if (isScam) {
+      resultIcon.className =
+        "w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center bg-red-100 dark:bg-red-900/30";
+      resultIcon.innerHTML =
+        '<i class="fas fa-exclamation-triangle text-4xl text-red-600"></i>';
+      resultTitle.textContent = "Potential Scam Detected";
+      resultTitle.className = "text-xl font-bold mb-2 text-red-600";
+      resultDescription.textContent =
+        "This screenshot contains suspicious elements commonly found in scams.";
+    } else {
+      resultIcon.className =
+        "w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center bg-green-100 dark:bg-green-900/30";
+      resultIcon.innerHTML =
+        '<i class="fas fa-check-circle text-4xl text-green-600"></i>';
+      resultTitle.textContent = "Appears Legitimate";
+      resultTitle.className = "text-xl font-bold mb-2 text-green-600";
+      resultDescription.textContent =
+        "This screenshot appears to be legitimate, but always stay vigilant.";
+    }
+
+    // Overall confidence
+    const overallConfidenceSpan = document.getElementById("overallConfidence");
+    overallConfidenceSpan.textContent = confidence + "%";
+    overallConfidenceSpan.className = `text-2xl font-bold ${confidenceColorClass}`;
+
+    // MODIFICATION: Switched from span to <a> tag
+    const finalConfidenceLink = document.getElementById(
+      "finalConfidencePercent"
+    );
+    finalConfidenceLink.textContent = confidence + "%";
+    finalConfidenceLink.className = `block text-2xl font-bold mt-3 hover:underline ${confidenceColorClass}`;
+
+    const overallBar = document.getElementById("overallConfidenceBar");
+    overallBar.style.width = confidence + "%";
+    overallBar.className = `h-3 rounded-full transition-all duration-500 ${
+      isScam ? "bg-red-500" : "bg-green-500"
+    }`;
+
+    // Text confidence
+    const textConf = Math.round(
+      data.text_confidence > 1
+        ? data.text_confidence
+        : data.text_confidence * 100
+    );
+    document.getElementById("textConfidence").textContent = textConf + "%";
+    const textBar = document.getElementById("textConfidenceBar");
+    textBar.style.width = textConf + "%";
+    textBar.className = `h-2 rounded-full transition-all duration-500 ${
+      textConf > 50 ? "bg-red-500" : "bg-green-500"
+    }`;
+
+    // Image confidence
+    const imageConf = Math.round(
+      data.image_confidence > 1
+        ? data.image_confidence
+        : data.image_confidence * 100
+    );
+    document.getElementById("imageConfidence").textContent = imageConf + "%";
+    const imageBar = document.getElementById("imageConfidenceBar");
+    imageBar.style.width = imageConf + "%";
+    imageBar.className = `h-2 rounded-full transition-all duration-500 ${
+      imageConf > 50 ? "bg-red-500" : "bg-green-500"
+    }`;
+
+    // Extracted text
+    document.getElementById("extractedText").textContent =
+      data.extracted_text || "No text detected";
+    document.getElementById("charCount").textContent = (
+      data.extracted_text || ""
+    ).length;
+
+    // Feature importance
+    displayFeatureImportance(data.feature_importance || []);
+
+    // High-risk detection
+    displayHighRiskElements(
+      data.extracted_text,
+      data.detected_urls || [],
+      data.high_risk_keywords || []
+    );
+
+    // Images
+    if (data.original_image) {
+      document.getElementById("originalImage").src = data.original_image;
+    }
+    if (data.preprocessed_image) {
+      document.getElementById("preprocessedImage").src =
+        data.preprocessed_image;
+    }
+
+    // Heatmap
+    if (data.heatmap) {
+      displayHeatmap(data.heatmap, data.original_image);
+    }
+
+    // Get advanced settings from the 'settings' object
+    const settings = data.settings || {};
+
+    const textModel = settings.text_model || "svm";
+    const imageModel = settings.cnn_model || "efficientnet";
+    const textWeight =
+      settings.text_weight !== undefined ? settings.text_weight : 0.6;
+    const imageWeight =
+      settings.cnn_weight !== undefined ? settings.cnn_weight : 0.4;
+
+    // 1. Populate Selected Model Names
+    const textModelName = getModelName(textModel);
+    const imageModelName = getModelName(imageModel);
+
+    document.getElementById("selectedTextModel").textContent = textModelName;
+    document.getElementById("selectedImageModel").textContent = imageModelName;
+
+    document.getElementById("selectedTextModelName").textContent =
+      textModelName;
+    document.getElementById("selectedImageModelName").textContent =
+      imageModelName;
+
+    // 2. Populate Step 6: Final Computation
+    const textWeightPercent = Math.round(textWeight * 100);
+    const imageWeightPercent = Math.round(imageWeight * 100);
+
+    document.getElementById(
+      "textWeightPercent"
+    ).textContent = `(${textWeightPercent}%)`;
+    document.getElementById("textWeightBar").style.width =
+      textWeightPercent + "%";
+
+    document.getElementById(
+      "imageWeightPercent"
+    ).textContent = `(${imageWeightPercent}%)`;
+    document.getElementById("imageWeightBar").style.width =
+      imageWeightPercent + "%";
+
+    // 3. Populate Computation Formula (decimals)
+    const textConfDecimal = (textConf / 100).toFixed(2);
+    const imageConfDecimal = (imageConf / 100).toFixed(2);
+    const overallConfDecimal = (
+      data.confidence > 1 ? data.confidence / 100 : data.confidence
+    ).toFixed(2);
+
+    const formulaHtml = `
+      (<span class="text-green-600">${textConfDecimal}</span> × ${textWeight.toFixed(
+      2
+    )}) + (<span class="text-indigo-600">${imageConfDecimal}</span> × ${imageWeight.toFixed(
+      2
+    )}) = <span class="${confidenceColorClass} text-lg">${overallConfDecimal}</span>
+    `;
+    document.getElementById("computationFormula").innerHTML = formulaHtml;
+  }
+
+  function displayHeatmap(heatmapSrc, originalSrc) {
+    const canvas = document.getElementById("heatmapCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const img = new Image();
+    img.onload = function () {
+      const maxWidth = 300;
+      const scale = maxWidth / img.width;
+      canvas.width = maxWidth;
+      canvas.height = img.height * scale;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = heatmapSrc;
+  }
+
+  function displayFeatureImportance(features) {
+    const container = document.getElementById("featureImportanceList");
+    container.innerHTML = "";
+
+    if (!features || features.length === 0) {
+      container.innerHTML =
+        '<p class="text-sm text-gray-500 dark:text-gray-400">No significant features detected</p>';
+      return;
+    }
+
+    features.slice(0, 10).forEach((feature) => {
+      const importance = Math.round(
+        feature.importance > 1 ? feature.importance : feature.importance * 100
+      );
+      const div = document.createElement("div");
+      div.className =
+        "flex items-center justify-between bg-gray-50 dark:bg-gray-700 rounded-lg p-2";
+      div.innerHTML = `
+      <span class="text-sm text-gray-700 dark:text-gray-300 font-medium">${
+        feature.word
+      }</span>
+      <div class="flex items-center">
+        <div class="w-24 bg-gray-200 dark:bg-gray-600 rounded-full h-1.5 mr-2">
+          <div class="bg-brand h-1.5 rounded-full" style="width: ${Math.min(
+            importance,
+            100
+          )}%"></div>
+        </div>
+        <span class="text-xs text-gray-500 dark:text-gray-400 w-10 text-right">${importance}</span>
+      </div>
+    `;
+      container.appendChild(div);
+    });
+  }
+
+  function displayHighRiskElements(text, urls, keywords) {
+    const keywordsList = document.getElementById("keywordsList");
+    keywordsList.innerHTML = "";
+
+    if (keywords && keywords.length > 0) {
+      keywords.forEach((word) => {
+        const span = document.createElement("span");
+        span.className =
+          "px-2 py-1 bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200 text-xs rounded-full";
+        span.textContent = word;
+        keywordsList.appendChild(span);
+      });
+    } else {
+      keywordsList.innerHTML =
+        '<span class="text-xs text-gray-500 dark:text-gray-400">No high-risk keywords detected</span>';
+    }
+
+    const urlsList = document.getElementById("urlsList");
+    urlsList.innerHTML = "";
+
+    if (urls && urls.length > 0) {
+      urls.forEach((url) => {
+        const div = document.createElement("div");
+        div.className =
+          "text-xs text-orange-700 dark:text-orange-300 break-all font-mono bg-white dark:bg-gray-800 p-2 rounded";
+        div.textContent = url;
+        urlsList.appendChild(div);
+      });
+    } else {
+      urlsList.innerHTML =
+        '<span class="text-xs text-gray-500 dark:text-gray-400">No URLs detected</span>';
+    }
+  }
+
+  function setupEventListeners(data) {
+    // Download button
+    const downloadBtn = document.getElementById("downloadBtn");
+    if (downloadBtn) {
+      downloadBtn.addEventListener("click", async function () {
+        try {
+          if (typeof html2canvas !== "undefined") {
+            const element = document.querySelector(".fade-in");
+            const isDark = document.documentElement.classList.contains("dark");
+            const canvas = await html2canvas(element, {
+              scale: 2,
+              useCORS: true,
+              allowTaint: true,
+              logging: false,
+              backgroundColor: isDark ? "#1f2937" : "#ffffff",
+              foreignObjectRendering: false,
+              removeContainer: true,
+            });
+
+            const link = document.createElement("a");
+            link.download = `ScamAlam_Analysis_${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+          } else {
+            alert("Screenshot library not loaded. Please try again.");
+          }
+        } catch (error) {
+          console.error("Download error:", error);
+          alert("Could not generate report. Please try again.");
+        }
+      });
+    }
+
+    // Share button
+    const shareBtn = document.getElementById("shareBtn");
+    if (shareBtn) {
+      shareBtn.addEventListener("click", async function () {
+        try {
+          const response = await fetch("/api/share", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ result: data }),
+          });
+
+          if (response.ok) {
+            const blob = await response.blob();
+            const file = new File([blob], "ScamAlam_Analysis.png", {
+              type: "image/png",
+            });
+
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: "ScamAlam Analysis",
+                text: "Check out my scam analysis results from ScamAlam!",
+              });
+            } else {
+              // Fallback: download
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = "ScamAlam_Analysis.png";
+              link.click();
+              URL.revokeObjectURL(url);
+              alert("Image has been downloaded to your device.");
+            }
+          } else {
+            throw new Error("Share API not available");
+          }
+        } catch (error) {
+          console.error("Share error:", error);
+          alert("Could not share. Please try the download button instead.");
+        }
+      });
+    }
+  }
+</script>
+{% endblock %}

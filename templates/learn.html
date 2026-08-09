@@ -1,0 +1,1319 @@
+{% extends "base.html" %} {% block title %}ScamAlam{% endblock %} {% block
+extra_head %}
+<style>
+  /* Message bubble animations */
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .message-left {
+    animation: slideInLeft 0.4s ease-out;
+  }
+
+  .message-right {
+    animation: slideInRight 0.4s ease-out;
+  }
+
+  .scam-badge {
+    animation: fadeIn 0.5s ease-out 0.8s both;
+  }
+
+/* Carousel styles */
+.carousel-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.4s ease-in-out;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+/* Fix: Make all slides the same height */
+.carousel-slide > div {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 500px; /* Adjust this value based on your tallest slide */
+}
+
+/* Fix: Make the message container grow to fill space */
+.carousel-slide .p-3.space-y-2\.5 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 280px; /* Fixed minimum height for message area */
+}
+
+.dot {
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background-color: #10b981;
+  width: 24px;
+}
+
+/* Optional: Add smooth animations for messages */
+.message-left,
+.message-right {
+  animation: fadeInMessage 0.3s ease-in;
+}
+
+@keyframes fadeInMessage {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile-specific fixes */
+@media (max-width: 768px) {
+  .carousel-container {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden;
+  }
+  
+  .carousel-track {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .carousel-slide {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Add equal padding to the card inside the slide */
+  .carousel-slide > div {
+    width: calc(100% - 2rem) !important; /* Equal margins: 1rem left + 1rem right */
+    max-width: calc(100% - 2rem) !important;
+    margin: 0 1rem !important; /* 1rem on both sides */
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 375px) {
+  .carousel-slide > div {
+    width: calc(100% - 1.5rem) !important; /* 0.75rem on each side */
+    max-width: calc(100% - 1.5rem) !important;
+    margin: 0 0.75rem !important;
+  }
+}
+
+/* Larger phones */
+@media (min-width: 376px) and (max-width: 768px) {
+  .carousel-slide > div {
+    width: calc(100% - 2.5rem) !important; /* 1.25rem on each side */
+    max-width: calc(100% - 2.5rem) !important;
+    margin: 0 1.25rem !important;
+  }
+}
+
+  /* Card and List Styling */
+  .scam-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .scam-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .safe-list li {
+    position: relative;
+    padding-left: 1.5rem; /* Space for the check icon */
+    
+
+
+
+
+
+    
+
+  .safe-list li::before {
+    content: "\f058"; /* FontAwesome 'check-circle' icon */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    color: #10b981; /* Emerald 500 */
+    position: absolute;
+    left: 0;
+    top: 0.25rem; /* Align icon with text */
+    font-size: 0.875rem; /* text-sm */
+  }
+
+  /* Utility for Interactive Practice Section */
+  .hidden {
+    display: none;
+  }
+</style>
+{% endblock %} {% block content %}
+
+<div class="fade-in pb-6">
+  <div
+    class="bg-gradient-to-br from-blue-600 to-blue-700 text-white px-6 pt-8 pb-12 rounded-b-3xl shadow-lg"
+  >
+    <div class="text-center slide-up">
+      <h1 class="text-4xl font-semibold mb-2" data-translate="uploadTitle">
+        Learn more about Scams!
+      </h1>
+    </div>
+  </div>
+
+  <div class="py-6">
+    <h2
+      class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 px-6"
+      data-translate="examplesTitle"
+    >
+      Scam Examples in Action
+    </h2>
+
+    <div class="carousel-container rounded-2xl mx-6">
+      <div class="carousel-track" id="carouselTrack">
+        <!-- Slide 1: Task Scam -->
+        <div class="carousel-slide">
+          <div
+            class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700"
+          >
+            <div
+              class="p-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div
+                    class="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-2"
+                  >
+                    <i class="fas fa-tasks text-brand text-sm"></i>
+                  </div>
+                  <div>
+                    <h3
+                      class="font-semibold text-gray-800 dark:text-gray-100 text-sm"
+                      data-translate="scamConversation"
+                    >
+                      Scam Conversation
+                    </h3>
+                    <p
+                      class="text-xs text-gray-500 dark:text-gray-400"
+                      data-translate="example1Label"
+                    >
+                      1 of 3 (Task Scam)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="p-3 space-y-2.5 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 min-h-[220px]"
+            >
+              <div class="flex items-start space-x-2 message-left">
+                <div
+                  class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+                >
+                  <i class="fas fa-user text-white text-xs"></i>
+                </div>
+                <div
+                  class="bg-gray-200 dark:bg-gray-700 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+                >
+                  <p
+                    class="text-xs text-gray-800 dark:text-gray-200 leading-relaxed"
+                    data-translate="taskScamMsg1"
+                  >
+                    We are partnership with TEMU to boost the sales qulity &
+                    marketing engagement. so,your role is to follow the
+                    sellers's products pages from TEMU which we will provide you
+                    daily & we will pay per follow.
+                  </p>
+                  <span
+                    class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 block"
+                    >8:05 PM</span
+                  >
+                </div>
+              </div>
+
+              <div class="flex items-start space-x-2 message-left">
+                <div
+                  class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+                >
+                  <i class="fas fa-user text-white text-xs"></i>
+                </div>
+                <div
+                  class="bg-gray-200 dark:bg-gray-700 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+                >
+                  <p
+                    class="text-xs text-gray-800 dark:text-gray-200 leading-relaxed"
+                    data-translate="taskScamMsg2"
+                  >
+                    The salary range from 2500-4000pesos per and depending on
+                    how many times you visit the brand pages. We pay you by BANK
+                    transfer or GCASH / PAYMAYA. depending on the method you
+                    prefer of payment
+                  </p>
+                  <span
+                    class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 block"
+                    >8:05 PM</span
+                  >
+                </div>
+              </div>
+
+              <div class="flex items-end justify-end space-x-2 message-right">
+                <div
+                  class="bg-brand rounded-2xl rounded-tr-sm px-3 py-2 max-w-[70%]"
+                >
+                  <p
+                    class="text-xs text-white leading-relaxed"
+                    data-translate="taskScamMsg3"
+                  >
+                    Wow, that's great! I completed the task. When will I get
+                    paid?
+                  </p>
+                  <span class="text-[10px] text-blue-200 mt-1 block"
+                    >10:25 AM</span
+                  >
+                </div>
+                <div
+                  class="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0"
+                >
+                  <i class="fas fa-user text-white text-xs"></i>
+                </div>
+              </div>
+
+              <div class="flex items-start space-x-2 message-left">
+                <div
+                  class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+                >
+                  <i class="fas fa-user text-white text-xs"></i>
+                </div>
+                <div
+                  class="bg-gray-200 dark:bg-gray-700 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+                >
+                  <p
+                    class="text-xs text-gray-800 dark:text-gray-200 leading-relaxed"
+                    data-translate="taskScamMsg4"
+                  >
+                    Good! To unlock bigger tasks (₱5000-₱8,000), you need to pay
+                    ₱1500 activation fee. Send to this GCash...
+                  </p>
+                  <span
+                    class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 block"
+                    >10:26 AM</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="bg-red-50 dark:bg-red-900/20 border-t-2 border-red-500 p-3 scam-badge"
+            >
+              <div class="flex items-start">
+                <div
+                  class="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center mr-2 flex-shrink-0"
+                >
+                  <i class="fas fa-exclamation-triangle text-white text-sm"></i>
+                </div>
+                <div>
+                  <h4
+                    class="font-bold text-red-900 dark:text-red-300 mb-1 text-sm"
+                    data-translate="taskScamTitle"
+                  >
+                    Task Scam / "Easy Money" Scam
+                  </h4>
+                  <p
+                    class="text-xs text-red-800 dark:text-red-200 leading-relaxed"
+                    data-translate="taskScamDesc"
+                  >
+                    Scammers promise easy money for simple tasks, then ask for
+                    payment to "unlock" higher earnings.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2: Phishing Scam -->
+        <div class="carousel-slide">
+          <div
+            class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700"
+          >
+            <div
+              class="p-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div
+                    class="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-2"
+                  >
+                    <i class="fas fa-mobile-alt text-brand text-sm"></i>
+                  </div>
+                  <div>
+                    <h3
+                      class="font-semibold text-gray-800 dark:text-gray-100 text-sm"
+                      data-translate="scamMessage"
+                    >
+                      Scam Message
+                    </h3>
+                    <p
+                      class="text-xs text-gray-500 dark:text-gray-400"
+                      data-translate="example2Label"
+                    >
+                      2 of 3 (GCash Phishing)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="p-3 space-y-2.5 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 min-h-[220px]"
+            >
+              <div class="flex items-start space-x-2 message-left">
+                <div
+                  class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+                >
+                  <i class="fas fa-user text-white text-xs"></i>
+                </div>
+                <div
+                  class="bg-gray-200 dark:bg-gray-700 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+                >
+                  <p
+                    class="text-xs text-gray-800 dark:text-gray-200 leading-relaxed"
+                    data-translate="phishingMsg"
+                  >
+                    GCASH ALERT: Your account has been compromised. Click this
+                    link immediately to secure your account:
+                    http://gcash-securit.xyz/verify
+                  </p>
+                  <span
+                    class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 block"
+                    >2:45 PM</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="bg-red-50 dark:bg-red-900/20 border-t-2 border-red-500 p-3 scam-badge"
+            >
+              <div class="flex items-start">
+                <div
+                  class="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center mr-2 flex-shrink-0"
+                >
+                  <i class="fas fa-shield-alt text-white text-sm"></i>
+                </div>
+                <div>
+                  <h4
+                    class="font-bold text-red-900 dark:text-red-300 mb-1 text-sm"
+                    data-translate="phishingTitle"
+                  >
+                    SMS Phishing / GCash Hack
+                  </h4>
+                  <p
+                    class="text-xs text-red-800 dark:text-red-200 leading-relaxed"
+                    data-translate="phishingDesc"
+                  >
+                    Fake messages claiming your account is compromised. The link
+                    steals your credentials and OTP.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Gambling Scam -->
+        <div class="carousel-slide">
+          <div
+            class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700"
+          >
+            <div
+              class="p-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div
+                    class="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-2"
+                  >
+                    <i class="fas fa-dice text-brand text-sm"></i>
+                  </div>
+                  <div>
+                    <h3
+                      class="font-semibold text-gray-800 dark:text-gray-100 text-sm"
+                      data-translate="scamMessage"
+                    >
+                      Scam Message
+                    </h3>
+                    <p
+                      class="text-xs text-gray-500 dark:text-gray-400"
+                      data-translate="example3Label"
+                    >
+                      3 of 3 (Gambling Scam)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="p-3 space-y-2.5 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 min-h-[220px]"
+            >
+              <div class="flex items-start space-x-2 message-left">
+                <div
+                  class="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0"
+                >
+                  <i class="fas fa-user text-white text-xs"></i>
+                </div>
+                <div
+                  class="bg-gray-200 dark:bg-gray-700 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[70%]"
+                >
+                  <p
+                    class="text-xs text-gray-800 dark:text-gray-200 leading-relaxed"
+                    data-translate="gamblingMsg"
+                  >
+                    🎰 Join our VIP casino! I won ₱50,000 in 2 hours! Min
+                    deposit ₱500. Get ₱1,000 bonus! 100% legit!
+                    www.crazy88.fun/?sr=cc312 💰💰💰
+                  </p>
+                  <span
+                    class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 block"
+                    >8:15 PM</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="bg-red-50 dark:bg-red-900/20 border-t-2 border-red-500 p-3 scam-badge"
+            >
+              <div class="flex items-start">
+                <div
+                  class="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center mr-2 flex-shrink-0"
+                >
+                  <i class="fas fa-coins text-white text-sm"></i>
+                </div>
+                <div>
+                  <h4
+                    class="font-bold text-red-900 dark:text-red-300 mb-1 text-sm"
+                    data-translate="gamblingTitle"
+                  >
+                    Illegal Online Gambling Scam
+                  </h4>
+                  <p
+                    class="text-xs text-red-800 dark:text-red-200 leading-relaxed"
+                    data-translate="gamblingDesc"
+                  >
+                    Fake casino sites with impossible withdrawal requirements
+                    and hidden fees.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-center items-center space-x-2 mt-5 px-6">
+      <button
+        class="dot w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 active"
+        onclick="goToSlide(0)"
+        aria-label="Go to slide 1"
+      ></button>
+      <button
+        class="dot w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"
+        onclick="goToSlide(1)"
+        aria-label="Go to slide 2"
+      ></button>
+      <button
+        class="dot w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"
+        onclick="goToSlide(2)"
+        aria-label="Go to slide 3"
+      ></button>
+    </div>
+
+    <div class="flex justify-between items-center mt-4 px-6">
+      <button
+        onclick="previousSlide()"
+        class="flex items-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:shadow-lg text-gray-700 dark:text-gray-200 hover:text-brand text-sm transition-all"
+        aria-label="Previous slide"
+      >
+        <i class="fas fa-chevron-left text-xs"></i>
+        <span class="font-medium" data-translate="btnPrevious">Previous</span>
+      </button>
+      <button
+        onclick="nextSlide()"
+        class="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-full shadow-md hover:shadow-lg text-sm transition-all"
+        aria-label="Next slide"
+      >
+        <span class="font-medium" data-translate="btnNext">Next</span>
+        <i class="fas fa-chevron-right text-xs"></i>
+      </button>
+    </div>
+  </div>
+
+  <hr class="border-gray-200 dark:border-gray-700 mx-6 mb-8" />
+
+  <div class="px-6 pb-8">
+    <h2
+      class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-5"
+      data-translate="commonTypesTitle"
+    >
+      Common Types of Online Scams ⚠️
+    </h2>
+    <p
+      class="text-sm text-gray-600 dark:text-gray-400 mb-6"
+      data-translate="commonTypesIntro"
+    >
+      Scammers keep finding new ways to trick people, but by knowing their
+      methods, you can stop them.
+    </p>
+
+    <div class="space-y-6">
+      <div
+        class="scam-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 border-l-4 border-red-500"
+      >
+        <div class="flex items-start">
+          <div
+            class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mr-3 flex-shrink-0"
+          >
+            <i
+              class="fas fa-hand-holding-usd text-red-600 dark:text-red-400 text-lg"
+            ></i>
+          </div>
+          <div>
+            <h3
+              class="font-bold text-gray-900 dark:text-gray-100 mb-1 text-base"
+              data-translate="taskJobTitle"
+            >
+              Task and Fake Job Offer Scams
+            </h3>
+            <p
+              class="text-sm text-gray-700 dark:text-gray-300 mb-3"
+              data-translate="taskJobDesc"
+            >
+              These scams usually appear as messages or posts promising easy
+              money or high-paying online jobs. They might claim you can earn at
+              least ₱500 a day by liking pages, sharing posts, or doing simple
+              "tasks." Some also pretend to be recruiters offering home-based
+              jobs with big salaries. At first, they might give you small
+              payments or show fake proofs of earnings to make you believe it's
+              real. Then, they'll ask you to pay a "registration," "activation,"
+              or "training" fee to continue—once you send the money, they stop
+              replying or block you.
+            </p>
+            <h4
+              class="font-semibold text-sm text-green-700 dark:text-green-400 mb-1"
+              data-translate="howToStaySafe"
+            >
+              How to stay safe:
+            </h4>
+            <ul
+              class="safe-list text-xs text-gray-600 dark:text-gray-400 space-y-1"
+            >
+              <li data-translate="taskJobTip1">
+                Never pay to join an earning or job program.
+              </li>
+              <li data-translate="taskJobTip2">
+                Be cautious of offers that sound too easy or too good to be
+                true.
+              </li>
+              <li data-translate="taskJobTip3">
+                Check if the company or page is verified or registered with
+                DOLE.
+              </li>
+              <li data-translate="taskJobTip4">
+                Search online for reviews or complaints before trusting any
+                "opportunity."
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="scam-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 border-l-4 border-blue-500"
+      >
+        <div class="flex items-start">
+          <div
+            class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3 flex-shrink-0"
+          >
+            <i class="fas fa-link text-blue-600 dark:text-blue-400 text-lg"></i>
+          </div>
+          <div>
+            <h3
+              class="font-bold text-gray-900 dark:text-gray-100 mb-1 text-base"
+              data-translate="phishingScamTitle"
+            >
+              Phishing Scam
+            </h3>
+            <p
+              class="text-sm text-gray-700 dark:text-gray-300 mb-3"
+              data-translate="phishingScamDesc"
+            >
+              You receive a text claiming your account is locked and asking you
+              to click a suspicious link to "verify". These links are designed
+              to steal your passwords or OTPs. Once you enter your details,
+              scammers can access your account.
+            </p>
+            <h4
+              class="font-semibold text-sm text-green-700 dark:text-green-400 mb-1"
+              data-translate="howToStaySafe"
+            >
+              How to stay safe:
+            </h4>
+            <ul
+              class="safe-list text-xs text-gray-600 dark:text-gray-400 space-y-1"
+            >
+              <li data-translate="phishingTip1">
+                Never click on suspicious links.
+              </li>
+              <li data-translate="phishingTip2">
+                Always check the official bank number or email.
+              </li>
+              <li data-translate="phishingTip3">
+                <strong class="text-blue-600 dark:text-blue-400"
+                  >banks never ask for passwords or OTPs.</strong
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="scam-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 border-l-4 border-lime-500"
+      >
+        <div class="flex items-start">
+          <div
+            class="w-10 h-10 rounded-full bg-lime-100 dark:bg-lime-900/30 flex items-center justify-center mr-3 flex-shrink-0"
+          >
+            <i class="fas fa-dice text-lime-600 dark:text-lime-400 text-lg"></i>
+          </div>
+          <div>
+            <h3
+              class="font-bold text-gray-900 dark:text-gray-100 mb-1 text-base"
+              data-translate="gamblingScamTitle"
+            >
+              Gambling Scam
+            </h3>
+            <p
+              class="text-sm text-gray-700 dark:text-gray-300 mb-3"
+              data-translate="gamblingScamDesc"
+            >
+              These scams usually appear as online betting or casino platforms
+              that promise guaranteed wins or "risk-free" gambling. Some even
+              show fake screenshots of people "winning" thousands of pesos to
+              make it look legitimate. Once you deposit money, they either rig
+              the game so you always lose or block your account entirely.
+            </p>
+            <h4
+              class="font-semibold text-sm text-green-700 dark:text-green-400 mb-1"
+              data-translate="howToStaySafe"
+            >
+              How to stay safe:
+            </h4>
+            <ul
+              class="safe-list text-xs text-gray-600 dark:text-gray-400 space-y-1"
+            >
+              <li data-translate="gamblingTip1">
+                Only use licensed and verified gambling sites regulated by
+                PAGCOR.
+              </li>
+              <li data-translate="gamblingTip2">
+                Avoid pages or messages that promise "sure wins" or ask you to
+                deposit through GCash or personal accounts.
+              </li>
+              <li data-translate="gamblingTip3">
+                Remember: real gambling is never guaranteed — if it sounds too
+                easy, it's likely a scam.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="border-gray-200 dark:border-gray-700 mx-6 mb-8" />
+
+  <div class="px-6 pb-8">
+    <h2
+      class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-5"
+      data-translate="redFlagsTitle"
+    >
+      How to Know If It's a Scam 🚩
+    </h2>
+    <div
+      class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded-lg p-4 shadow-sm"
+    >
+      <h3
+        class="font-bold text-yellow-900 dark:text-yellow-300 mb-3 text-base"
+        data-translate="redFlagsSubtitle"
+      >
+        Look for these Red Flags:
+      </h3>
+      <ul class="text-sm text-gray-800 dark:text-gray-200 space-y-3">
+        <li class="flex items-start">
+          <i
+            class="fas fa-exclamation-circle text-yellow-600 dark:text-yellow-400 mr-3 mt-1 flex-shrink-0"
+          ></i>
+          <div>
+            <strong class="font-semibold" data-translate="redFlag1Title"
+              >Too good to be true:</strong
+            >
+            <span data-translate="redFlag1Desc">
+              If it sounds unbelievable, it probably is.</span
+            >
+          </div>
+        </li>
+        <li class="flex items-start">
+          <i
+            class="fas fa-exclamation-circle text-yellow-600 dark:text-yellow-400 mr-3 mt-1 flex-shrink-0"
+          ></i>
+          <div>
+            <strong class="font-semibold" data-translate="redFlag2Title"
+              >Poor grammar or spelling:</strong
+            >
+            <span data-translate="redFlag2Desc">
+              Many scam messages have awkward or broken English/Tagalog.</span
+            >
+          </div>
+        </li>
+        <li class="flex items-start">
+          <i
+            class="fas fa-exclamation-circle text-yellow-600 dark:text-yellow-400 mr-3 mt-1 flex-shrink-0"
+          ></i>
+          <div>
+            <strong class="font-semibold" data-translate="redFlag3Title"
+              >Pressure tactics:</strong
+            >
+            <span data-translate="redFlag3Desc">
+              Scammers make you act fast "limited offer" or "urgent."</span
+            >
+          </div>
+        </li>
+        <li class="flex items-start">
+          <i
+            class="fas fa-exclamation-circle text-yellow-600 dark:text-yellow-400 mr-3 mt-1 flex-shrink-0"
+          ></i>
+          <div>
+            <strong class="font-semibold" data-translate="redFlag4Title"
+              >Requests for money:</strong
+            >
+            <span data-translate="redFlag4Desc">
+              Legit companies or contests never ask for fees.</span
+            >
+          </div>
+        </li>
+        <li class="flex items-start">
+          <i
+            class="fas fa-exclamation-circle text-yellow-600 dark:text-yellow-400 mr-3 mt-1 flex-shrink-0"
+          ></i>
+          <div>
+            <strong class="font-semibold" data-translate="redFlag5Title"
+              >Unverified sources:</strong
+            >
+            <span data-translate="redFlag5Desc">
+              Check if the message is from an official account.</span
+            >
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="border-gray-200 dark:border-gray-700 mx-6 mb-8" />
+
+  <div class="px-6 pb-8">
+    <h2
+      class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-5"
+      data-translate="practiceTitle"
+    >
+      Practice Spotting a Scam 🧠
+    </h2>
+    <p
+      class="text-sm text-gray-700 dark:text-gray-300 mb-4"
+      data-translate="practiceIntro"
+    >
+      Let's test your awareness. Read the messages below and click "Reveal
+      Answer":
+    </p>
+
+    <div class="space-y-4">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 border-l-4 border-gray-400 dark:border-gray-600"
+        data-answer-type="scam"
+      >
+        <div
+          class="text-xs text-gray-500 dark:text-gray-400 mb-2"
+          data-translate="message1Label"
+        >
+          Message 1
+        </div>
+        <p
+          class="text-sm text-gray-800 dark:text-gray-200 italic mb-3"
+          data-translate="message1Text"
+        >
+          "Congratulations! You've won P10,000. Click this link to claim your
+          prize: bit.ly/claimnow"
+        </p>
+
+        <button
+          onclick="toggleAnswer(this)"
+          class="reveal-button w-full text-center text-xs font-semibold text-white transition-colors py-2 rounded-lg mt-3 bg-gray-400 dark:bg-gray-600 hover:bg-gray-500 dark:hover:bg-gray-500"
+        >
+          <span data-translate="btnReveal">Reveal Answer</span>
+        </button>
+
+        <div
+          class="answer-content hidden mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
+        >
+          <div
+            class="flex items-center text-red-700 dark:text-red-400 font-bold text-sm mb-1"
+          >
+            <i class="fas fa-times-circle mr-2"></i>
+            <span data-translate="answer1Title">That's a scam.</span>
+          </div>
+          <p
+            class="text-xs text-gray-600 dark:text-gray-400"
+            data-translate="answer1Desc"
+          >
+            Real contests contact winners through official channels, not random
+            text messages or short links.
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 border-l-4 border-gray-400 dark:border-gray-600"
+        data-answer-type="scam"
+      >
+        <div
+          class="text-xs text-gray-500 dark:text-gray-400 mb-2"
+          data-translate="message2Label"
+        >
+          Message 2
+        </div>
+        <p
+          class="text-sm text-gray-800 dark:text-gray-200 italic mb-3"
+          data-translate="message2Text"
+        >
+          "Hi, this is your bank. Please verify your account details so we can
+          unlock it."
+        </p>
+
+        <button
+          onclick="toggleAnswer(this)"
+          class="reveal-button w-full text-center text-xs font-semibold text-white transition-colors py-2 rounded-lg mt-3 bg-gray-400 dark:bg-gray-600 hover:bg-gray-500 dark:hover:bg-gray-500"
+        >
+          <span data-translate="btnReveal">Reveal Answer</span>
+        </button>
+
+        <div
+          class="answer-content hidden mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
+        >
+          <div
+            class="flex items-center text-red-700 dark:text-red-400 font-bold text-sm mb-1"
+          >
+            <i class="fas fa-times-circle mr-2"></i>
+            <span data-translate="answer2Title">Also a scam.</span>
+          </div>
+          <p
+            class="text-xs text-gray-600 dark:text-gray-400"
+            data-translate="answer2Desc"
+          >
+            Your bank will never ask for personal details or passwords via SMS
+            or social media.
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 border-l-4 border-gray-400 dark:border-gray-600"
+        data-answer-type="legit"
+      >
+        <div
+          class="text-xs text-gray-500 dark:text-gray-400 mb-2"
+          data-translate="message3Label"
+        >
+          Message 3
+        </div>
+        <p
+          class="text-sm text-gray-800 dark:text-gray-200 italic mb-3"
+          data-translate="message3Text"
+        >
+          "Hi, I'm recruiting part-time data encoders. No fees needed, just
+          internet access and time."
+        </p>
+
+        <button
+          onclick="toggleAnswer(this)"
+          class="reveal-button w-full text-center text-xs font-semibold text-white transition-colors py-2 rounded-lg mt-3 bg-gray-400 dark:bg-gray-600 hover:bg-gray-500 dark:hover:bg-gray-500"
+        >
+          <span data-translate="btnReveal">Reveal Answer</span>
+        </button>
+
+        <div
+          class="answer-content hidden mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
+        >
+          <div
+            class="flex items-center text-green-700 dark:text-green-400 font-bold text-sm mb-1"
+          >
+            <i class="fas fa-check-circle mr-2"></i>
+            <span data-translate="answer3Title"
+              >Legit, but still double-check.</span
+            >
+          </div>
+          <p
+            class="text-xs text-gray-600 dark:text-gray-400"
+            data-translate="answer3Desc"
+          >
+            Since they are not asking for money, the job itself might be
+            legitimate. Always check for a proper job posting or company profile
+            before applying.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="border-gray-200 dark:border-gray-700 mx-6 mb-8" />
+
+  <div class="px-6 pb-8">
+    <h2
+      class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-5"
+      data-translate="protectionTitle"
+    >
+      Simple Habits to Stay Protected 🔒
+    </h2>
+    <div
+      class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-lg p-4 shadow-sm"
+    >
+      <h3
+        class="font-bold text-blue-900 dark:text-blue-300 mb-3 text-base"
+        data-translate="protectionSubtitle"
+      >
+        Be ScamAlam with these simple tips:
+      </h3>
+      <ul class="safe-list text-sm text-gray-800 dark:text-gray-200 space-y-3">
+        <li>
+          <strong class="font-semibold" data-translate="protectionTip1Title"
+            >Protect your OTP and passwords:</strong
+          >
+          <span data-translate="protectionTip1Desc">
+            Don't share your OTP or passwords not even with family.</span
+          >
+        </li>
+        <li>
+          <strong class="font-semibold" data-translate="protectionTip2Title"
+            >Use strong security:</strong
+          >
+          <span data-translate="protectionTip2Desc">
+            Use strong passwords and enable two-factor authentication (2FA) on
+            all accounts.</span
+          >
+        </li>
+        <li>
+          <strong class="font-semibold" data-translate="protectionTip3Title"
+            >Set privacy:</strong
+          >
+          <span data-translate="protectionTip3Desc">
+            Keep your social media profiles private.</span
+          >
+        </li>
+        <li>
+          <strong class="font-semibold" data-translate="protectionTip4Title"
+            >Pause before you click:</strong
+          >
+          <span data-translate="protectionTip4Desc">
+            Before clicking a link, pause and think: "Is this safe?"</span
+          >
+        </li>
+        <li>
+          <strong class="font-semibold" data-translate="protectionTip5Title"
+            >Use ScamAlam:</strong
+          >
+          <span data-translate="protectionTip5Desc">
+            Scan suspicious screenshots or messages with the app to check for
+            threats.</span
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="border-gray-200 dark:border-gray-700 mx-6 mb-8" />
+
+  <div class="px-6 pb-12">
+    <h2
+      class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-5"
+      data-translate="reportTitle"
+    >
+      Report Scams and Get Help 📞
+    </h2>
+    <p
+      class="text-sm text-gray-700 dark:text-gray-300 mb-4"
+      data-translate="reportIntro"
+    >
+      If you've received a suspicious message or think you've been scammed,
+      reporting helps authorities track and stop these criminals.
+    </p>
+
+    <div class="space-y-3">
+      <a
+        href="https://acg.pnp.gov.ph"
+        class="flex items-center bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      >
+        <i
+          class="fas fa-user-shield text-xl text-green-600 dark:text-green-400 mr-3"
+        ></i>
+        <div>
+          <div
+            class="font-semibold text-sm text-gray-900 dark:text-gray-100"
+            data-translate="report1Title"
+          >
+            PNP Anti-Cybercrime Group
+          </div>
+          <div
+            class="text-xs text-gray-500 dark:text-gray-400"
+            data-translate="report1Desc"
+          >
+            For any cybercrime or online scam reports.
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt text-gray-400 text-xs ml-auto"></i>
+      </a>
+      <a
+        href="https://ntc.gov.ph"
+        class="flex items-center bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      >
+        <i
+          class="fas fa-broadcast-tower text-xl text-indigo-600 dark:text-indigo-400 mr-3"
+        ></i>
+        <div>
+          <div
+            class="font-semibold text-sm text-gray-900 dark:text-gray-100"
+            data-translate="report2Title"
+          >
+            National Telecommunications Commission (NTC)
+          </div>
+          <div
+            class="text-xs text-gray-500 dark:text-gray-400"
+            data-translate="report2Desc"
+          >
+            For text and call scam messages.
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt text-gray-400 text-xs ml-auto"></i>
+      </a>
+      <a
+        href="https://www.sec.gov.ph"
+        class="flex items-center bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      >
+        <i
+          class="fas fa-balance-scale text-xl text-amber-600 dark:text-amber-400 mr-3"
+        ></i>
+        <div>
+          <div
+            class="font-semibold text-sm text-gray-900 dark:text-gray-100"
+            data-translate="report3Title"
+          >
+            Securities and Exchange Commission (SEC)
+          </div>
+          <div
+            class="text-xs text-gray-500 dark:text-gray-400"
+            data-translate="report3Desc"
+          >
+            For investment and financial-related scams.
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt text-gray-400 text-xs ml-auto"></i>
+      </a>
+      <a
+        href="https://www.bsp.gov.ph/Inclusive%20Finance/Tools/Protect_yourself_from_Fraud_and_Scam.pdf"
+        class="flex items-center bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      >
+        <i class="fas fa-bank text-xl text-red-600 dark:text-red-400 mr-3"></i>
+        <div>
+          <div
+            class="font-semibold text-sm text-gray-900 dark:text-gray-100"
+            data-translate="report4Title"
+          >
+            Bangko Sentral ng Pilipinas (BSP)
+          </div>
+          <div
+            class="text-xs text-gray-500 dark:text-gray-400"
+            data-translate="report4Desc"
+          >
+            Resource on protecting yourself from fraud and scams.
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt text-gray-400 text-xs ml-auto"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block extra_scripts %}
+<script>
+  let currentSlide = 0;
+  const totalSlides = 3;
+  const track = document.getElementById("carouselTrack");
+  const dots = document.querySelectorAll(".dot");
+
+  function updateCarousel() {
+    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+    // Update dots
+    dots.forEach((dot, index) => {
+      if (index === currentSlide) {
+        dot.classList.add("active");
+      } else {
+        dot.classList.remove("active");
+      }
+    });
+
+    // Haptic feedback
+    if ("vibrate" in navigator) {
+      navigator.vibrate(10);
+    }
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateCarousel();
+  }
+
+  function previousSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    updateCarousel();
+  }
+
+  function goToSlide(index) {
+    currentSlide = index;
+    updateCarousel();
+  }
+
+  // Touch swipe support
+  let touchStartX = 0;
+  let touchEndX = 0;
+  let touchStartY = 0;
+  let touchEndY = 0;
+
+  const carousel = document.querySelector(".carousel-container");
+
+  carousel.addEventListener("touchstart", (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  carousel.addEventListener("touchmove", (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  carousel.addEventListener("touchend", (e) => {
+    handleSwipe();
+  }, { passive: true });
+
+  function handleSwipe() {
+    const swipeThreshold = 50;
+    const diffX = touchStartX - touchEndX;
+    const diffY = Math.abs(touchStartY - touchEndY);
+
+    if (Math.abs(diffX) > swipeThreshold && Math.abs(diffX) > diffY) {
+      if (diffX > 0) {
+        nextSlide();
+      } else {
+        previousSlide();
+      }
+    }
+    
+    touchStartX = 0;
+    touchEndX = 0;
+    touchStartY = 0;
+    touchEndY = 0;
+  }
+    
+  // --- Interactive Quiz Function ---
+  function toggleAnswer(buttonElement) {
+    const parentCard = buttonElement.closest(".bg-white");
+    const answerContent = parentCard.querySelector(".answer-content");
+    const answerType = parentCard.getAttribute("data-answer-type");
+
+    if (answerContent.classList.contains("hidden")) {
+      // Reveal the answer: Add the color border and change button text
+      answerContent.classList.remove("hidden");
+      buttonElement.textContent = "Hide Answer";
+
+      // Remove previous border color and add the correct one
+      parentCard.classList.remove("border-gray-400");
+      if (answerType === "scam") {
+        parentCard.classList.add("border-red-400");
+      } else if (answerType === "legit") {
+        parentCard.classList.add("border-green-500");
+      }
+    } else {
+      // Hide the answer: Remove the color border and change button text
+      answerContent.classList.add("hidden");
+      buttonElement.textContent = "Reveal Answer";
+
+      // Restore the neutral gray border color
+      parentCard.classList.remove("border-red-400", "border-green-500");
+      parentCard.classList.add("border-gray-400");
+    }
+  }
+  // --- End Interactive Quiz Function ---
+
+  // Initialize carousel on load
+  document.addEventListener("DOMContentLoaded", updateCarousel);
+</script>
+{% endblock %}

@@ -1,0 +1,1004 @@
+{% extends "base.html" %} {% block title %}Upload Screenshot - ScamAlam{%
+endblock %} {% block content %}
+<div class="fade-in pb-6">
+  <!-- Header Section -->
+  <div
+    class="bg-brand text-center text-white px-6 py-8 rounded-b-3xl shadow-md"
+  >
+    <h1 class="text-4xl font-semibold mb-2" data-translate="uploadTitle">
+      ScamAlam
+    </h1>
+    <p class="text-blue-100 text-sm" data-translate="uploadSubtitle">
+      Upload a screenshot to detect potential scams
+    </p>
+  </div>
+
+  <!-- Upload Card -->
+  <div class="px-4 mt-6">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-4">
+      <!-- Drop Zone -->
+      <div
+        id="dropZone"
+        class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-brand hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
+      >
+        <div id="dropZoneContent">
+          <div
+            class="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fas fa-cloud-upload-alt text-4xl text-brand"></i>
+          </div>
+          <p
+            class="text-gray-800 dark:text-gray-200 font-medium mb-1"
+            data-translate="uploadTap"
+          >
+            Tap to upload screenshot
+          </p>
+          <p
+            class="text-gray-500 dark:text-gray-400 text-sm"
+            data-translate="uploadFormats"
+          >
+            PNG, JPG, or JPEG (Max 10MB)
+          </p>
+        </div>
+
+        <!-- Image Preview (Hidden Initially) -->
+        <div id="imagePreviewContent" class="hidden">
+          <div class="relative">
+            <img
+              id="imagePreview"
+              class="max-w-full h-64 object-contain mx-auto rounded-lg mb-3"
+            />
+            <button
+              id="clearImageBtn"
+              class="absolute top-2 right-2 w-8 h-8 bg-white dark:bg-gray-700 rounded-full shadow-md flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600"
+            >
+              <i class="fas fa-times text-gray-600 dark:text-gray-300"></i>
+            </button>
+          </div>
+          <div class="flex justify-center space-x-3">
+            <button
+              id="cropImageBtn"
+              class="px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700"
+            >
+              <i class="fas fa-crop mr-2"></i> Crop
+            </button>
+          </div>
+          <p id="fileName" class="text-sm text-gray-600 dark:text-gray-400"></p>
+        </div>
+
+        <input type="file" id="fileInput" class="hidden" accept="image/*" />
+      </div>
+
+      <!-- Analyze Button -->
+      <button
+        id="analyzeBtn"
+        disabled
+        class="w-full mt-6 bg-brand text-white font-semibold py-4 rounded-xl hover:bg-blue-700 transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed flex items-center justify-center"
+      >
+        <span id="analyzeText" data-translate="uploadSelectImage"
+          >Select an image to analyze</span
+        >
+        <i id="loadingSpinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+      </button>
+    </div>
+
+    <!-- Advanced Settings Card -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden mb-4"
+    >
+      <button
+        id="advancedToggle"
+        class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      >
+        <div class="flex items-center">
+          <i class="fas fa-sliders-h text-brand mr-3"></i>
+          <span
+            class="font-medium text-gray-800 dark:text-gray-200"
+            data-translate="uploadAdvanced"
+          >
+            Advanced Settings
+          </span>
+        </div>
+        <i
+          id="advancedArrow"
+          class="fas fa-chevron-down text-gray-400 dark:text-gray-500 transition-transform"
+        ></i>
+      </button>
+
+      <div
+        id="advancedSettings"
+        class="hidden px-6 pb-6 border-t border-gray-100 dark:border-gray-700"
+      >
+        <div class="pt-4 space-y-4">
+          <!-- Text Analysis Model -->
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              <i class="fas fa-font text-brand mr-2"></i>
+              <span data-translate="uploadTextModel">Text Analysis Model</span>
+            </label>
+            <select
+              id="textModel"
+              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand focus:border-transparent"
+            >
+              <option value="svm">SVM (Support Vector Machine)</option>
+              <option value="rf" selected>Random Forest</option>
+              <option value="nb">Naive Bayes</option>
+              <!-- <option value="bert" disabled>BERT</option> -->
+            </select>
+          </div>
+
+          <!-- CNN Model -->
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              <i class="fas fa-image text-brand mr-2"></i>
+              <span data-translate="uploadImageModel"
+                >Image Analysis Model</span
+              >
+            </label>
+            <select
+              id="cnnModel"
+              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand focus:border-transparent"
+            >
+              <option value="alexnet" disabled>AlexNet</option>
+              <option value="vggnet" selected>VGGNet</option>
+              <option value="resnet">ResNet</option>
+              <option value="mobilenet">MobileNet</option>
+              <option value="efficientnet">EfficientNet</option>
+            </select>
+          </div>
+
+          <!-- Model Weights -->
+          <div class="pt-2">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
+              data-translate="uploadWeights"
+            >
+              Model Weights
+            </label>
+
+            <div class="space-y-3">
+              <div>
+                <div
+                  class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1"
+                >
+                  <span data-translate="uploadTextAnalysis">Text Analysis</span>
+                  <span id="textWeightValue" class="font-semibold text-brand"
+                    >70%</span
+                  >
+                </div>
+                <input
+                  type="range"
+                  id="textWeight"
+                  min="0"
+                  max="100"
+                  value="70"
+                  class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-gray-600 accent-brand"
+                />
+              </div>
+
+              <div>
+                <div
+                  class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1"
+                >
+                  <span data-translate="uploadImageAnalysis"
+                    >Image Analysis</span
+                  >
+                  <span id="cnnWeightValue" class="font-semibold text-brand"
+                    >30%</span
+                  >
+                </div>
+                <input
+                  type="range"
+                  id="cnnWeight"
+                  min="0"
+                  max="100"
+                  value="30"
+                  class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-gray-600 accent-brand"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Card -->
+    <div
+      class="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 flex items-start"
+    >
+      <div
+        class="w-10 h-10 bg-brand rounded-full flex items-center justify-center flex-shrink-0 mr-3"
+      >
+        <i class="fas fa-info text-white"></i>
+      </div>
+      <div>
+        <p
+          class="text-sm text-gray-700 dark:text-gray-300 font-medium mb-1"
+          data-translate="uploadInfoTitle"
+        >
+          How it works
+        </p>
+        <p
+          class="text-xs text-gray-600 dark:text-gray-400"
+          data-translate="uploadInfoDesc"
+        >
+          Our AI analyzes both text and visual elements in your screenshot to
+          detect potential scams with high accuracy.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analysis Progress Modal -->
+  <div
+    id="analysisModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+  >
+    <div
+      class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in"
+    >
+      <!-- Header -->
+      <div class="text-center mb-6">
+        <div
+          class="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <i class="fas fa-shield-alt text-4xl text-brand"></i>
+        </div>
+        <h3
+          class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2"
+          data-translate="modalAnalyzing"
+        >
+          Analyzing Screenshot
+        </h3>
+        <p
+          class="text-sm text-gray-600 dark:text-gray-400"
+          data-translate="modalWait"
+        >
+          Please wait while we scan for potential scams
+        </p>
+      </div>
+
+      <!-- Progress Steps -->
+      <div class="space-y-4 mb-6">
+        <!-- Step 1: Upload -->
+        <div
+          id="step1"
+          class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mr-4 flex-shrink-0"
+          >
+            <i class="fas fa-upload text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p
+              class="font-semibold text-gray-800 dark:text-gray-200"
+              data-translate="modalStep1Title"
+            >
+              Processing Image
+            </p>
+            <p
+              class="text-xs text-gray-500 dark:text-gray-400"
+              data-translate="modalStep1Desc"
+            >
+              Preparing screenshot for analysis
+            </p>
+          </div>
+          <div id="step1-spinner" class="hidden">
+            <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
+          </div>
+          <div id="step1-check" class="hidden">
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+          </div>
+        </div>
+
+        <!-- Step 2: Text Extraction -->
+        <div
+          id="step2"
+          class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mr-4 flex-shrink-0"
+          >
+            <i class="fas fa-font text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p
+              class="font-semibold text-gray-800 dark:text-gray-200"
+              data-translate="modalStep2Title"
+            >
+              Extracting Text
+            </p>
+            <p
+              class="text-xs text-gray-500 dark:text-gray-400"
+              data-translate="modalStep2Desc"
+            >
+              Reading content from image
+            </p>
+          </div>
+          <div id="step2-spinner" class="hidden">
+            <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
+          </div>
+          <div id="step2-check" class="hidden">
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+          </div>
+        </div>
+
+        <!-- Step 3: Text Analysis -->
+        <div
+          id="step3"
+          class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mr-4 flex-shrink-0"
+          >
+            <i class="fas fa-brain text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p
+              class="font-semibold text-gray-800 dark:text-gray-200"
+              data-translate="modalStep3Title"
+            >
+              Text Analysis
+            </p>
+            <p
+              class="text-xs text-gray-500 dark:text-gray-400"
+              data-translate="modalStep3Desc"
+            >
+              Scanning for suspicious language
+            </p>
+          </div>
+          <div id="step3-spinner" class="hidden">
+            <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
+          </div>
+          <div id="step3-check" class="hidden">
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+          </div>
+        </div>
+
+        <!-- Step 4: Image Analysis -->
+        <div
+          id="step4"
+          class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mr-4 flex-shrink-0"
+          >
+            <i class="fas fa-image text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p
+              class="font-semibold text-gray-800 dark:text-gray-200"
+              data-translate="modalStep4Title"
+            >
+              Visual Analysis
+            </p>
+            <p
+              class="text-xs text-gray-500 dark:text-gray-400"
+              data-translate="modalStep4Desc"
+            >
+              Examining image patterns
+            </p>
+          </div>
+          <div id="step4-spinner" class="hidden">
+            <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
+          </div>
+          <div id="step4-check" class="hidden">
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+          </div>
+        </div>
+
+        <!-- Step 5: Final Result -->
+        <div
+          id="step5"
+          class="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 transition-all"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mr-4 flex-shrink-0"
+          >
+            <i class="fas fa-chart-line text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p
+              class="font-semibold text-gray-800 dark:text-gray-200"
+              data-translate="modalStep5Title"
+            >
+              Generating Results
+            </p>
+            <p
+              class="text-xs text-gray-500 dark:text-gray-400"
+              data-translate="modalStep5Desc"
+            >
+              Calculating confidence scores
+            </p>
+          </div>
+          <div id="step5-spinner" class="hidden">
+            <i class="fas fa-spinner fa-spin text-brand text-xl"></i>
+          </div>
+          <div id="step5-check" class="hidden">
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overall Progress Bar -->
+      <div class="mb-4">
+        <div
+          class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-2"
+        >
+          <span data-translate="modalProgress">Overall Progress</span>
+          <span id="overallProgress">0%</span>
+        </div>
+        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+          <div
+            id="progressBar"
+            class="bg-brand h-2 rounded-full transition-all duration-500"
+            style="width: 0%"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Crop Modal -->
+  <div
+    id="cropModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
+  >
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 w-full max-w-2xl"
+    >
+      <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+        Crop Image
+      </h2>
+      <div class="w-full max-h-[70vh] overflow-auto flex justify-center">
+        <img id="cropImage" class="max-h-[60vh] object-contain rounded-lg" />
+      </div>
+      <div class="mt-4 flex justify-end space-x-3">
+        <button
+          id="cancelCropBtn"
+          class="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600"
+        >
+          Cancel
+        </button>
+        <button
+          id="applyCropBtn"
+          class="px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700"
+        >
+          Apply
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<style>
+  @keyframes scale-in {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out;
+  }
+
+  #analysisModal .bg-gray-50,
+  #analysisModal .dark .bg-gray-700 {
+    transition: all 0.3s ease;
+  }
+
+  #analysisModal .bg-gray-50.active,
+  .dark #analysisModal .bg-gray-700.active {
+    background-color: #eff6ff;
+    border: 2px solid #2563eb;
+  }
+
+  .dark #analysisModal .bg-gray-700.active {
+    background-color: #1e3a8a;
+  }
+
+  #analysisModal .bg-gray-50.active .bg-gray-300,
+  .dark #analysisModal .bg-gray-700.active .bg-gray-600 {
+    background-color: #2563eb;
+  }
+
+  #analysisModal .bg-gray-50.completed,
+  .dark #analysisModal .bg-gray-700.completed {
+    background-color: #f0fdf4;
+  }
+
+  .dark #analysisModal .bg-gray-700.completed {
+    background-color: #14532d;
+  }
+
+  #analysisModal .bg-gray-50.completed .bg-gray-300,
+  .dark #analysisModal .bg-gray-700.completed .bg-gray-600 {
+    background-color: #22c55e;
+  }
+</style>
+
+<script>
+  // Translations for upload page
+  const translations = {
+    en: {
+      uploadTitle: "ScamAlam",
+      uploadSubtitle: "Upload a screenshot to detect potential scams",
+      uploadTap: "Tap to upload screenshot",
+      uploadFormats: "PNG, JPG, or JPEG (Max 10MB)",
+      uploadSelectImage: "Select an image to analyze",
+      uploadAnalyze: "Analyze Screenshot",
+      uploadAdvanced: "Advanced Settings",
+      uploadTextModel: "Text Analysis Model",
+      uploadImageModel: "Image Analysis Model",
+      uploadWeights: "Model Weights",
+      uploadTextAnalysis: "Text Analysis",
+      uploadImageAnalysis: "Image Analysis",
+      uploadInfoTitle: "How it works",
+      uploadInfoDesc:
+        "Our AI analyzes both text and visual elements in your screenshot to detect potential scams with high accuracy.",
+      modalAnalyzing: "Analyzing Screenshot",
+      modalWait: "Please wait while we scan for potential scams",
+      modalStep1Title: "Processing Image",
+      modalStep1Desc: "Preparing screenshot for analysis",
+      modalStep2Title: "Extracting Text",
+      modalStep2Desc: "Reading content from image",
+      modalStep3Title: "Text Analysis",
+      modalStep3Desc: "Scanning for suspicious language",
+      modalStep4Title: "Visual Analysis",
+      modalStep4Desc: "Examining image patterns",
+      modalStep5Title: "Generating Results",
+      modalStep5Desc: "Calculating confidence scores",
+      modalProgress: "Overall Progress",
+      errorFileType: "Please select an image file (PNG, JPG, or JPEG)",
+      errorFileSize: "File size must be less than 10MB",
+      errorAnalysis: "Analysis failed: ",
+    },
+    fil: {
+      uploadTitle: "ScamAlam",
+      uploadSubtitle:
+        "Mag-upload ng screenshot para madetect ang mga posibleng scam",
+      uploadTap: "Pindutin para mag-upload ng screenshot",
+      uploadFormats: "PNG, JPG, o JPEG (Max 10MB)",
+      uploadSelectImage: "Pumili ng larawan para suriin",
+      uploadAnalyze: "Suriin ang Screenshot",
+      uploadAdvanced: "Advanced na Setting",
+      uploadTextModel: "Text Analysis Model",
+      uploadImageModel: "Image Analysis Model",
+      uploadWeights: "Timbang ng Model",
+      uploadTextAnalysis: "Text Analysis",
+      uploadImageAnalysis: "Image Analysis",
+      uploadInfoTitle: "Paano ito gumagana",
+      uploadInfoDesc:
+        "Sinusuri ng aming AI ang text at visual elements sa iyong screenshot para madetect ang mga potensyal na scam nang may mataas na accuracy.",
+      modalAnalyzing: "Sinusuri ang Screenshot",
+      modalWait:
+        "Mangyaring maghintay habang sinusuri namin ang mga posibleng scam",
+      modalStep1Title: "Pinoproseso ang Larawan",
+      modalStep1Desc: "Inihahanda ang screenshot para sa pagsusuri",
+      modalStep2Title: "Kinukuha ang Text",
+      modalStep2Desc: "Binabasa ang content mula sa larawan",
+      modalStep3Title: "Text Analysis",
+      modalStep3Desc: "Sinusuri ang mga kahina-hinalang salita",
+      modalStep4Title: "Visual Analysis",
+      modalStep4Desc: "Sinusuri ang mga pattern sa larawan",
+      modalStep5Title: "Ginagawa ang mga Resulta",
+      modalStep5Desc: "Kinakalkula ang confidence scores",
+      modalProgress: "Kabuuang Progress",
+      errorFileType: "Mangyaring pumili ng image file (PNG, JPG, o JPEG)",
+      errorFileSize: "Ang laki ng file ay dapat mas mababa sa 10MB",
+      errorAnalysis: "Nabigo ang pagsusuri: ",
+    },
+  };
+
+  // Apply translations
+  function applyTranslations() {
+    const lang = localStorage.getItem("language") || "en";
+    const t = translations[lang];
+
+    document.querySelectorAll("[data-translate]").forEach((el) => {
+      const key = el.getAttribute("data-translate");
+      if (t[key]) {
+        el.textContent = t[key];
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Apply translations on load
+    applyTranslations();
+
+    const dropZone = document.getElementById("dropZone");
+    const fileInput = document.getElementById("fileInput");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const imagePreview = document.getElementById("imagePreview");
+    const imagePreviewContent = document.getElementById("imagePreviewContent");
+    const dropZoneContent = document.getElementById("dropZoneContent");
+    const clearImageBtn = document.getElementById("clearImageBtn");
+    const fileName = document.getElementById("fileName");
+    const analyzeText = document.getElementById("analyzeText");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+    const analysisModal = document.getElementById("analysisModal");
+
+    // Advanced settings
+    const advancedToggle = document.getElementById("advancedToggle");
+    const advancedSettings = document.getElementById("advancedSettings");
+    const advancedArrow = document.getElementById("advancedArrow");
+    const textWeightSlider = document.getElementById("textWeight");
+    const cnnWeightSlider = document.getElementById("cnnWeight");
+    const textWeightValue = document.getElementById("textWeightValue");
+    const cnnWeightValue = document.getElementById("cnnWeightValue");
+
+    let cropper;
+    const cropModal = document.getElementById("cropModal");
+    const cropImage = document.getElementById("cropImage");
+    const cropImageBtn = document.getElementById("cropImageBtn");
+    const cancelCropBtn = document.getElementById("cancelCropBtn");
+    const applyCropBtn = document.getElementById("applyCropBtn");
+
+    cropImageBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent clicking the drop zone
+      if (!originalImageData) return;
+      cropImage.src = originalImageData;
+      cropModal.classList.remove("hidden");
+
+      cropImage.onload = () => {
+        cropper = new Cropper(cropImage, {
+          aspectRatio: NaN, // free crop
+          viewMode: 1,
+          background: false,
+          movable: true,
+          zoomable: true,
+        });
+      };
+    });
+
+    cancelCropBtn.addEventListener("click", () => {
+      cropper.destroy();
+      cropModal.classList.add("hidden");
+    });
+
+    applyCropBtn.addEventListener("click", () => {
+      const canvas = cropper.getCroppedCanvas({
+        width: 800,
+        imageSmoothingQuality: "high",
+      });
+
+      // Convert the cropped canvas to a blob and file object
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return;
+
+          // Get the original filename or use default
+          const originalName = selectedFile ? selectedFile.name : "image.jpg";
+          const fileExtension = originalName.split(".").pop();
+          const baseName =
+            originalName.substring(0, originalName.lastIndexOf(".")) ||
+            originalName;
+
+          // Replace selected file with cropped version
+          selectedFile = new File(
+            [blob],
+            `${baseName}_cropped.${fileExtension}`,
+            {
+              type: "image/jpeg",
+            }
+          );
+
+          // Update preview and originalImageData
+          // Clean up old blob URL to prevent memory leak
+          if (originalImageData && originalImageData.startsWith("blob:")) {
+            URL.revokeObjectURL(originalImageData);
+          }
+
+          // Create new blob URL for preview
+          const croppedDataUrl = URL.createObjectURL(blob);
+          imagePreview.src = croppedDataUrl;
+          originalImageData = croppedDataUrl;
+
+          // Update filename display
+          fileName.textContent = selectedFile.name;
+
+          cropper.destroy();
+          cropModal.classList.add("hidden");
+        },
+        "image/jpeg",
+        0.95
+      );
+    });
+
+    let selectedFile = null;
+    let originalImageData = null;
+
+    // Get current language
+    const lang = localStorage.getItem("language") || "en";
+    const t = translations[lang];
+
+    // Drop zone click
+    dropZone.addEventListener("click", () => fileInput.click());
+
+    // File selection
+    fileInput.addEventListener("change", handleFileSelect);
+
+    // Drag and drop
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add(
+        "border-brand",
+        "bg-blue-50",
+        "dark:bg-blue-900/20"
+      );
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove(
+        "border-brand",
+        "bg-blue-50",
+        "dark:bg-blue-900/20"
+      );
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove(
+        "border-brand",
+        "bg-blue-50",
+        "dark:bg-blue-900/20"
+      );
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        handleFileSelect({ target: { files: files } });
+      }
+    });
+
+    // Clear image
+    clearImageBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      clearImage();
+    });
+
+    // Advanced settings toggle
+    advancedToggle.addEventListener("click", () => {
+      advancedSettings.classList.toggle("hidden");
+      advancedArrow.classList.toggle("rotate-180");
+    });
+
+    // Weight sliders
+    textWeightSlider.addEventListener("input", (e) => {
+      const value = parseInt(e.target.value);
+      textWeightValue.textContent = value + "%";
+      cnnWeightSlider.value = 100 - value;
+      cnnWeightValue.textContent = 100 - value + "%";
+    });
+
+    cnnWeightSlider.addEventListener("input", (e) => {
+      const value = parseInt(e.target.value);
+      cnnWeightValue.textContent = value + "%";
+      textWeightSlider.value = 100 - value;
+      textWeightValue.textContent = 100 - value + "%";
+    });
+
+    // Analyze button
+    analyzeBtn.addEventListener("click", analyzeImage);
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Validate file type
+      if (!file.type.match("image.*")) {
+        alert(t.errorFileType);
+        return;
+      }
+
+      // Validate file size (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert(t.errorFileSize);
+        return;
+      }
+
+      selectedFile = file;
+
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        originalImageData = event.target.result;
+        imagePreview.src = originalImageData;
+        fileName.textContent = file.name;
+        dropZoneContent.classList.add("hidden");
+        imagePreviewContent.classList.remove("hidden");
+        analyzeBtn.disabled = false;
+        analyzeText.textContent = t.uploadAnalyze;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearImage() {
+      selectedFile = null;
+      originalImageData = null;
+      fileInput.value = "";
+      imagePreview.src = "";
+      fileName.textContent = "";
+      dropZoneContent.classList.remove("hidden");
+      imagePreviewContent.classList.add("hidden");
+      analyzeBtn.disabled = true;
+      analyzeText.textContent = t.uploadSelectImage;
+    }
+
+    async function analyzeImage() {
+      if (!selectedFile) return;
+
+      // Show modal and reset progress
+      analysisModal.classList.remove("hidden");
+      resetProgressSteps();
+
+      // Get settings
+      const textModel = document.getElementById("textModel").value;
+      const cnnModel = document.getElementById("cnnModel").value;
+      const textWeight = parseInt(textWeightSlider.value) / 100;
+      const cnnWeight = parseInt(cnnWeightSlider.value) / 100;
+
+      // Prepare form data
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("text_model", textModel);
+      formData.append("cnn_model", cnnModel);
+      formData.append("text_weight", textWeight);
+      formData.append("cnn_weight", cnnWeight);
+
+      try {
+        // Start analysis and get session ID
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to start analysis");
+        }
+
+        const { session_id } = await response.json();
+
+        // Connect to SSE for real-time progress updates
+        const eventSource = new EventSource(`/api/progress/${session_id}`);
+
+        eventSource.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+
+          if (data.error) {
+            eventSource.close();
+            analysisModal.classList.add("hidden");
+            alert("Analysis error: " + data.error);
+            return;
+          }
+
+          if (data.step === "complete") {
+            eventSource.close();
+
+            // Store results
+            const resultsData = {
+              ...data.message,
+              original_image: originalImageData,
+              settings: {
+                text_model: textModel,
+                cnn_model: cnnModel,
+                text_weight: textWeight,
+                cnn_weight: cnnWeight,
+              },
+            };
+
+            // Navigate to results
+            sessionStorage.setItem(
+              "analysisResults",
+              JSON.stringify(resultsData)
+            );
+            window.location.href = "/results";
+          } else if (data.step === "error") {
+            eventSource.close();
+            analysisModal.classList.add("hidden");
+            alert("Analysis error: " + data.message);
+          } else {
+            // Update progress for specific step
+            updateStepProgress(data.step, data.progress, data.message);
+          }
+        };
+
+        eventSource.onerror = (error) => {
+          console.error("SSE Error:", error);
+          eventSource.close();
+          analysisModal.classList.add("hidden");
+          alert("Connection error. Please try again.");
+        };
+      } catch (error) {
+        console.error("Error:", error);
+        analysisModal.classList.add("hidden");
+        alert("Analysis failed: " + error.message);
+      }
+    }
+
+    // ADD THESE NEW FUNCTIONS:
+    function resetProgressSteps() {
+      // Reset all steps to initial state
+      for (let i = 1; i <= 5; i++) {
+        const stepEl = document.getElementById(`step${i}`);
+        const spinner = document.getElementById(`step${i}-spinner`);
+        const check = document.getElementById(`step${i}-check`);
+
+        stepEl.classList.remove(
++         "active",
++         "completed",
+          "bg-blue-50",
+          "dark:bg-blue-900/30",
+          "bg-green-50",
+          "dark:bg-green-900/30"
+        );
+        stepEl.classList.add("bg-gray-50", "dark:bg-gray-700");
+        spinner.classList.add("hidden");
+        check.classList.add("hidden");
+      }
+
+      // Reset progress bar
+      document.getElementById("progressBar").style.width = "0%";
+      document.getElementById("overallProgress").textContent = "0%";
+    }
+
+    function updateStepProgress(stepNum, overallProgress, message) {
+      // Update each step's visual state
+      for (let i = 1; i <= 5; i++) {
+        const stepEl = document.getElementById(`step${i}`);
+        const spinner = document.getElementById(`step${i}-spinner`);
+        const check = document.getElementById(`step${i}-check`);
+
+        // Clear previous states first
+        stepEl.classList.remove("active", "completed");
+
+        if (i < stepNum) {
+          // Completed steps - green with checkmark
+          stepEl.classList.add("completed");
+          spinner.classList.add("hidden");
+          check.classList.remove("hidden");
+        } else if (i === stepNum) {
+          // Current step - blue with spinner
+          stepEl.classList.add("active");
+          spinner.classList.remove("hidden");
+          check.classList.add("hidden");
+        } else {
+          // Future steps - gray
+          spinner.classList.add("hidden");
+          check.classList.add("hidden");
+        }
+      }
+
+      // Update progress bar
+      document.getElementById("progressBar").style.width =
+        overallProgress + "%";
+      document.getElementById("overallProgress").textContent =
+        Math.round(overallProgress) + "%";
+    }
+
+    // Listen for language changes
+    window.addEventListener("storage", function (e) {
+      if (e.key === "language") {
+        applyTranslations();
+        // Update button text if image is selected
+        if (selectedFile) {
+          const lang = localStorage.getItem("language") || "en";
+          analyzeText.textContent = translations[lang].uploadAnalyze;
+        } else {
+          const lang = localStorage.getItem("language") || "en";
+          analyzeText.textContent = translations[lang].uploadSelectImage;
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

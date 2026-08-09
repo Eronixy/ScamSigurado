@@ -1,0 +1,74 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_started
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+psycopg://scamsigurado:scamsigurado@postgres:5432/scamsigurado
+      ML_RUNTIME_URL: http://ml-runtime:8000
+      WEB_ORIGINS: http://localhost:3000,http://localhost:3001
+      API_MAX_UPLOAD_BYTES: 10485760
+      RESULT_RETENTION_DAYS: 30
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ml-runtime:
+        condition: service_healthy
+    command: ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+
+  ml-runtime:
+    build:
+      context: .
+      dockerfile: services/ml-runtime/Dockerfile
+    environment:
+      APP_ENV: development
+      ML_MODEL_DIR: /app/models
+      ML_TEMP_DIR: /tmp/scamsigurado-ml
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/internal/v1/ready')",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: scamsigurado
+      POSTGRES_USER: scamsigurado
+      POSTGRES_PASSWORD: scamsigurado
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scamsigurado -d scamsigurado"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
