@@ -1,8 +1,6 @@
 :80 {
   request_body {
-    # The application still validates files at 10 MB. Leave room for multipart
-    # request metadata so an otherwise valid 10 MB image reaches FastAPI.
-    max_size 12MB
+    max_size 10MB
   }
 
   reverse_proxy api:8000
