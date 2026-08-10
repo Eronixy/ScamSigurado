@@ -28,7 +28,7 @@ class ScamDetector:
     def analyze(self, image_path: Path, options: AnalysisOptions) -> dict:
         options.validate()
         extracted_text = text.extract_text_from_image(str(image_path))
-        text_probability = text.predict_scam_probability(
+        text_probability, feature_importance = text.analyze_text(
             extracted_text, options.text_model, self.registry
         )
         image_probability = image.predict_scam_probability(
@@ -49,9 +49,7 @@ class ScamDetector:
             "text_confidence": text_probability,
             "image_confidence": image_probability,
             "extracted_text": extracted_text[:500],
-            "feature_importance": text.get_feature_importance(
-                extracted_text, options.text_model, self.registry
-            ),
+            "feature_importance": feature_importance,
             "detected_urls": heuristics.detect_urls(extracted_text),
             "high_risk_keywords": heuristics.detect_high_risk_keywords(extracted_text),
         }

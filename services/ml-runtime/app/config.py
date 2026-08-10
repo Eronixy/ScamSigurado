@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     default_image_model: str = "vggnet"
     default_text_weight: float = 0.7
     default_image_weight: float = 0.3
-    model_version: str = "legacy-model-set-1"
+    model_version: str = "model-set-1-training-aligned-v2"
 
 
 @lru_cache

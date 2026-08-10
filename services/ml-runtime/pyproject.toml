@@ -5,6 +5,7 @@ description = "Private ML and OCR inference runtime for ScamSigurado"
 requires-python = ">=3.11,<3.13"
 dependencies = [
     "fastapi>=0.115,<1",
+    "nltk>=3.9,<4",
     "numpy>=2.0,<3",
     "opencv-python-headless>=4.10,<5",
     "pillow>=10,<12",
