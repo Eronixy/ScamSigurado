@@ -6,7 +6,7 @@ export const analysisStatuses = [
   "Dispatching payload to Public API Gateway...",
   "Extracting text content from screenshot...",
   "Routing request to private ML runtime...",
-  "Computing multimodal threat confidence score...",
+  "Computing multimodal scam risk score...",
 ] as const;
 
 export function useAnalysisModal() {

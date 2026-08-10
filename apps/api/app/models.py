@@ -26,7 +26,7 @@ class Analysis(Base):
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="processing")
     prediction: Mapped[str | None] = mapped_column(String(20), nullable=True)
-    confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    scam_risk: Mapped[float | None] = mapped_column(Float, nullable=True)
     text_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
     image_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
     extracted_text: Mapped[str | None] = mapped_column(Text, nullable=True)

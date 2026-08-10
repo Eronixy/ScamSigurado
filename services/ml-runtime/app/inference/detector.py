@@ -38,11 +38,14 @@ class ScamDetector:
         combined_probability = (
             options.text_weight * text_probability + options.image_weight * image_probability
         ) / total_weight
+        # This is a scam probability, not a model-confidence value. Keeping it
+        # unflipped means 10% always means low scam risk, regardless of the
+        # resulting classification.
         is_scam = combined_probability > 0.5
 
         return {
             "prediction": "scam" if is_scam else "legitimate",
-            "confidence": combined_probability if is_scam else 1 - combined_probability,
+            "scam_risk": combined_probability,
             "text_confidence": text_probability,
             "image_confidence": image_probability,
             "extracted_text": extracted_text[:500],

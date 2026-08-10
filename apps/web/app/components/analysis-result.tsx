@@ -125,10 +125,10 @@ export function AnalysisResultView({ analysisId }: { analysisId: string }) {
           </div>
           <div className="w-fit border-[4px] border-black bg-[#FFFDF5] px-4 py-3 text-center shadow-[4px_4px_0px_0px_#000]">
             <strong className="block font-mono text-3xl font-black">
-              {Math.round((analysis.confidence ?? 0) * 100)}%
+              {Math.round((analysis.scam_risk ?? 0) * 100)}%
             </strong>
             <span className="font-black text-[0.65rem] tracking-widest uppercase">
-              confidence
+              scam risk
             </span>
           </div>
         </div>

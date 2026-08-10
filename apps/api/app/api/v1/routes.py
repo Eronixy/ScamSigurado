@@ -53,7 +53,7 @@ async def create_analysis(
         )
         analysis.status = "completed"
         analysis.prediction = result["prediction"]
-        analysis.confidence = result["confidence"]
+        analysis.scam_risk = result["scam_risk"]
         analysis.text_confidence = result["text_confidence"]
         analysis.image_confidence = result["image_confidence"]
         analysis.extracted_text = result["extracted_text"]
@@ -126,7 +126,7 @@ def _analysis_response(analysis: Analysis) -> AnalysisResult:
         id=analysis.id,
         status=analysis.status,
         prediction=analysis.prediction,
-        confidence=analysis.confidence,
+        scam_risk=analysis.scam_risk,
         text_confidence=analysis.text_confidence,
         image_confidence=analysis.image_confidence,
         extracted_text=analysis.extracted_text,

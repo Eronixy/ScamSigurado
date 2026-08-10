@@ -10,7 +10,7 @@ class FeatureImportance(BaseModel):
 
 class AnalysisResponse(BaseModel):
     prediction: Literal["scam", "legitimate"]
-    confidence: float = Field(ge=0, le=1)
+    scam_risk: float = Field(ge=0, le=1)
     text_confidence: float = Field(ge=0, le=1)
     image_confidence: float = Field(ge=0, le=1)
     extracted_text: str
