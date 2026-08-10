@@ -20,7 +20,7 @@ class AnalysisResult(BaseModel):
     id: UUID
     status: Literal["completed", "failed", "processing"]
     prediction: Literal["scam", "legitimate"] | None = None
-    confidence: float | None = Field(default=None, ge=0, le=1)
+    scam_risk: float | None = Field(default=None, ge=0, le=1)
     text_confidence: float | None = Field(default=None, ge=0, le=1)
     image_confidence: float | None = Field(default=None, ge=0, le=1)
     extracted_text: str | None = None

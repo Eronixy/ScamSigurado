@@ -9,7 +9,7 @@ export type AnalysisResult = {
   id: string;
   status: AnalysisStatus;
   prediction: "scam" | "legitimate" | null;
-  confidence: number | null;
+  scam_risk: number | null;
   text_confidence: number | null;
   image_confidence: number | null;
   extracted_text: string | null;
